@@ -52,599 +52,271 @@ footer{text-align:center;color:#817581;font-size:12px;padding:22px}
 <button class="tab" id="clientTab" onclick="show('client')">Reservar turno</button>
 <button class="tab" id="adminTab" onclick="show('admin')">Administración</button>
 </nav>
-
 <div id="status" class="status">Conectando con la agenda…</div>
-
 <section id="home" class="panel" style="text-align:center;padding:35px 18px">
-<h2>Bienvenida a MG Estética</h2>
-<p class="muted">Elegí qué querés hacer</p>
+<h2>Bienvenida a MG Estética</h2><p class="muted">Elegí qué querés hacer</p>
 <button class="primary" style="width:100%;margin:10px 0;padding:16px" onclick="show('client')">Reservar turno</button>
 <button class="secondary" style="width:100%;margin:10px 0;padding:16px" onclick="show('admin')">Administración</button>
 </section>
-
 <section id="client" class="hidden">
 <div class="panel"><h2>Servicios disponibles</h2><div id="services" class="grid"></div></div>
-<div class="panel">
-<h2>Consultá horarios</h2>
+<div class="panel"><h2>Consultá horarios</h2>
 <label>Fecha</label><input id="date" type="date">
 <label>Servicio</label><select id="servicePick"></select>
-<p class="muted">Verde: disponible · Gris: ocupado. Reservas con al menos 48 horas de anticipación.</p>
-<div id="slots" class="slots"></div>
+<p class="muted">Verde: disponible · Gris: ocupado. Reservas con al menos 48 horas de anticipación.</p><div id="slots" class="slots"></div>
 </div>
-<div id="booking" class="panel hidden">
-<h2>Solicitud de reserva</h2>
+<div id="booking" class="panel hidden"><h2>Solicitud de reserva</h2>
 <p id="chosen" class="notice"></p><p id="depositInfo" class="notice"></p>
 <label>Nombre y apellido</label><input id="custName" autocomplete="name" placeholder="Tu nombre">
 <label>WhatsApp</label><input id="custPhone" inputmode="tel" autocomplete="tel" placeholder="11...">
 <button class="primary" style="width:100%;margin-top:14px" onclick="book()">Solicitar turno y enviar WhatsApp</button>
-<p class="muted">La reserva queda pendiente hasta verificar la seña.</p>
-</div>
+<p class="muted">La reserva queda pendiente hasta verificar la seña.</p></div>
 <div class="panel"><p class="notice"><b>Política de turnos:</b> reservar con 48 horas de anticipación. Cancelaciones o reprogramaciones con al menos 24 horas de anticipación. Las señas no se reintegran. Contacto: <span id="contactDisplay"></span>.</p></div>
 </section>
-
 <section id="admin" class="hidden">
-<div class="panel" id="loginPanel">
-<h2>Ingreso de administración</h2>
+<div class="panel" id="loginPanel"><h2>Ingreso de administración</h2>
 <label>Email</label><input id="email" type="email" autocomplete="username">
 <label>Contraseña</label><input id="password" type="password" autocomplete="current-password">
 <button class="primary" id="loginButton" style="margin-top:12px" onclick="login()">Ingresar</button>
-<p class="muted">Acceso mediante Firebase Authentication.</p>
-<p id="loginError" class="status error hidden" role="alert"></p>
+<p class="muted">Acceso mediante Firebase Authentication.</p><p id="loginError" class="status error hidden" role="alert"></p>
 </div>
-
 <div id="adminArea" class="hidden">
 <div class="panel"><div class="row"><h2>Administración</h2><button class="secondary" onclick="logout()">Cerrar sesión</button></div></div>
-
-<div class="panel">
-<h2>Datos de pago y contacto</h2>
-<div class="grid">
-<div><label>Alias de Mercado Pago</label><input id="payAlias"></div>
-<div><label>Titular</label><input id="payHolder"></div>
+<div class="panel"><h2>Datos de pago y contacto</h2><div class="grid">
+<div><label>Alias de Mercado Pago</label><input id="payAlias"></div><div><label>Titular</label><input id="payHolder"></div>
 <div><label>WhatsApp (solo números con país)</label><input id="payWhatsApp" inputmode="tel"></div>
-<div><label>Porcentaje de seña</label><input id="depositPercent" type="number" min="1" max="100"></div>
-</div>
-<button class="primary" style="margin-top:12px" onclick="saveSettings()">Guardar datos</button>
-</div>
-
-<div class="panel">
-<h2>Agregar servicio</h2>
-<div class="grid">
-<div><label>Nombre</label><input id="newName"></div>
-<div><label>Precio ($)</label><input id="newPrice" inputmode="numeric"></div>
-<div><label>Duración (min)</label><input id="newDuration" type="number" min="15" step="15" value="30"></div>
-</div>
-<button class="primary" style="margin-top:12px" onclick="addService()">Agregar</button>
-</div>
-
+<div><label>Porcentaje de seña</label><input id="depositPercent" type="number" min="1" max="100"></div></div>
+<button class="primary" style="margin-top:12px" onclick="saveSettings()">Guardar datos</button></div>
+<div class="panel"><h2>Agregar servicio</h2><div class="grid">
+<div><label>Nombre</label><input id="newName"></div><div><label>Precio ($)</label><input id="newPrice" inputmode="numeric"></div>
+<div><label>Duración (min)</label><input id="newDuration" type="number" min="15" step="15" value="30"></div></div>
+<button class="primary" style="margin-top:12px" onclick="addService()">Agregar</button></div>
 <div class="panel"><h2>Editar servicios y precios</h2><div id="manageServices"></div></div>
-
-<div class="panel">
-<h2>Configurar servicios por fecha</h2>
+<div class="panel"><h2>Configurar servicios por fecha</h2>
 <p class="muted">Elegí la fecha y marcá los servicios que vas a atender. Los clientes solo verán los servicios habilitados para esa fecha.</p>
-<label>Fecha</label><input id="dailyServiceDate" type="date">
-<div id="dailyServicePicker"></div>
-<button class="primary" style="margin-top:12px" onclick="saveDailyServices()">Guardar servicios para esta fecha</button>
-<div id="dailyServiceStatus" class="status"></div>
-</div>
-
-<div class="panel">
-<h2>Administrar horarios regulares</h2>
+<label>Fecha</label><input id="dailyServiceDate" type="date"><div id="dailyServicePicker"></div>
+<button class="primary" style="margin-top:12px" onclick="saveDailyServices()">Guardar servicios para esta fecha</button><div id="dailyServiceStatus" class="status"></div></div>
+<div class="panel"><h2>Administrar horarios regulares</h2>
 <p class="muted">Configurá horarios de 10:00 a 19:30. Tocá un horario para bloquearlo o habilitarlo. La configuración se guarda por fecha.</p>
-<label>Fecha</label><input id="adminDate" type="date">
-<div id="adminSlots" class="slots"></div>
-</div>
-
-<div class="panel">
-<h2>Jornadas especiales de depilación definitiva</h2>
-<label>Fecha</label><input id="specialDate" type="date">
-<label>Horarios separados por coma</label><textarea id="specialTimes" rows="3" placeholder="09:00, 09:30, 10:00"></textarea>
-<button class="primary" style="margin-top:10px" onclick="saveSpecialDate()">Guardar jornada</button>
-<div id="specialDates"></div>
-</div>
-
-<div class="panel">
-<h2>Reservas y solicitudes</h2>
-<label>Buscar por nombre o teléfono</label>
-<input id="searchBookings" placeholder="Buscar…" oninput="renderBookings()">
-<div id="requests"></div>
-</div>
-</div>
-</section>
+<label>Fecha</label><input id="adminDate" type="date"><div id="adminSlots" class="slots"></div></div>
+<div class="panel"><h2>Jornadas especiales de depilación definitiva</h2>
+<label>Fecha</label><input id="specialDate" type="date"><label>Horarios separados por coma</label>
+<textarea id="specialTimes" rows="3" placeholder="09:00, 09:30, 10:00"></textarea>
+<button class="primary" style="margin-top:10px" onclick="saveSpecialDate()">Guardar jornada</button><div id="specialDates"></div></div>
+<div class="panel"><h2>Reservas y solicitudes</h2><label>Buscar por nombre o teléfono</label>
+<input id="searchBookings" placeholder="Buscar…" oninput="renderBookings()"><div id="requests"></div></div>
+</div></section>
 <footer>MG Estética · Agenda online</footer>
 </main>
-
 <script type="module">
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
 import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
 import {getFirestore,collection,doc,getDocs,setDoc,deleteDoc,addDoc,onSnapshot,runTransaction} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
 
-const firebaseConfig={
-apiKey:'AIzaSyB_yLOsIAhEkcr1blJK46HAHcWylVI-3v0',
-authDomain:'mg-estetica-turnos.firebaseapp.com',
-projectId:'mg-estetica-turnos',
-messagingSenderId:'425300609473',
-storageBucket:'mg-estetica-turnos.firebasestorage.app',
-appId:'1:425300609473:web:45bb97101299ae18b00740'
+const firebaseConfig = {
+  apiKey: 'AIzaSyB_yLOsIAhEkcr1blJK46HAhcWylVI-3v0',
+  authDomain: 'mg-estetica-turnos.firebaseapp.com',
+  projectId: 'mg-estetica-turnos',
+  storageBucket: 'mg-estetica-turnos.firebasestorage.app',
+  messagingSenderId: '425300609473',
+  appId: '1:425300609473:web:45bb97101299ae18b00740'
 };
-
 const ADMIN_UID='lvCsIh1rliWqmsV8cPCCnCCZdHj2';
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
-
 const seed=[
-['aumento-gluteos','Aumento de glúteos con peptonas','',60],
-['mesoterapia-celulitis','Mesoterapia para celulitis','',45],
-['electrodos','Electrodos','',30],
-['masajes','Masajes (descontracturantes, relajantes, deportivos, reductores y drenaje linfático)','',45],
-['radiofrecuencia','Radiofrecuencia facial y corporal','',45],
-['microneedling','Microneedling con activos','',60],
-['plasma','Plasma facial y capilar','',60],
-['limpieza','Limpiezas faciales','',60],
-['hidralips','Hidralips','',45],
-['unas','Uñas: semipermanente y soft gel','',90],
-['pestanas','Colocación de pestañas','',90],
-['cejas','Cejas: diseño, laminado, depilado, perfilado y henna','',45],
-['depilacion','Depilación definitiva (jornadas especiales)','',30],
-['hifu','HIFU (lifting facial)','',60],
-['liposonix','Liposonix (reducción corporal)','',60],
-['enygma','Enygma (rejuvenecimiento íntimo)','',60],
-['nutricionista','Consulta con médico nutricionista','',30],
+['aumento-gluteos','Aumento de glúteos con peptonas','',60],['mesoterapia-celulitis','Mesoterapia para celulitis','',45],
+['electrodos','Electrodos','',30],['masajes','Masajes (descontracturantes, relajantes, deportivos, reductores y drenaje linfático)','',45],
+['radiofrecuencia','Radiofrecuencia facial y corporal','',45],['microneedling','Microneedling con activos','',60],['plasma','Plasma facial y capilar','',60],
+['limpieza','Limpiezas faciales','',60],['hidralips','Hidralips','',45],['unas','Uñas: semipermanente y soft gel','',90],
+['pestanas','Colocación de pestañas','',90],['cejas','Cejas: diseño, laminado, depilado, perfilado y henna','',45],
+['depilacion','Depilación definitiva (jornadas especiales)','',30],['hifu','HIFU (lifting facial)','',60],['liposonix','Liposonix (reducción corporal)','',60],
+['enygma','Enygma (rejuvenecimiento íntimo)','',60],['nutricionista','Consulta con médico nutricionista','',30],
 ['lipoquimica','Mesoterapia para reducción corporal (LIPO QUÍMICA)','',45]
 ];
-
 let services=[],specialSlots={},dailyServices={},busy={},bookings=[];
 let settings={alias:'YANI.BELU',holder:'Yanina Belén Romero',whatsapp:'5491141736931',depositPercent:50};
 let isAdmin=false,selected=null,stopBookings=null;
-
 const times=Array.from({length:20},(_,i)=>`${String(10+Math.floor(i/2)).padStart(2,'0')}:${i%2?'30':'00'}`);
-
 function setStatus(t,error=false){$('status').textContent=t;$('status').classList.toggle('error',error)}
 function showLoginError(t){$('loginError').textContent=t;$('loginError').classList.remove('hidden')}
 function clearLoginError(){$('loginError').textContent='';$('loginError').classList.add('hidden')}
-
 function authErrorMessage(e){
-const messages={
-'auth/invalid-credential':'El correo o la contraseña no coinciden. Revisá que estés usando la contraseña actual de Firebase.',
-'auth/user-not-found':'No existe un usuario con ese correo en este proyecto de Firebase.',
-'auth/wrong-password':'La contraseña es incorrecta.',
-'auth/invalid-email':'El formato del correo no es válido.',
-'auth/too-many-requests':'Firebase bloqueó temporalmente los intentos. Esperá un rato y probá nuevamente.',
-'auth/network-request-failed':'No se pudo conectar con Firebase. Revisá tu conexión a internet.',
-'auth/operation-not-allowed':'El acceso por Email/contraseña no está habilitado en Firebase Authentication.',
-'auth/unauthorized-domain':'Este dominio no está autorizado en Firebase Authentication.'
-};
+const messages={'auth/invalid-credential':'El correo o la contraseña no coinciden. Revisá que estés usando la contraseña actual de Firebase.','auth/user-not-found':'No existe un usuario con ese correo en este proyecto de Firebase.','auth/wrong-password':'La contraseña es incorrecta.','auth/invalid-email':'El formato del correo no es válido.','auth/too-many-requests':'Firebase bloqueó temporalmente los intentos. Esperá un rato y probá nuevamente.','auth/network-request-failed':'No se pudo conectar con Firebase. Revisá tu conexión a internet.','auth/operation-not-allowed':'El acceso por Email/contraseña no está habilitado en Firebase Authentication.','auth/unauthorized-domain':'Este dominio no está autorizado en Firebase Authentication.'};
 return (messages[e.code]||e.message||'Error desconocido')+' (Código: '+(e.code||'sin código')+')';
 }
-
-function esc(s){
-return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function price(v){
-let n=Number(String(v??'').replace(/[^0-9]/g,''));
-return n>0&&Number.isFinite(n)?n:null;
-}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function price(v){let n=Number(String(v??'').replace(/[^0-9]/g,''));return n>0&&Number.isFinite(n)?n:null}
 function money(n){return '$'+Math.round(n).toLocaleString('es-AR')}
 function localDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'America/Argentina/Buenos_Aires'}).format(new Date())}
 function dateTime(d,t){return new Date(`${d}T${t}:00-03:00`)}
 function slotKey(d,t){return d+'_'+t}
 function initDate(id){if(!$(id).value)$(id).value=localDate()}
-
 function show(which){
-$('home').classList.toggle('hidden',which!=='home');
-$('client').classList.toggle('hidden',which!=='client');
-$('admin').classList.toggle('hidden',which!=='admin');
-$('mainNav').classList.toggle('hidden',which==='home');
-$('clientTab').classList.toggle('active',which==='client');
-$('adminTab').classList.toggle('active',which==='admin');
+$('home').classList.toggle('hidden',which!=='home');$('client').classList.toggle('hidden',which!=='client');$('admin').classList.toggle('hidden',which!=='admin');
+$('mainNav').classList.toggle('hidden',which==='home');$('clientTab').classList.toggle('active',which==='client');$('adminTab').classList.toggle('active',which==='admin');
 }
-
 function renderServices(){
-$('services').innerHTML=services.map(s=>`
-<div class="service"><b>${esc(s.name)}</b>
-<div class="muted">${s.duration||0} min · ${price(s.price)!==null?money(price(s.price)):'Consultar precio'}</div></div>
-`).join('')||'Todavía no hay servicios publicados.';
-if(isAdmin)renderManage();
-drawSlots('slots','date',false);
+$('services').innerHTML=services.map(s=>`<div class="service"><b>${esc(s.name)}</b><div class="muted">${s.duration||0} min · ${price(s.price)!==null?money(price(s.price)):'Consultar precio'}</div></div>`).join('')||'Todavía no hay servicios publicados.';
+if(isAdmin)renderManage();drawSlots('slots','date',false);
 }
-
 function renderDailyServicePicker(){
-const d=$('dailyServiceDate').value;
-if(!d)return;
-const selectedIds=dailyServices[d]||[];
-
-$('dailyServicePicker').innerHTML=services.map(s=>`
-<div class="checkrow">
-<input type="checkbox" class="daily-service-check" value="${esc(s.id)}" ${selectedIds.includes(s.id)?'checked':''}>
-<div><b>${esc(s.name)}</b><div class="muted">${price(s.price)!==null?money(price(s.price)):'Consultar precio'}</div></div>
-</div>
-`).join('')||'No hay servicios cargados.';
-
-$('dailyServiceStatus').textContent=selectedIds.length?
-`${selectedIds.length} servicios habilitados para ${d}.`:
-'No hay servicios habilitados para esta fecha.';
+const d=$('dailyServiceDate').value;if(!d)return;const selectedIds=dailyServices[d]||[];
+$('dailyServicePicker').innerHTML=services.map(s=>`<div class="checkrow"><input type="checkbox" class="daily-service-check" value="${esc(s.id)}" ${selectedIds.includes(s.id)?'checked':''}><div><b>${esc(s.name)}</b><div class="muted">${price(s.price)!==null?money(price(s.price)):'Consultar precio'}</div></div></div>`).join('')||'No hay servicios cargados.';
+$('dailyServiceStatus').textContent=selectedIds.length?`${selectedIds.length} servicios habilitados para ${d}.`:'No hay servicios habilitados para esta fecha.';
 }
-
 async function saveDailyServices(){
-if(!isAdmin)return;
-const d=$('dailyServiceDate').value;
-if(!d)return alert('Elegí una fecha.');
+if(!isAdmin)return;const d=$('dailyServiceDate').value;if(!d)return alert('Elegí una fecha.');
 const ids=[...document.querySelectorAll('.daily-service-check:checked')].map(x=>x.value);
-
-try{
-await setDoc(doc(db,'dailyServices',d),{date:d,serviceIds:ids,updatedAt:Date.now()});
-dailyServices[d]=ids;
-$('dailyServiceStatus').textContent=ids.length?
-`Configuración guardada. ${ids.length} servicios habilitados para ${d}.`:
-'Fecha guardada sin servicios habilitados.';
-drawSlots('slots','date',false);
-alert('Servicios de la fecha guardados correctamente.');
-}catch(e){alert('No se pudo guardar la configuración: '+e.message)}
+try{await setDoc(doc(db,'dailyServices',d),{date:d,serviceIds:ids,updatedAt:Date.now()});dailyServices[d]=ids;
+$('dailyServiceStatus').textContent=ids.length?`Configuración guardada. ${ids.length} servicios habilitados para ${d}.`:'Fecha guardada sin servicios habilitados.';
+drawSlots('slots','date',false);alert('Servicios de la fecha guardados correctamente.')}catch(e){alert('No se pudo guardar la configuración: '+e.message)}
 }
-
 function drawSlots(target,dateId,admin){
-const date=$(dateId).value;
-if(!date){$(target).innerHTML='Elegí una fecha.';return;}
-
-if(admin){
-$(target).innerHTML=times.map(t=>{
-let key=slotKey(date,t),taken=busy[key]===true;
-return `<button class="slot ${taken?'busy':''}" onclick="toggleBusy('${date}','${t}')">${t} · ${taken?'Bloqueado':'Disponible'}</button>`;
-}).join('');
-return;
+const date=$(dateId).value;if(!date){$(target).innerHTML='Elegí una fecha.';return}
+if(admin){$(target).innerHTML=times.map(t=>{let key=slotKey(date,t),taken=busy[key]===true;return `<button class="slot ${taken?'busy':''}" onclick="toggleBusy('${date}','${t}')">${t} · ${taken?'Bloqueado':'Disponible'}</button>`}).join('');return}
+const ids=dailyServices[date]||[],availableServices=services.filter(x=>ids.includes(x.id)),p=$('servicePick'),old=p.value;
+p.innerHTML=availableServices.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');if(availableServices.some(x=>x.id===old))p.value=old;
+const s=services.find(x=>x.id===p.value),day=new Date(date+'T12:00:00').getDay();
+if(!availableServices.length){$(target).innerHTML='No hay servicios habilitados para esta fecha.';$('booking').classList.add('hidden');return}
+if(!s){$(target).innerHTML='Elegí un servicio.';$('booking').classList.add('hidden');return}
+let list=times;if(/depilación definitiva/i.test(s.name))list=specialSlots[date]||[];else if(day===0)list=[];
+if(!list.length){$(target).innerHTML='No hay horarios habilitados para esta fecha.';$('booking').classList.add('hidden');return}
+$(target).innerHTML=list.map(t=>{let key=slotKey(date,t),taken=busy[key]===true,tooSoon=dateTime(date,t).getTime()<Date.now()+48*3600000;
+return `<button class="slot ${taken?'busy':''}" ${taken||tooSoon?'disabled':''} onclick="choose('${t}')">${t} · ${taken?'Ocupado':tooSoon?'48 h':'Libre'}</button>`}).join('');
 }
-
-const ids=dailyServices[date]||[];
-const availableServices=services.filter(x=>ids.includes(x.id));
-const p=$('servicePick'),old=p.value;
-
-p.innerHTML=availableServices.map(x=>`<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');
-if(availableServices.some(x=>x.id===old))p.value=old;
-
-const s=services.find(x=>x.id===p.value);
-const day=new Date(date+'T12:00:00').getDay();
-
-if(!availableServices.length){
-$(target).innerHTML='No hay servicios habilitados para esta fecha.';
-$('booking').classList.add('hidden');
-return;
-}
-if(!s){
-$(target).innerHTML='Elegí un servicio.';
-$('booking').classList.add('hidden');
-return;
-}
-
-let list=times;
-if(/depilación definitiva/i.test(s.name))list=specialSlots[date]||[];
-else if(day===0)list=[];
-
-if(!list.length){
-$(target).innerHTML='No hay horarios habilitados para esta fecha.';
-$('booking').classList.add('hidden');
-return;
-}
-
-$(target).innerHTML=list.map(t=>{
-let key=slotKey(date,t),taken=busy[key]===true;
-let tooSoon=dateTime(date,t).getTime()<Date.now()+48*3600000;
-return `<button class="slot ${taken?'busy':''}" ${taken||tooSoon?'disabled':''} onclick="choose('${t}')">${t} · ${taken?'Ocupado':tooSoon?'48 h':'Libre'}</button>`;
-}).join('');
-}
-
 function choose(t){
-let s=services.find(x=>x.id===$('servicePick').value),d=$('date').value;
-if(!s)return;
+let s=services.find(x=>x.id===$('servicePick').value),d=$('date').value;if(!s)return;
 if(!(dailyServices[d]||[]).includes(s.id))return alert('Este servicio no está habilitado para esa fecha.');
 if(dateTime(d,t).getTime()<Date.now()+48*3600000)return alert('Los turnos deben solicitarse con al menos 48 horas de anticipación.');
 if(/depilación definitiva/i.test(s.name)&&!(specialSlots[d]||[]).includes(t))return alert('Ese horario no pertenece a la jornada especial.');
 if(!/depilación definitiva/i.test(s.name)&&!times.includes(t))return alert('Horario inválido.');
-
-selected={time:t,date:d,service:s};
-$('chosen').textContent=`${s.name} · ${d} · ${t}`;
+selected={time:t,date:d,service:s};$('chosen').textContent=`${s.name} · ${d} · ${t}`;
 let total=price(s.price),pct=Number(settings.depositPercent)||50;
 $('depositInfo').textContent=total===null?'Este servicio no tiene precio cargado. Consultá por WhatsApp.':`Precio: ${money(total)} · Seña (${pct}%): ${money(total*pct/100)} · Saldo: ${money(total-total*pct/100)}. Alias: ${settings.alias} · Titular: ${settings.holder}.`;
-$('booking').classList.remove('hidden');
-$('booking').scrollIntoView({behavior:'smooth'});
+$('booking').classList.remove('hidden');$('booking').scrollIntoView({behavior:'smooth'});
 }
-
 async function book(){
-let name=$('custName').value.trim(),phone=$('custPhone').value.trim();
-if(!name||!phone||!selected)return alert('Completá nombre y WhatsApp.');
-let total=price(selected.service.price);
-if(total===null)return alert('Consultá el precio por WhatsApp antes de reservar.');
+let name=$('custName').value.trim(),phone=$('custPhone').value.trim();if(!name||!phone||!selected)return alert('Completá nombre y WhatsApp.');
+let total=price(selected.service.price);if(total===null)return alert('Consultá el precio por WhatsApp antes de reservar.');
 if(dateTime(selected.date,selected.time).getTime()<Date.now()+48*3600000)return alert('Se requieren 48 horas de anticipación.');
-
-let key=slotKey(selected.date,selected.time),pct=Number(settings.depositPercent)||50,deposit=money(total*pct/100);
-let bookingRef=doc(collection(db,'bookings'));
-let chosen=selected;
-
+let key=slotKey(selected.date,selected.time),pct=Number(settings.depositPercent)||50,deposit=money(total*pct/100),bookingRef=doc(collection(db,'bookings')),chosen=selected;
 try{
 await runTransaction(db,async tx=>{
-let sl=doc(db,'slots',key),ss=await tx.get(sl);
-let ds=doc(db,'dailyServices',chosen.date),dd=await tx.get(ds);
-let allowed=dd.exists()&&(dd.data().serviceIds||[]).includes(chosen.service.id);
-if(!allowed)throw Error('Este servicio ya no está habilitado para esa fecha.');
+let sl=doc(db,'slots',key),ss=await tx.get(sl),ds=doc(db,'dailyServices',chosen.date),dd=await tx.get(ds);
+let allowed=dd.exists()&&(dd.data().serviceIds||[]).includes(chosen.service.id);if(!allowed)throw Error('Este servicio ya no está habilitado para esa fecha.');
 if(ss.exists()&&ss.data().busy===true)throw Error('Este horario ya está ocupado.');
 tx.set(bookingRef,{bookingId:bookingRef.id,name,phone,date:chosen.date,time:chosen.time,service:chosen.service.name,serviceId:chosen.service.id,status:'Pendiente de verificar seña',deposit,total:money(total),saldo:money(total-total*pct/100),createdAt:Date.now(),slotId:key});
 tx.set(sl,{date:chosen.date,time:chosen.time,busy:true,bookingId:bookingRef.id});
 });
-
 let msg=`Hola, soy ${name}. Solicito ${chosen.service.name} para el ${chosen.date} a las ${chosen.time}. Precio: ${money(total)}. Seña (${pct}%): ${deposit}. Alias: ${settings.alias}. Envío comprobante para verificar.`;
-let wa='https://wa.me/'+settings.whatsapp.replace(/\D/g,'')+'?text='+encodeURIComponent(msg);
-window.open(wa,'_blank');
-$('booking').classList.add('hidden');
-$('custName').value='';
-$('custPhone').value='';
-selected=null;
+let wa='https://wa.me/'+settings.whatsapp.replace(/\D/g,'')+'?text='+encodeURIComponent(msg);window.open(wa,'_blank');
+$('booking').classList.add('hidden');$('custName').value='';$('custPhone').value='';selected=null;
 alert('Solicitud registrada como pendiente de verificar la seña. Enviá el comprobante por WhatsApp.');
 }catch(e){alert(e.message||'No se pudo reservar.')}
 }
-
 function renderManage(){
-$('manageServices').innerHTML=services.map(s=>`
-<div class="service" style="margin:10px 0">
-<label>Nombre</label><input id="n${esc(s.id)}" value="${esc(s.name)}">
+$('manageServices').innerHTML=services.map(s=>`<div class="service" style="margin:10px 0"><label>Nombre</label><input id="n${esc(s.id)}" value="${esc(s.name)}">
 <div class="grid"><div><label>Precio ($)</label><input id="p${esc(s.id)}" inputmode="numeric" value="${esc(String(s.price||''))}"></div>
 <div><label>Duración (min)</label><input id="d${esc(s.id)}" type="number" min="15" step="15" value="${s.duration||30}"></div></div>
-<div class="row"><button class="primary" onclick="updateService('${esc(s.id)}')">Guardar</button><button class="danger" onclick="removeService('${esc(s.id)}')">Eliminar</button></div>
-</div>`).join('')||'No hay servicios.';
+<div class="row"><button class="primary" onclick="updateService('${esc(s.id)}')">Guardar</button><button class="danger" onclick="removeService('${esc(s.id)}')">Eliminar</button></div></div>`).join('')||'No hay servicios.';
 }
-
 function renderSpecialDates(){
-$('specialDates').innerHTML=Object.keys(specialSlots).sort().map(d=>`
-<div class="row"><span><b>${d}</b><div class="muted small">${(specialSlots[d]||[]).join(' · ')}</div></span>
-<button class="danger" onclick="removeSpecialDate('${d}')">Quitar jornada</button></div>
-`).join('')||'No hay jornadas cargadas.';
+$('specialDates').innerHTML=Object.keys(specialSlots).sort().map(d=>`<div class="row"><span><b>${d}</b><div class="muted small">${(specialSlots[d]||[]).join(' · ')}</div></span><button class="danger" onclick="removeSpecialDate('${d}')">Quitar jornada</button></div>`).join('')||'No hay jornadas cargadas.';
 }
-
 function renderBookings(){
-let q=($('searchBookings').value||'').toLowerCase();
-let list=bookings.filter(b=>(b.name+' '+b.phone).toLowerCase().includes(q));
-$('requests').innerHTML=list.map(b=>`
-<div class="service" style="margin:10px 0">
-<b>${esc(b.name)} · ${esc(b.service)}</b>
-<div class="muted">${esc(b.date)} · ${esc(b.time)} · WhatsApp ${esc(b.phone)}</div>
-<p class="muted">Total ${esc(b.total||'')} · Seña ${esc(b.deposit||'')} · ${esc(b.status||'')}</p>
-<div class="row"><button class="primary" onclick="paid('${esc(b.id)}')">Verificar seña</button>
-<button class="secondary" onclick="reschedule('${esc(b.id)}')">Reprogramar</button>
-<button class="danger" onclick="cancelBooking('${esc(b.id)}')">Cancelar</button></div>
-</div>`).join('')||'No hay reservas.';
+let q=($('searchBookings').value||'').toLowerCase(),list=bookings.filter(b=>(b.name+' '+b.phone).toLowerCase().includes(q));
+$('requests').innerHTML=list.map(b=>`<div class="service" style="margin:10px 0"><b>${esc(b.name)} · ${esc(b.service)}</b>
+<div class="muted">${esc(b.date)} · ${esc(b.time)} · WhatsApp ${esc(b.phone)}</div><p class="muted">Total ${esc(b.total||'')} · Seña ${esc(b.deposit||'')} · ${esc(b.status||'')}</p>
+<div class="row"><button class="primary" onclick="paid('${esc(b.id)}')">Verificar seña</button><button class="secondary" onclick="reschedule('${esc(b.id)}')">Reprogramar</button><button class="danger" onclick="cancelBooking('${esc(b.id)}')">Cancelar</button></div></div>`).join('')||'No hay reservas.';
 }
-
 function render(){
-initDate('date');initDate('adminDate');initDate('dailyServiceDate');
-$('contactDisplay').textContent=settings.whatsapp;
-renderServices();
-
-if(isAdmin){
-$('loginPanel').classList.add('hidden');
-$('adminArea').classList.remove('hidden');
-renderManage();
-renderDailyServicePicker();
-renderSpecialDates();
-renderBookings();
-drawSlots('adminSlots','adminDate',true);
-$('payAlias').value=settings.alias||'';
-$('payHolder').value=settings.holder||'';
-$('payWhatsApp').value=settings.whatsapp||'';
-$('depositPercent').value=settings.depositPercent||50;
-}else{
-$('loginPanel').classList.remove('hidden');
-$('adminArea').classList.add('hidden');
+initDate('date');initDate('adminDate');initDate('dailyServiceDate');$('contactDisplay').textContent=settings.whatsapp;renderServices();
+if(isAdmin){$('loginPanel').classList.add('hidden');$('adminArea').classList.remove('hidden');renderManage();renderDailyServicePicker();renderSpecialDates();renderBookings();drawSlots('adminSlots','adminDate',true);
+$('payAlias').value=settings.alias||'';$('payHolder').value=settings.holder||'';$('payWhatsApp').value=settings.whatsapp||'';$('depositPercent').value=settings.depositPercent||50;
+}else{$('loginPanel').classList.remove('hidden');$('adminArea').classList.add('hidden')}
 }
-}
-
-async function ensureSeed(){
-let snap=await getDocs(collection(db,'services'));
-if(snap.empty){
-for(const [id,name,p,duration] of seed)await setDoc(doc(db,'services',id),{name,price:p,duration,active:true});
-}
-}
-
+async function ensureSeed(){let snap=await getDocs(collection(db,'services'));if(snap.empty){for(const [id,name,p,duration] of seed)await setDoc(doc(db,'services',id),{name,price:p,duration,active:true})}}
 function watchBookings(){
-if(stopBookings){stopBookings();stopBookings=null;}
-if(isAdmin){
-stopBookings=onSnapshot(collection(db,'bookings'),s=>{
-bookings=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
-renderBookings();
-},e=>setStatus('Error de reservas: '+e.message,true));
-}else{bookings=[];$('requests').innerHTML='';}
+if(stopBookings){stopBookings();stopBookings=null}
+if(isAdmin){stopBookings=onSnapshot(collection(db,'bookings'),s=>{bookings=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));renderBookings()},e=>setStatus('Error de reservas: '+e.message,true))}
+else{bookings=[];$('requests').innerHTML=''}
 }
-
 async function init(){
 try{
-onSnapshot(collection(db,'services'),s=>{
-services=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.active!==false).sort((a,b)=>a.name.localeCompare(b.name));
-renderServices();
-if(isAdmin)renderDailyServicePicker();
-},e=>setStatus('Error de servicios: '+e.message,true));
-
-onSnapshot(collection(db,'slots'),s=>{
-busy={};
-s.docs.forEach(d=>busy[d.id]=d.data().busy===true);
-drawSlots('slots','date',false);
-if(isAdmin)drawSlots('adminSlots','adminDate',true);
-},e=>setStatus('Error de horarios: '+e.message,true));
-
-onSnapshot(collection(db,'dailyServices'),s=>{
-dailyServices={};
-s.docs.forEach(d=>dailyServices[d.id]=d.data().serviceIds||[]);
-renderDailyServicePicker();
-drawSlots('slots','date',false);
-},e=>setStatus('Error de servicios por fecha: '+e.message,true));
-
-onSnapshot(collection(db,'specialDates'),s=>{
-specialSlots={};
-s.docs.forEach(d=>specialSlots[d.id]=d.data().times||[]);
-drawSlots('slots','date',false);
-if(isAdmin)renderSpecialDates();
-},e=>setStatus('Error jornadas: '+e.message,true));
-
-onSnapshot(doc(db,'settings','public'),s=>{
-if(s.exists())settings={...settings,...s.data()};
-$('contactDisplay').textContent=settings.whatsapp;
-drawSlots('slots','date',false);
-if(isAdmin){
-$('payAlias').value=settings.alias||'';
-$('payHolder').value=settings.holder||'';
-$('payWhatsApp').value=settings.whatsapp||'';
-$('depositPercent').value=settings.depositPercent||50;
-}
-},e=>setStatus('Error configuración: '+e.message,true));
-
+onSnapshot(collection(db,'services'),s=>{services=s.docs.map(d=>({id:d.id,...d.data()})).filter(x=>x.active!==false).sort((a,b)=>a.name.localeCompare(b.name));renderServices();if(isAdmin)renderDailyServicePicker()},e=>setStatus('Error de servicios: '+e.message,true));
+onSnapshot(collection(db,'slots'),s=>{busy={};s.docs.forEach(d=>busy[d.id]=d.data().busy===true);drawSlots('slots','date',false);if(isAdmin)drawSlots('adminSlots','adminDate',true)},e=>setStatus('Error de horarios: '+e.message,true));
+onSnapshot(collection(db,'dailyServices'),s=>{dailyServices={};s.docs.forEach(d=>dailyServices[d.id]=d.data().serviceIds||[]);renderDailyServicePicker();drawSlots('slots','date',false)},e=>setStatus('Error de servicios por fecha: '+e.message,true));
+onSnapshot(collection(db,'specialDates'),s=>{specialSlots={};s.docs.forEach(d=>specialSlots[d.id]=d.data().times||[]);drawSlots('slots','date',false);if(isAdmin)renderSpecialDates()},e=>setStatus('Error jornadas: '+e.message,true));
+onSnapshot(doc(db,'settings','public'),s=>{if(s.exists())settings={...settings,...s.data()};$('contactDisplay').textContent=settings.whatsapp;drawSlots('slots','date',false);
+if(isAdmin){$('payAlias').value=settings.alias||'';$('payHolder').value=settings.holder||'';$('payWhatsApp').value=settings.whatsapp||'';$('depositPercent').value=settings.depositPercent||50}},e=>setStatus('Error configuración: '+e.message,true));
 onAuthStateChanged(auth,async u=>{
-if(u&&u.uid!==ADMIN_UID){
-isAdmin=false;watchBookings();render();
-setStatus('La cuenta inició sesión, pero no tiene permiso de administradora.',true);
-await signOut(auth);return;
-}
-isAdmin=!!u;
-watchBookings();
-if(isAdmin){try{await ensureSeed()}catch(e){setStatus('No se pudieron cargar los servicios iniciales: '+e.message,true)}}
-render();
-setStatus(isAdmin?'Agenda conectada · Administración':'Agenda conectada');
+if(u&&u.uid!==ADMIN_UID){isAdmin=false;watchBookings();render();setStatus('La cuenta inició sesión, pero no tiene permiso de administradora.',true);await signOut(auth);return}
+isAdmin=!!u;watchBookings();if(isAdmin){try{await ensureSeed()}catch(e){setStatus('No se pudieron cargar los servicios iniciales: '+e.message,true)}}
+render();setStatus(isAdmin?'Agenda conectada · Administración':'Agenda conectada');
 });
 initDate('date');initDate('adminDate');initDate('dailyServiceDate');
 }catch(e){setStatus('No se pudo iniciar: '+e.message+' · Verificá Firebase y sus reglas.',true)}
 }
-
 async function login(){
-clearLoginError();
-const email=$('email').value.trim(),password=$('password').value;
-if(!email||!password){showLoginError('Completá el correo electrónico y la contraseña.');return}
+clearLoginError();const email=$('email').value.trim(),password=$('password').value;if(!email||!password){showLoginError('Completá el correo electrónico y la contraseña.');return}
 const btn=$('loginButton');btn.disabled=true;btn.textContent='Ingresando…';
-try{
-const credential=await signInWithEmailAndPassword(auth,email,password);
-if(credential.user.uid!==ADMIN_UID){await signOut(auth);showLoginError('El correo ingresado no corresponde a la cuenta administradora autorizada.');return}
-$('password').value='';showLoginError('');
-}catch(e){console.error('Error de inicio de sesión Firebase:',e);showLoginError(authErrorMessage(e))}
+try{const credential=await signInWithEmailAndPassword(auth,email,password);if(credential.user.uid!==ADMIN_UID){await signOut(auth);showLoginError('El correo ingresado no corresponde a la cuenta administradora autorizada.');return}
+$('password').value='';showLoginError('')}catch(e){console.error('Error de inicio de sesión Firebase:',e);showLoginError(authErrorMessage(e))}
 finally{btn.disabled=false;btn.textContent='Ingresar'}
 }
-
 async function logout(){await signOut(auth)}
-
 async function saveSettings(){
-if(!isAdmin)return;
-let a=$('payAlias').value.trim(),h=$('payHolder').value.trim(),w=$('payWhatsApp').value.replace(/\D/g,''),p=Number($('depositPercent').value);
+if(!isAdmin)return;let a=$('payAlias').value.trim(),h=$('payHolder').value.trim(),w=$('payWhatsApp').value.replace(/\D/g,''),p=Number($('depositPercent').value);
 if(!a||!h||!w||p<1||p>100)return alert('Completá los datos y el porcentaje (1 a 100).');
-try{await setDoc(doc(db,'settings','public'),{alias:a,holder:h,whatsapp:w,depositPercent:p});alert('Configuración guardada.')}
-catch(e){alert('No se pudo guardar. Revisá las reglas de Firestore: '+e.message)}
+try{await setDoc(doc(db,'settings','public'),{alias:a,holder:h,whatsapp:w,depositPercent:p});alert('Configuración guardada.')}catch(e){alert('No se pudo guardar. Revisá las reglas de Firestore: '+e.message)}
 }
-
 async function addService(){
-if(!isAdmin)return;
-let name=$('newName').value.trim(),p=$('newPrice').value.replace(/\D/g,''),d=Number($('newDuration').value);
+if(!isAdmin)return;let name=$('newName').value.trim(),p=$('newPrice').value.replace(/\D/g,''),d=Number($('newDuration').value);
 if(!name||d<15)return alert('Ingresá nombre y duración válida.');
-try{await addDoc(collection(db,'services'),{name,price:p,duration:d,active:true});$('newName').value=$('newPrice').value=''}
-catch(e){alert('No se pudo agregar: '+e.message)}
+try{await addDoc(collection(db,'services'),{name,price:p,duration:d,active:true});$('newName').value=$('newPrice').value=''}catch(e){alert('No se pudo agregar: '+e.message)}
 }
-
 async function updateService(id){
-if(!isAdmin)return;
-let name=$('n'+id).value.trim(),p=$('p'+id).value.replace(/\D/g,''),d=Number($('d'+id).value);
+if(!isAdmin)return;let name=$('n'+id).value.trim(),p=$('p'+id).value.replace(/\D/g,''),d=Number($('d'+id).value);
 if(!name||d<15)return alert('Revisá los datos.');
-try{await setDoc(doc(db,'services',id),{name,price:p,duration:d,active:true});alert('Servicio actualizado.')}
-catch(e){alert('No se pudo actualizar: '+e.message)}
+try{await setDoc(doc(db,'services',id),{name,price:p,duration:d,active:true});alert('Servicio actualizado.')}catch(e){alert('No se pudo actualizar: '+e.message)}
 }
-
 async function removeService(id){
 if(!isAdmin||!confirm('¿Eliminar servicio?'))return;
-try{
-await deleteDoc(doc(db,'services',id));
-for(const [d,ids] of Object.entries(dailyServices)){
-if(ids.includes(id)){
-await setDoc(doc(db,'dailyServices',d),{date:d,serviceIds:ids.filter(x=>x!==id),updatedAt:Date.now()});
+try{await deleteDoc(doc(db,'services',id));for(const [d,ids] of Object.entries(dailyServices)){if(ids.includes(id))await setDoc(doc(db,'dailyServices',d),{date:d,serviceIds:ids.filter(x=>x!==id),updatedAt:Date.now()})}}
+catch(e){alert('No se pudo eliminar: '+e.message)}
 }
-}
-}catch(e){alert('No se pudo eliminar: '+e.message)}
-}
-
 async function toggleBusy(d,t){
-if(!isAdmin)return;
-let k=slotKey(d,t);
-try{
-await setDoc(doc(db,'slots',k),{busy:!busy[k],date:d,time:t},{merge:true});
-}catch(e){alert('No se pudo cambiar el horario: '+e.message)}
+if(!isAdmin)return;let k=slotKey(d,t);try{await setDoc(doc(db,'slots',k),{busy:!busy[k],date:d,time:t},{merge:true})}catch(e){alert('No se pudo cambiar el horario: '+e.message)}
 }
-
 async function saveSpecialDate(){
-if(!isAdmin)return;
-let d=$('specialDate').value,ts=[...new Set($('specialTimes').value.split(/[;,\s]+/).map(x=>x.trim()).filter(Boolean))];
+if(!isAdmin)return;let d=$('specialDate').value,ts=[...new Set($('specialTimes').value.split(/[;,\s]+/).map(x=>x.trim()).filter(Boolean))];
 if(!d||!ts.length||ts.some(t=>!/^([01]\d|2[0-3]):[0-5]\d$/.test(t)))return alert('Elegí una fecha e ingresá horarios válidos (HH:MM).');
-try{await setDoc(doc(db,'specialDates',d),{times:ts.sort()});$('specialTimes').value=''}
-catch(e){alert('No se pudo guardar la jornada: '+e.message)}
+try{await setDoc(doc(db,'specialDates',d),{times:ts.sort()});$('specialTimes').value=''}catch(e){alert('No se pudo guardar la jornada: '+e.message)}
 }
-
-async function removeSpecialDate(d){
-if(!isAdmin||!confirm('¿Quitar jornada?'))return;
-try{await deleteDoc(doc(db,'specialDates',d))}
-catch(e){alert('No se pudo quitar: '+e.message)}
-}
-
-async function paid(id){
-if(!isAdmin)return;
-try{await setDoc(doc(db,'bookings',id),{status:'Seña verificada'},{merge:true})}
-catch(e){alert('No se pudo actualizar la seña: '+e.message)}
-}
-
+async function removeSpecialDate(d){if(!isAdmin||!confirm('¿Quitar jornada?'))return;try{await deleteDoc(doc(db,'specialDates',d))}catch(e){alert('No se pudo quitar: '+e.message)}}
+async function paid(id){if(!isAdmin)return;try{await setDoc(doc(db,'bookings',id),{status:'Seña verificada'},{merge:true})}catch(e){alert('No se pudo actualizar la seña: '+e.message)}}
 async function cancelBooking(id){
-let b=bookings.find(x=>x.id===id);
-if(!isAdmin||!b)return;
-if(dateTime(b.date,b.time).getTime()<Date.now()+24*3600000)return alert('Cancelación permitida hasta 24 horas antes.');
+let b=bookings.find(x=>x.id===id);if(!isAdmin||!b)return;if(dateTime(b.date,b.time).getTime()<Date.now()+24*3600000)return alert('Cancelación permitida hasta 24 horas antes.');
 if(!confirm('¿Cancelar? La seña no se reintegra.'))return;
-try{
-await runTransaction(db,async tx=>{
-let sl=doc(db,'slots',b.slotId||slotKey(b.date,b.time));
-tx.delete(sl);
-tx.update(doc(db,'bookings',id),{status:'Cancelado'});
-});
-}catch(e){alert('No se pudo cancelar: '+e.message)}
+try{await runTransaction(db,async tx=>{let sl=doc(db,'slots',b.slotId||slotKey(b.date,b.time));tx.delete(sl);tx.update(doc(db,'bookings',id),{status:'Cancelado'})})}catch(e){alert('No se pudo cancelar: '+e.message)}
 }
-
 async function reschedule(id){
-let b=bookings.find(x=>x.id===id);
-if(!isAdmin||!b)return;
-if(dateTime(b.date,b.time).getTime()<Date.now()+24*3600000)return alert('Reprogramación permitida hasta 24 horas antes.');
-let nd=prompt('Nueva fecha (AAAA-MM-DD):',b.date);
-if(!nd||!/^\d{4}-\d{2}-\d{2}$/.test(nd))return alert('Fecha inválida.');
-let nt=prompt('Nuevo horario (HH:MM):',b.time);
-if(!nt||!/^([01]\d|2[0-3]):[0-5]\d$/.test(nt))return alert('Horario inválido.');
+let b=bookings.find(x=>x.id===id);if(!isAdmin||!b)return;if(dateTime(b.date,b.time).getTime()<Date.now()+24*3600000)return alert('Reprogramación permitida hasta 24 horas antes.');
+let nd=prompt('Nueva fecha (AAAA-MM-DD):',b.date);if(!nd||!/^\d{4}-\d{2}-\d{2}$/.test(nd))return alert('Fecha inválida.');
+let nt=prompt('Nuevo horario (HH:MM):',b.time);if(!nt||!/^([01]\d|2[0-3]):[0-5]\d$/.test(nt))return alert('Horario inválido.');
 if(dateTime(nd,nt).getTime()<Date.now()+48*3600000)return alert('La nueva fecha debe respetar 48 horas de anticipación.');
-
-let nw=slotKey(nd,nt);
-let isDep=/depilación definitiva/i.test(b.service||'');
-let validTime=isDep?(specialSlots[nd]||[]).includes(nt):times.includes(nt);
+let nw=slotKey(nd,nt),isDep=/depilación definitiva/i.test(b.service||''),validTime=isDep?(specialSlots[nd]||[]).includes(nt):times.includes(nt);
 if(!validTime)return alert('Ese horario no pertenece a los horarios habilitados para este tipo de servicio.');
-
 if(!(dailyServices[nd]||[]).includes(b.serviceId))return alert('El servicio no está habilitado para esa nueva fecha.');
-
-try{
-await runTransaction(db,async tx=>{
-let nref=doc(db,'slots',nw),ns=await tx.get(nref);
-if(ns.exists()&&ns.data().busy)throw Error('El horario nuevo está ocupado.');
-let dref=doc(db,'dailyServices',nd),ds=await tx.get(dref);
-if(!ds.exists()||!(ds.data().serviceIds||[]).includes(b.serviceId))throw Error('El servicio no está habilitado para esa fecha.');
-tx.delete(doc(db,'slots',b.slotId||slotKey(b.date,b.time)));
-tx.set(nref,{busy:true,date:nd,time:nt,bookingId:id});
-tx.update(doc(db,'bookings',id),{date:nd,time:nt,slotId:nw});
-});
-alert('Turno reprogramado.');
-}catch(e){alert(e.message||'No se pudo reprogramar')}
+try{await runTransaction(db,async tx=>{let nref=doc(db,'slots',nw),ns=await tx.get(nref);if(ns.exists()&&ns.data().busy)throw Error('El horario nuevo está ocupado.');
+let dref=doc(db,'dailyServices',nd),ds=await tx.get(dref);if(!ds.exists()||!(ds.data().serviceIds||[]).includes(b.serviceId))throw Error('El servicio no está habilitado para esa fecha.');
+tx.delete(doc(db,'slots',b.slotId||slotKey(b.date,b.time)));tx.set(nref,{busy:true,date:nd,time:nt,bookingId:id});tx.update(doc(db,'bookings',id),{date:nd,time:nt,slotId:nw})});alert('Turno reprogramado.')}catch(e){alert(e.message||'No se pudo reprogramar')}
 }
-
-Object.assign(window,{
-show,choose,book,login,logout,saveSettings,addService,updateService,removeService,
-toggleBusy,saveSpecialDate,removeSpecialDate,renderBookings,paid,cancelBooking,reschedule,
-saveDailyServices
-});
-
-$('date').addEventListener('change',()=>{
-$('booking').classList.add('hidden');
-drawSlots('slots','date',false);
-});
+Object.assign(window,{show,choose,book,login,logout,saveSettings,addService,updateService,removeService,toggleBusy,saveSpecialDate,removeSpecialDate,renderBookings,paid,cancelBooking,reschedule,saveDailyServices});
+$('date').addEventListener('change',()=>{$('booking').classList.add('hidden');drawSlots('slots','date',false)});
 $('adminDate').addEventListener('change',()=>drawSlots('adminSlots','adminDate',true));
 $('dailyServiceDate').addEventListener('change',renderDailyServicePicker);
 $('servicePick').addEventListener('change',()=>drawSlots('slots','date',false));
-
 init();
 </script>
 </body>
