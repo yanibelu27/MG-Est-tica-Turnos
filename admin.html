@@ -5,130 +5,68 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MG Estética | Administración</title>
 <style>
-:root{--p:#b83272;--d:#27212a;--l:#eadde5;--s:#fff2f8}
-*{box-sizing:border-box}
-body{margin:0;background:#faf7f9;color:var(--d);font:16px system-ui}
-header{background:linear-gradient(120deg,#351e32,#a83270);color:white;padding:24px}
-main{max-width:900px;margin:auto;padding:16px}
-.panel{background:white;border:1px solid var(--l);border-radius:16px;padding:18px;margin:14px 0}
-label{display:block;margin:12px 0 5px;font-weight:650}
-input,textarea,button{width:100%;padding:12px;border:1px solid #d9cbd4;border-radius:10px;font:inherit}
-textarea{min-height:90px;resize:vertical}
-button{background:var(--p);color:white;font-weight:700;border:0;cursor:pointer;margin-top:10px}
-button:disabled{opacity:.55;cursor:wait}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
-.row{border-bottom:1px solid var(--l);padding:14px 0}
-.hidden{display:none!important}
-.muted{font-size:14px;color:#746975}
-.danger{background:#9e284a}
-.preview{display:block;max-width:220px;max-height:180px;object-fit:cover;border-radius:12px;margin-top:10px}
-.service-photo{width:100px;height:85px;object-fit:cover;border-radius:10px;float:left;margin:0 12px 8px 0}
-.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;clear:both}
-.actions button{margin-top:8px}
+:root{--p:#b83272;--d:#27212a;--l:#eadde5;--s:#fff2f8;--g:#218653}
+*{box-sizing:border-box}body{margin:0;background:#faf7f9;color:var(--d);font:16px system-ui}
+header{background:linear-gradient(120deg,#351e32,#a83270);color:white;padding:22px}
+main{max-width:950px;margin:auto;padding:14px}.panel{background:white;border:1px solid var(--l);border-radius:16px;padding:17px;margin:14px 0}
+label{display:block;margin:12px 0 5px;font-weight:650}input,textarea,select,button{width:100%;padding:11px;border:1px solid #d9cbd4;border-radius:10px;font:inherit}
+textarea{min-height:90px;resize:vertical}button{background:var(--p);color:white;font-weight:700;border:0;cursor:pointer;margin-top:10px}button:disabled{opacity:.55}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.row{border-bottom:1px solid var(--l);padding:14px 0}
+.hidden{display:none!important}.muted{font-size:14px;color:#746975}.danger{background:#9e284a}.secondary{background:#5b4b58}
+.preview{max-width:220px;max-height:180px;object-fit:cover;border-radius:12px;margin-top:10px}.service-photo{width:100px;height:85px;object-fit:cover;border-radius:10px;float:left;margin:0 12px 8px 0}
+.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;clear:both}.actions button{margin-top:8px}
+.day{border:1px solid var(--l);border-radius:12px;padding:12px;margin:10px 0}.dayhead{display:flex;align-items:center;gap:10px}.dayhead input{width:auto;transform:scale(1.2)}.dayhead label{margin:0}
 footer{text-align:center;padding:20px;color:#777;font-size:12px}
 </style>
 </head>
 <body>
 <header><h1>MG Estética · Administración</h1><p>Panel privado</p></header>
 <main>
-<section id="login" class="panel">
-<h2>Ingresar</h2>
+<section id="login" class="panel"><h2>Ingresar</h2>
 <label for="email">Email</label><input id="email" type="email" autocomplete="username">
 <label for="pass">Contraseña</label><input id="pass" type="password" autocomplete="current-password">
-<button id="loginBtn">Iniciar sesión</button><p class="muted" id="msg" role="status"></p>
-</section>
+<button id="loginBtn">Iniciar sesión</button><p class="muted" id="msg" role="status"></p></section>
 <section id="panel" class="hidden">
-<div class="panel">
-<button id="logout" class="danger">Cerrar sesión</button>
-<h2>Agregar servicio</h2>
+<div class="panel"><button id="logout" class="danger">Cerrar sesión</button>
+<h2>Agenda · Días y horarios de atención</h2><p class="muted">Activá los días que atendés y configurá el horario de inicio, fin e intervalo de turnos. Guardá los cambios.</p>
+<div id="days"></div><button id="saveAgenda">Guardar agenda</button><p id="agendaMsg" class="muted" role="status"></p></div>
+<div class="panel"><h2>Servicios · Agregar</h2>
 <label for="nm">Nombre</label><input id="nm" maxlength="100">
-<div class="grid">
-<div><label for="pr">Precio (ARS)</label><input id="pr" inputmode="numeric"></div>
-<div><label for="du">Duración (min)</label><input id="du" type="number" min="15" max="600" value="30"></div>
-</div>
-<label for="desc">Descripción</label><textarea id="desc" maxlength="1000" placeholder="Contá brevemente en qué consiste el servicio"></textarea>
-<label for="photo">Foto del servicio (opcional)</label>
-<input id="photo" type="file" accept="image/*">
-<p class="muted">Elegí una imagen de la galería del celular. Máximo 5 MB. Se mostrará en la página de reservas.</p>
-<img id="preview" class="preview hidden" alt="Vista previa de la foto seleccionada">
-<button id="add">Guardar servicio</button><p id="saveMsg" class="muted" role="status"></p>
-</div>
-<div class="panel"><h2>Servicios</h2><div id="services">Cargando…</div></div>
+<div class="grid"><div><label for="pr">Precio (ARS)</label><input id="pr" inputmode="numeric"></div><div><label for="du">Duración (min)</label><input id="du" type="number" min="15" max="600" value="30"></div></div>
+<label for="desc">Descripción</label><textarea id="desc" maxlength="1000" placeholder="Descripción del servicio que ofrecés"></textarea>
+<label for="photo">Foto del servicio (opcional)</label><input id="photo" type="file" accept="image/*"><p class="muted">Foto desde la galería. Máximo 5 MB.</p>
+<img id="preview" class="preview hidden" alt="Vista previa"><button id="add">Guardar servicio</button><p id="saveMsg" class="muted" role="status"></p></div>
+<div class="panel"><h2>Servicios disponibles</h2><p class="muted">Podés editar, cambiar fotos, activar/desactivar o eliminar. Los servicios activos se mostrarán a las clientas.</p><div id="services">Cargando…</div></div>
 <div class="panel"><h2>Solicitudes de turnos</h2><div id="requests">Cargando…</div></div>
-</section>
-<footer>MG Estética · Administración</footer>
-</main>
+</section><footer>MG Estética · Administración</footer></main>
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
-import{getFirestore,collection,getDocs,addDoc,updateDoc,doc,deleteDoc}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+import{getFirestore,collection,getDocs,addDoc,updateDoc,doc,deleteDoc,getDoc,setDoc}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
 import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
-import{getStorage,ref,uploadBytes,getDownloadURL}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
-
+import{getStorage,ref,uploadBytes,getDownloadURL,deleteObject}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
 const firebaseConfig={apiKey:'AIzaSyB_yLOsIAhEkcr1blJK46HAhcWylVI-3v0',authDomain:'mg-estetica-turnos.firebaseapp.com',projectId:'mg-estetica-turnos',storageBucket:'mg-estetica-turnos.firebasestorage.app',messagingSenderId:'425300609473',appId:'1:425300609473:web:45bb97101299ae18b00740'};
 const app=initializeApp(firebaseConfig),db=getFirestore(app),auth=getAuth(app),storage=getStorage(app);
-const ADMIN='lvCsIh1rliWqmsV8cPCCnCCZdHj2';
+const ADMIN='lvCsIh1rliWqmsV8cPCCnCCZdHj2',daysNames=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'],dayKeys=['mon','tue','wed','thu','fri','sat','sun'];
 const $=x=>document.getElementById(x);
 function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function safeImageUrl(value){try{const u=new URL(value);return u.protocol==='https:'?u.href:''}catch{return ''}}
-async function uploadServicePhoto(file,serviceId){
- if(!file)return null;
- if(!file.type.startsWith('image/'))throw new Error('El archivo debe ser una imagen.');
- if(file.size>5*1024*1024)throw new Error('La imagen no puede superar los 5 MB.');
- const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
- const path=`services/${serviceId}/${Date.now()}.${ext}`;
- const imageRef=ref(storage,path);
- await uploadBytes(imageRef,file,{contentType:file.type});
- return {imageUrl:await getDownloadURL(imageRef),imagePath:path};
-}
-onAuthStateChanged(auth,u=>{
- if(u&&u.uid===ADMIN){$('login').classList.add('hidden');$('panel').classList.remove('hidden');loadAll();}
- else{$('login').classList.remove('hidden');$('panel').classList.add('hidden');if(u&&u.uid!==ADMIN)$('msg').textContent='Esta cuenta no tiene permiso de administración.';}
-});
-$('loginBtn').onclick=async()=>{try{ $('msg').textContent='Ingresando…';await signInWithEmailAndPassword(auth,$('email').value,$('pass').value);$('msg').textContent='';}catch(e){$('msg').textContent='No se pudo iniciar sesión. Revisá email y contraseña.'}};
+let agenda={};
+function renderDays(){ $('days').innerHTML=dayKeys.map((k,i)=>{const d=agenda[k]||{enabled:false,start:'10:00',end:'20:00',interval:30};return `<div class="day"><div class="dayhead"><input type="checkbox" id="en_${k}" ${d.enabled?'checked':''}><label for="en_${k}">${daysNames[i]}</label></div><div class="grid"><div><label for="st_${k}">Desde</label><input type="time" id="st_${k}" value="${esc(d.start||'10:00')}"></div><div><label for="ed_${k}">Hasta</label><input type="time" id="ed_${k}" value="${esc(d.end||'20:00')}"></div><div><label for="it_${k}">Intervalo (minutos)</label><select id="it_${k}">${[15,20,30,45,60,90,120].map(v=>`<option value="${v}" ${Number(d.interval||30)===v?'selected':''}>${v}</option>`).join('')}</select></div></div></div>`}).join('')}
+function readAgenda(){let a={};dayKeys.forEach(k=>a[k]={enabled:$('en_'+k).checked,start:$('st_'+k).value,end:$('ed_'+k).value,interval:Number($('it_'+k).value)});return a}
+async function loadAgenda(){try{const snap=await getDoc(doc(db,'dailyServices','weekly'));if(snap.exists())agenda=snap.data().days||{};renderDays()}catch(e){$('agendaMsg').textContent='No se pudo leer la agenda. '+(e.code||'')}}
+$('saveAgenda').onclick=async()=>{const a=readAgenda();for(const k of dayKeys){if(a[k].enabled&&(!a[k].start||!a[k].end||a[k].start>=a[k].end)){ $('agendaMsg').textContent='Revisá el horario de inicio y fin en los días habilitados.';return;}}
+const b=$('saveAgenda');b.disabled=true;$('agendaMsg').textContent='Guardando…';try{await setDoc(doc(db,'dailyServices','weekly'),{days:a,updatedAt:Date.now()});agenda=a;$('agendaMsg').textContent='Agenda guardada correctamente.'}catch(e){$('agendaMsg').textContent='No se pudo guardar. Revisá las reglas de Firestore. '+(e.code||'')}finally{b.disabled=false}};
+onAuthStateChanged(auth,u=>{if(u&&u.uid===ADMIN){$('login').classList.add('hidden');$('panel').classList.remove('hidden');loadAll();loadAgenda()}else{$('login').classList.remove('hidden');$('panel').classList.add('hidden');if(u&&u.uid!==ADMIN)$('msg').textContent='Esta cuenta no tiene permiso de administración.'}});
+$('loginBtn').onclick=async()=>{try{$('msg').textContent='Ingresando…';await signInWithEmailAndPassword(auth,$('email').value,$('pass').value);$('msg').textContent=''}catch(e){$('msg').textContent='No se pudo iniciar sesión. Revisá email y contraseña.'}};
 $('logout').onclick=()=>signOut(auth);
-$('photo').addEventListener('change',()=>{
- const f=$('photo').files[0],img=$('preview');
- if(!f){img.src='';img.classList.add('hidden');return;}
- if(!f.type.startsWith('image/')||f.size>5*1024*1024){alert('Elegí una imagen de hasta 5 MB.');$('photo').value='';img.classList.add('hidden');return;}
- img.src=URL.createObjectURL(f);img.classList.remove('hidden');
-});
-$('add').onclick=async()=>{
- const name=$('nm').value.trim(),price=$('pr').value.replace(/\D/g,''),duration=Number($('du').value),description=$('desc').value.trim(),file=$('photo').files[0];
- if(!name||!Number.isFinite(duration)||duration<15||duration>600)return alert('Ingresá nombre y una duración válida (15 a 600 minutos).');
- const btn=$('add');btn.disabled=true;$('saveMsg').textContent='Guardando servicio…';
- try{
-  const created=await addDoc(collection(db,'services'),{name,price,duration,description,active:true});
-  if(file){$('saveMsg').textContent='Subiendo fotografía…';const photoData=await uploadServicePhoto(file,created.id);await updateDoc(doc(db,'services',created.id),photoData);}
-  $('nm').value='';$('pr').value='';$('du').value='30';$('desc').value='';$('photo').value='';$('preview').src='';$('preview').classList.add('hidden');
-  $('saveMsg').textContent='Servicio guardado correctamente.';await loadAll();
- }catch(e){console.error(e);$('saveMsg').textContent='No se pudo guardar. Revisá que Firebase Storage esté habilitado y sus reglas estén configuradas. '+(e.code||'');}
- finally{btn.disabled=false;}
-};
-async function loadAll(){
- try{
-  const ss=await getDocs(collection(db,'services'));
-  $('services').innerHTML=ss.docs.map(d=>{
-   const s=d.data(),photo=safeImageUrl(s.imageUrl);
-   return `<div class="row">${photo?`<img class="service-photo" src="${esc(photo)}" alt="Foto de ${esc(s.name)}">`:''}<b>${esc(s.name||'Servicio')}</b><div class="muted">$${esc(s.price||'Consultar')} · ${esc(s.duration||30)} min</div>${s.description?`<p>${esc(s.description)}</p>`:''}<div class="actions"><button onclick="window.editSvc('${d.id}')">Editar datos</button><button onclick="window.changePhoto('${d.id}')">Cambiar foto</button><button class="danger" onclick="window.delSvc('${d.id}')">Eliminar</button></div></div>`;
-  }).join('')||'Sin servicios.';
-  const bs=await getDocs(collection(db,'bookingRequests'));
-  $('requests').innerHTML=bs.docs.map(d=>{const b=d.data();return `<div class="row"><b>${esc(b.name)}</b><div>${esc(b.service)} · ${esc(b.date)} ${esc(b.time)}</div><div class="muted">WhatsApp: ${esc(b.phone)} · Estado: ${esc(b.status)}</div><button onclick="window.confirmReq('${d.id}')">Marcar confirmado manualmente</button></div>`}).join('')||'Sin solicitudes.';
- }catch(e){console.error(e);$('services').textContent='No se pudieron cargar los datos. Revisá las reglas de Firestore.';}
-}
-window.editSvc=async id=>{
- const q=await getDocs(collection(db,'services')),s=q.docs.find(x=>x.id===id)?.data();if(!s)return;
- const n=prompt('Nombre',s.name||''),p=prompt('Precio (solo números)',s.price||''),du=prompt('Duración en minutos',s.duration||30),description=prompt('Descripción',s.description||'');
- if(n!==null&&p!==null&&du!==null&&description!==null){
-  const duration=Number(du);if(!n.trim()||duration<15||duration>600)return alert('Revisá el nombre y la duración.');
-  await updateDoc(doc(db,'services',id),{name:n.trim(),price:p.replace(/\D/g,''),duration,description:description.trim()});await loadAll();
- }
-};
-window.changePhoto=async id=>{
- const picker=document.createElement('input');picker.type='file';picker.accept='image/*';
- picker.onchange=async()=>{const file=picker.files[0];if(!file)return;try{const data=await uploadServicePhoto(file,id);await updateDoc(doc(db,'services',id),data);alert('Foto actualizada.');await loadAll();}catch(e){console.error(e);alert('No se pudo subir la foto. Revisá Firebase Storage y sus reglas. '+(e.code||''));}};
- picker.click();
-};
-window.delSvc=async id=>{if(confirm('¿Eliminar servicio?')){await deleteDoc(doc(db,'services',id));await loadAll();}};
-window.confirmReq=async id=>{await updateDoc(doc(db,'bookingRequests',id),{status:'Confirmado manualmente'});await loadAll();};
-</script>
-</body></html>
+$('photo').addEventListener('change',()=>{const f=$('photo').files[0],img=$('preview');if(!f){img.src='';img.classList.add('hidden');return;}if(!f.type.startsWith('image/')||f.size>5*1024*1024){alert('Elegí una imagen de hasta 5 MB.');$('photo').value='';img.classList.add('hidden');return;}img.src=URL.createObjectURL(f);img.classList.remove('hidden')});
+async function uploadServicePhoto(file,id){if(!file)return null;if(!file.type.startsWith('image/')||file.size>5*1024*1024)throw Error('Imagen inválida o mayor de 5 MB');const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg',path=`services/${id}/${Date.now()}.${ext}`,r=ref(storage,path);await uploadBytes(r,file,{contentType:file.type});return{imageUrl:await getDownloadURL(r),imagePath:path}}
+$('add').onclick=async()=>{const name=$('nm').value.trim(),price=$('pr').value.replace(/\D/g,''),duration=Number($('du').value),description=$('desc').value.trim(),file=$('photo').files[0];if(!name||!Number.isFinite(duration)||duration<15||duration>600)return alert('Ingresá nombre y duración válida (15 a 600 minutos).');const btn=$('add');btn.disabled=true;$('saveMsg').textContent='Guardando…';try{const created=await addDoc(collection(db,'services'),{name,price,duration,description,active:true});if(file){const photoData=await uploadServicePhoto(file,created.id);await updateDoc(doc(db,'services',created.id),photoData)}$('nm').value='';$('pr').value='';$('du').value='30';$('desc').value='';$('photo').value='';$('preview').src='';$('preview').classList.add('hidden');$('saveMsg').textContent='Servicio guardado.';await loadAll()}catch(e){$('saveMsg').textContent='Error guardando servicio. '+(e.code||e.message||'')}finally{btn.disabled=false}};
+async function loadAll(){try{const ss=await getDocs(collection(db,'services'));$('services').innerHTML=ss.docs.map(d=>{const s=d.data(),photo=safeImageUrl(s.imageUrl);return `<div class="row">${photo?`<img class="service-photo" src="${esc(photo)}" alt="">`:''}<b>${esc(s.name||'Servicio')}</b><div class="muted">$${esc(s.price||'Consultar')} · ${esc(s.duration||30)} min · ${s.active===false?'Inactivo':'Activo'}</div>${s.description?`<p>${esc(s.description)}</p>`:''}<div class="actions"><button onclick="window.editSvc('${d.id}')">Editar datos</button><button onclick="window.changePhoto('${d.id}')">Cambiar foto</button><button class="secondary" onclick="window.toggleSvc('${d.id}',${s.active!==false})">${s.active===false?'Activar':'Desactivar'}</button><button class="danger" onclick="window.delSvc('${d.id}')">Eliminar</button></div></div>`}).join('')||'Sin servicios.';
+const bs=await getDocs(collection(db,'bookingRequests'));$('requests').innerHTML=bs.docs.map(d=>{const b=d.data();return `<div class="row"><b>${esc(b.name)}</b><div>${esc(b.service)} · ${esc(b.date)} ${esc(b.time)}</div><div class="muted">WhatsApp: ${esc(b.phone)} · Estado: ${esc(b.status)}</div><button onclick="window.confirmReq('${d.id}')">Marcar confirmado manualmente</button></div>`}).join('')||'Sin solicitudes.'}catch(e){console.error(e);$('services').textContent='No se pudieron cargar datos. Revisá Firestore.'}}
+window.editSvc=async id=>{const q=await getDocs(collection(db,'services')),s=q.docs.find(x=>x.id===id)?.data();if(!s)return;const n=prompt('Nombre',s.name||''),p=prompt('Precio (solo números)',s.price||''),du=prompt('Duración en minutos',s.duration||30),description=prompt('Descripción',s.description||'');if(n!==null&&p!==null&&du!==null&&description!==null){const duration=Number(du);if(!n.trim()||duration<15||duration>600)return alert('Revisá nombre y duración.');await updateDoc(doc(db,'services',id),{name:n.trim(),price:p.replace(/\D/g,''),duration,description:description.trim()});await loadAll()}};
+window.changePhoto=async id=>{const picker=document.createElement('input');picker.type='file';picker.accept='image/*';picker.onchange=async()=>{const file=picker.files[0];if(!file)return;try{const data=await uploadServicePhoto(file,id);await updateDoc(doc(db,'services',id),data);alert('Foto actualizada');await loadAll()}catch(e){alert('No se pudo subir. Revisá Storage y sus reglas. '+(e.code||e.message||''))}};picker.click()};
+window.toggleSvc=async(id,active)=>{await updateDoc(doc(db,'services',id),{active:!active});await loadAll()};
+window.delSvc=async id=>{if(confirm('¿Eliminar servicio?')){await deleteDoc(doc(db,'services',id));await loadAll()}};
+window.confirmReq=async id=>{if(confirm('¿Marcar esta solicitud como confirmada manualmente?')){await updateDoc(doc(db,'bookingRequests',id),{status:'Confirmado manualmente'});await loadAll()}};
+</script></body></html>
