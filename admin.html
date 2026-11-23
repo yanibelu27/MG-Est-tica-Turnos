@@ -81,11 +81,12 @@ footer{text-align:center;padding:20px;color:#777;font-size:12px}
 <section id="login" class="panel">
 <h2>Ingresar</h2>
 <label for="email">Email</label>
-<input id="email" type="email" autocomplete="username">
+<input id="email" type="email" autocomplete="username" placeholder="tu correo electrónico">
 <label for="pass">Contraseña</label>
 <input id="pass" type="password" autocomplete="current-password">
 <button id="loginBtn">Iniciar sesión</button>
-<p class="muted" id="msg" role="status"></p>
+<button id="resetBtn" class="secondary" type="button">Olvidé mi contraseña</button>
+<p class="muted" id="msg" role="status" aria-live="polite"></p>
 </section>
 
 <section id="panel" class="hidden">
@@ -104,8 +105,7 @@ Cada servicio puede tener su propio horario e intervalo.
 <button id="nextMonth" class="secondary" aria-label="Mes siguiente">›</button>
 </div>
 
-<div class="calendar" id="calendar">
-</div>
+<div class="calendar" id="calendar"></div>
 
 <div class="legend">
 <span><i class="dot" style="background:#9ac9aa"></i>Fecha con servicios</span>
@@ -178,7 +178,8 @@ import{
 }from'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
 
 import{
- getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut
+ getAuth,signInWithEmailAndPassword,sendPasswordResetEmail,
+ onAuthStateChanged,signOut
 }from'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
 
 import{
@@ -198,6 +199,9 @@ const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const auth=getAuth(app);
 const storage=getStorage(app);
+
+// Solicita a Firebase los correos de acción en español.
+auth.languageCode='es';
 
 const ADMIN='lvCsIh1rliWqmsV8cPCCnCCZdHj2';
 const $=id=>document.getElementById(id);
@@ -246,11 +250,10 @@ let selectedDate=dateKey(new Date());
 let calendarMonth=new Date();
 calendarMonth.setDate(1);
 
-/* AUTENTICACIÓN CORREGIDA
-   - Informa el código exacto de error de Firebase.
-   - Muestra el UID autenticado cuando no coincide con ADMIN.
-   - Carga el panel solamente para el UID administrador.
-   - Evita mostrar "acceso correcto" antes de verificar el UID.
+/* AUTENTICACIÓN
+   - Verifica el UID administrador antes de mostrar el panel.
+   - Permite iniciar sesión con Firebase Authentication.
+   - Permite solicitar un correo nuevo para restablecer la contraseña.
 */
 
 onAuthStateChanged(auth,async u=>{
@@ -348,6 +351,61 @@ $('loginBtn').onclick=async()=>{
  }
 };
 
+/* RECUPERACIÓN DE CONTRASEÑA */
+$('resetBtn').onclick=async()=>{
+ const email=$('email').value.trim();
+ const btn=$('resetBtn');
+
+ if(!email){
+  $('msg').textContent='Primero escribí tu Gmail en el campo Email.';
+  $('email').focus();
+  return;
+ }
+
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+  $('msg').textContent='Revisá que el correo electrónico esté escrito correctamente.';
+  $('email').focus();
+  return;
+ }
+
+ btn.disabled=true;
+ btn.textContent='Enviando correo…';
+ $('msg').textContent='Solicitando el correo de recuperación a Firebase…';
+
+ try{
+  // Se usa el manejador de acciones predeterminado de Firebase.
+  // No se construye manualmente el enlace ni se reutilizan códigos anteriores.
+  await sendPasswordResetEmail(auth,email);
+
+  $('msg').textContent=
+   'Si la dirección corresponde a una cuenta registrada, Firebase enviará un correo para restablecer la contraseña. Revisá Recibidos y Spam y utilizá solamente el correo más reciente.';
+
+ }catch(e){
+  console.error('Error al solicitar restablecimiento:',{
+   code:e.code,
+   message:e.message,
+   projectId:firebaseConfig.projectId
+  });
+
+  const errores={
+   'auth/invalid-email':'El formato del correo electrónico no es válido.',
+   'auth/user-not-found':'No se encontró ese usuario en este proyecto de Firebase.',
+   'auth/missing-email':'Ingresá tu dirección de Gmail antes de solicitar la recuperación.',
+   'auth/too-many-requests':'Se solicitaron demasiados correos. Esperá un tiempo antes de volver a intentarlo.',
+   'auth/network-request-failed':'No hay conexión con Firebase. Revisá Internet e intentá nuevamente.',
+   'auth/unauthorized-continue-uri':'La dirección de continuación no está autorizada en Firebase.',
+   'auth/operation-not-allowed':'La recuperación por correo no está habilitada en Firebase Authentication.'
+  };
+
+  $('msg').textContent=
+   (errores[e.code]||'Firebase no pudo enviar el correo de recuperación.')+
+   ' Código: '+(e.code||'sin código')+'. Revisá la consola si necesitás más detalles.';
+ }finally{
+  btn.disabled=false;
+  btn.textContent='Olvidé mi contraseña';
+ }
+};
+
 $('logout').onclick=async()=>{
  try{
   await signOut(auth);
@@ -394,8 +452,6 @@ function renderCalendar(){
 
  const first=new Date(year,month,1);
  const daysInMonth=new Date(year,month+1,0).getDate();
-
- // Convertir domingo=0 a lunes=0
  const offset=(first.getDay()+6)%7;
 
  let html=weekdays.map(d=>`<div class="weekday">${d}</div>`).join('');
@@ -424,6 +480,7 @@ function renderCalendar(){
  $('calendar').innerHTML=html;
 }
 
+/* Se expone esta función porque los botones del calendario se generan dinámicamente. */
 window.selectAdminDate=async key=>{
  selectedDate=key;
  renderCalendar();
