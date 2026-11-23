@@ -1,19 +1,86 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MG Estética | Turnos</title><style>
-:root{--p:#b83272;--d:#27212a;--s:#fff2f8;--l:#eadde5}*{box-sizing:border-box}body{margin:0;background:#faf7f9;color:var(--d);font:16px system-ui}header{background:linear-gradient(120deg,#351e32,#a83270);color:white;padding:25px}main{max-width:850px;margin:auto;padding:16px}.panel{background:white;border:1px solid var(--l);border-radius:16px;padding:18px;margin:14px 0}h1{margin:0}label{display:block;margin:12px 0 5px;font-weight:650}input,select,button{width:100%;padding:12px;border:1px solid #d9cbd4;border-radius:10px;font:inherit}button{background:var(--p);color:white;font-weight:700;border:0;cursor:pointer;margin-top:10px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.service{border:1px solid var(--l);border-radius:12px;padding:12px}.muted{font-size:14px;color:#746975}.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}.slot{background:#eaf7ef;color:#17643c;border:1px solid #c6e8d2}.notice{background:var(--s);padding:12px;border-radius:12px}.hidden{display:none}footer{text-align:center;padding:20px;color:#777;font-size:12px}
-</style></head><body><header><h1>MG Estética</h1><p>Reservá tu turno · Consultá servicios y horarios</p></header><main>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MG Estética | Turnos</title>
+<style>
+:root{--p:#b83272;--d:#27212a;--s:#fff2f8;--l:#eadde5}
+*{box-sizing:border-box}
+body{margin:0;background:#faf7f9;color:var(--d);font:16px system-ui}
+header{background:linear-gradient(120deg,#351e32,#a83270);color:white;padding:25px}
+main{max-width:850px;margin:auto;padding:16px}
+.panel{background:white;border:1px solid var(--l);border-radius:16px;padding:18px;margin:14px 0}
+h1{margin:0}
+label{display:block;margin:12px 0 5px;font-weight:650}
+input,select,button{width:100%;padding:12px;border:1px solid #d9cbd4;border-radius:10px;font:inherit}
+button{background:var(--p);color:white;font-weight:700;border:0;cursor:pointer;margin-top:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.service{border:1px solid var(--l);border-radius:12px;padding:12px;overflow:hidden;background:white}
+.service img{width:100%;height:175px;object-fit:cover;border-radius:9px;display:block;margin-bottom:10px}
+.muted{font-size:14px;color:#746975}
+.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+.slot{background:#eaf7ef;color:#17643c;border:1px solid #c6e8d2}
+.notice{background:var(--s);padding:12px;border-radius:12px}
+.hidden{display:none}
+footer{text-align:center;padding:20px;color:#777;font-size:12px}
+</style>
+</head>
+<body>
+<header><h1>MG Estética</h1><p>Reservá tu turno · Consultá servicios y horarios</p></header>
+<main>
 <div class="panel"><h2>Servicios</h2><div id="catalog" class="grid"></div><p id="status" class="muted">Conectando…</p></div>
-<div class="panel"><h2>Elegí tu turno</h2><label>Servicio</label><select id="service"></select><label>Fecha</label><input id="date" type="date"><label>Horario</label><select id="time"><option value="">Primero elegí fecha y servicio</option></select><label>Nombre y apellido</label><input id="name" autocomplete="name"><label>WhatsApp</label><input id="phone" inputmode="tel"><button id="submit">Enviar solicitud de turno</button><p class="notice">La solicitud queda pendiente de confirmación. La disponibilidad debe confirmarse con MG Estética antes de realizar el pago. No transfieras ni envíes señas hasta recibir confirmación.</p></div>
-<footer>MG Estética · Agenda de turnos</footer></main>
+<div class="panel">
+<h2>Elegí tu turno</h2>
+<label for="service">Servicio</label><select id="service"></select>
+<label for="date">Fecha</label><input id="date" type="date">
+<label for="time">Horario</label><select id="time"><option value="">Primero elegí fecha y servicio</option></select>
+<label for="name">Nombre y apellido</label><input id="name" autocomplete="name">
+<label for="phone">WhatsApp</label><input id="phone" inputmode="tel">
+<button id="submit">Enviar solicitud de turno</button>
+<p class="notice">La solicitud queda pendiente de confirmación. La disponibilidad debe confirmarse con MG Estética antes de realizar el pago. No transfieras ni envíes señas hasta recibir confirmación.</p>
+</div>
+<footer>MG Estética · Agenda de turnos</footer>
+</main>
 <script type="module">
-import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';import {getFirestore,collection,getDocs,addDoc,query,where} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+import{initializeApp}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
+import{getFirestore,collection,getDocs,addDoc}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
 const firebaseConfig={apiKey:'AIzaSyB_yLOsIAhEkcr1blJK46HAhcWylVI-3v0',authDomain:'mg-estetica-turnos.firebaseapp.com',projectId:'mg-estetica-turnos',storageBucket:'mg-estetica-turnos.firebasestorage.app',messagingSenderId:'425300609473',appId:'1:425300609473:web:45bb97101299ae18b00740'};
-const app=initializeApp(firebaseConfig),db=getFirestore(app);const catalog=document.getElementById('catalog'),service=document.getElementById('service'),date=document.getElementById('date'),time=document.getElementById('time'),status=document.getElementById('status');let services=[];
+const app=initializeApp(firebaseConfig),db=getFirestore(app);
+const $=id=>document.getElementById(id),catalog=$('catalog'),service=$('service'),date=$('date'),time=$('time'),status=$('status');
+let services=[];
 const today=new Date();date.min=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
+function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function safeImageUrl(value){try{const u=new URL(value);return u.protocol==='https:'?u.href:''}catch{return ''}}
 function times(){return Array.from({length:20},(_,i)=>{let h=10+Math.floor(i/2),m=i%2?30:0;return `${String(h).padStart(2,'0')}:${m?'30':'00'}`})}
 function price(v){if(!v)return 'Precio a consultar';let n=Number(String(v).replace(/\D/g,''));return n?'$'+n.toLocaleString('es-AR'):'Precio a consultar'}
 function refreshTime(){time.innerHTML='<option value="">Seleccioná horario</option>';if(!date.value)return;let t=times();if(new Date(date.value+'T12:00').getDay()===0)t=[];t.forEach(x=>time.add(new Option(x,x)));}
-async function load(){try{let snap=await getDocs(collection(db,'services'));services=snap.docs.map(d=>({id:d.id,...d.data()})).filter(s=>s.active!==false);catalog.innerHTML=services.map(s=>`<article class="service"><b>${s.name||'Servicio'}</b><div class="muted">${s.duration||30} minutos · ${price(s.price)}</div>${s.description?`<p>${s.description}</p>`:''}</article>`).join('')||'<p>Los servicios aún no están publicados.</p>';service.innerHTML=services.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');status.textContent='Servicios cargados.';}catch(e){status.textContent='No se pudieron cargar los servicios. Revisá la configuración de Firebase.';console.error(e)}}
+async function load(){
+ try{
+  const snap=await getDocs(collection(db,'services'));
+  services=snap.docs.map(d=>({id:d.id,...d.data()})).filter(s=>s.active!==false);
+  catalog.innerHTML=services.map(s=>{
+   const image=safeImageUrl(s.imageUrl);
+   return `<article class="service">${image?`<img src="${esc(image)}" alt="Foto de ${esc(s.name||'servicio')}" loading="lazy" onerror="this.style.display='none'">`:''}<b>${esc(s.name||'Servicio')}</b><div class="muted">${esc(s.duration||30)} minutos · ${esc(price(s.price))}</div>${s.description?`<p>${esc(s.description).replace(/\n/g,'<br>')}</p>`:''}</article>`;
+  }).join('')||'<p>Los servicios aún no están publicados.</p>';
+  service.innerHTML=services.map(s=>`<option value="${esc(s.id)}">${esc(s.name||'Servicio')}</option>`).join('');
+  status.textContent='Servicios cargados.';
+ }catch(e){status.textContent='No se pudieron cargar los servicios. Revisá la configuración de Firebase.';console.error(e);}
+}
 date.addEventListener('change',refreshTime);service.addEventListener('change',refreshTime);
-document.getElementById('submit').onclick=async()=>{let s=services.find(x=>x.id===service.value),n=document.getElementById('name').value.trim(),p=document.getElementById('phone').value.trim();if(!s||!date.value||!time.value||!n||!p)return alert('Completá todos los datos.');if(date.value<date.min)return alert('Elegí una fecha futura.');try{await addDoc(collection(db,'bookingRequests'),{name:n,phone:p,serviceId:s.id,service:s.name,date:date.value,time:time.value,status:'Pendiente',createdAt:Date.now()});alert('Solicitud enviada. MG Estética debe confirmar disponibilidad antes del pago.');document.getElementById('name').value='';document.getElementById('phone').value='';}catch(e){alert('No se pudo enviar. Revisá las reglas de Firestore.');console.error(e)}};
+$('submit').onclick=async()=>{
+ const s=services.find(x=>x.id===service.value),n=$('name').value.trim(),p=$('phone').value.trim();
+ if(!s||!date.value||!time.value||!n||!p)return alert('Completá todos los datos.');
+ if(date.value<date.min)return alert('Elegí una fecha futura.');
+ const btn=$('submit');btn.disabled=true;btn.textContent='Enviando solicitud…';
+ try{
+  await addDoc(collection(db,'bookingRequests'),{name:n,phone:p,serviceId:s.id,service:s.name,date:date.value,time:time.value,status:'Pendiente',createdAt:Date.now()});
+  alert('Solicitud enviada. MG Estética debe confirmar disponibilidad antes del pago.');
+  $('name').value='';$('phone').value='';
+ }catch(e){alert('No se pudo enviar. Revisá las reglas de Firestore.');console.error(e);}
+ finally{btn.disabled=false;btn.textContent='Enviar solicitud de turno';}
+};
 load();
-</script></body></html>
+</script>
+</body>
+</html>
