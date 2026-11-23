@@ -4,32 +4,218 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MG Estética | Turnos</title>
+
 <style>
-:root{--p:#b83272;--d:#27212a;--s:#fff2f8;--l:#eadde5}
+:root{
+ --p:#b83272;
+ --d:#27212a;
+ --s:#fff2f8;
+ --l:#eadde5;
+ --green:#238653;
+ --greenbg:#e8f6ee;
+ --gray:#aaa2a9;
+}
 *{box-sizing:border-box}
-body{margin:0;background:#faf7f9;color:var(--d);font:16px system-ui}
-header{background:linear-gradient(120deg,#351e32,#a83270);color:white;padding:25px}
+body{
+ margin:0;
+ background:#faf7f9;
+ color:var(--d);
+ font:16px system-ui;
+}
+header{
+ background:linear-gradient(120deg,#351e32,#a83270);
+ color:white;
+ padding:25px;
+}
 main{max-width:850px;margin:auto;padding:16px}
-.panel{background:white;border:1px solid var(--l);border-radius:16px;padding:18px;margin:14px 0}
+.panel{
+ background:white;
+ border:1px solid var(--l);
+ border-radius:16px;
+ padding:18px;
+ margin:14px 0;
+}
 h1{margin:0}
+h2{margin-top:0}
 label{display:block;margin:12px 0 5px;font-weight:650}
-input,select,button{width:100%;padding:12px;border:1px solid #d9cbd4;border-radius:10px;font:inherit}
-button{background:var(--p);color:white;font-weight:700;border:0;cursor:pointer;margin-top:10px}
-button:disabled{opacity:.55}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
-.service{border:1px solid var(--l);border-radius:12px;padding:12px;overflow:hidden;background:white}
-.service img{width:100%;height:175px;object-fit:cover;border-radius:9px;display:block;margin-bottom:10px}
+input,select,button{
+ width:100%;
+ padding:12px;
+ border:1px solid #d9cbd4;
+ border-radius:10px;
+ font:inherit;
+}
+button{
+ background:var(--p);
+ color:white;
+ font-weight:700;
+ border:0;
+ cursor:pointer;
+}
+button:disabled{
+ opacity:.45;
+ cursor:not-allowed;
+}
+.grid{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+ gap:10px;
+}
+.service{
+ border:1px solid var(--l);
+ border-radius:12px;
+ padding:12px;
+ overflow:hidden;
+ background:white;
+}
+.service img{
+ width:100%;
+ height:175px;
+ object-fit:cover;
+ border-radius:9px;
+ display:block;
+ margin-bottom:10px;
+}
 .muted{font-size:14px;color:#746975}
-.notice{background:var(--s);padding:12px;border-radius:12px}
-footer{text-align:center;padding:20px;color:#777;font-size:12px}
+.notice{
+ background:var(--s);
+ padding:12px;
+ border-radius:12px;
+ line-height:1.5;
+}
+footer{
+ text-align:center;
+ padding:20px;
+ color:#777;
+ font-size:12px;
+}
+
+/* CALENDARIO */
+.calendar{
+ border:1px solid var(--l);
+ border-radius:14px;
+ padding:12px;
+ margin-top:12px;
+}
+.calendar-head{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ margin-bottom:14px;
+}
+.calendar-head button{
+ width:44px;
+ height:42px;
+ padding:5px;
+ margin:0;
+ font-size:22px;
+}
+.calendar-head h3{
+ margin:0;
+ text-align:center;
+ text-transform:capitalize;
+ font-size:19px;
+}
+.calendar-grid{
+ display:grid;
+ grid-template-columns:repeat(7,minmax(0,1fr));
+ gap:5px;
+}
+.weekday{
+ text-align:center;
+ font-size:12px;
+ font-weight:700;
+ color:#756b75;
+ padding:7px 0;
+}
+.calendar-day{
+ min-width:0;
+ min-height:43px;
+ padding:5px 2px;
+ border-radius:9px;
+ background:#f1eef0;
+ color:#aaa2a9;
+ border:1px solid transparent;
+ margin:0;
+ font-size:14px;
+ font-weight:600;
+}
+.calendar-day.available{
+ background:var(--greenbg);
+ color:var(--green);
+ border-color:#b9e4c9;
+}
+.calendar-day.available:active{
+ background:#cdebd8;
+}
+.calendar-day.selected{
+ background:var(--p);
+ color:white;
+ border-color:var(--p);
+}
+.calendar-day:disabled{
+ opacity:1;
+ cursor:not-allowed;
+}
+.calendar-day.empty{
+ visibility:hidden;
+}
+.calendar-legend{
+ display:flex;
+ flex-wrap:wrap;
+ gap:14px;
+ margin-top:12px;
+ font-size:12px;
+ color:#746975;
+}
+.legend-item{
+ display:flex;
+ align-items:center;
+ gap:5px;
+}
+.legend-dot{
+ width:11px;
+ height:11px;
+ border-radius:4px;
+ display:inline-block;
+}
+.legend-available{background:var(--greenbg);border:1px solid #b9e4c9}
+.legend-disabled{background:#f1eef0}
+.legend-selected{background:var(--p)}
+.selected-date{
+ background:var(--s);
+ padding:11px;
+ border-radius:10px;
+ margin-top:12px;
+ font-weight:650;
+}
+.calendar-info{
+ font-size:13px;
+ color:#746975;
+ margin:10px 0 0;
+ line-height:1.4;
+}
+@media(max-width:420px){
+ main{padding:10px}
+ .panel{padding:13px}
+ .calendar{padding:8px}
+ .calendar-grid{gap:3px}
+ .calendar-day{min-height:40px;font-size:13px}
+ .calendar-head h3{font-size:17px}
+}
 </style>
 </head>
+
 <body>
+
 <header>
 <h1>MG Estética</h1>
 <p>Reservá tu turno · Consultá servicios y horarios</p>
 </header>
+
 <main>
+
 <div class="panel">
 <h2>Servicios</h2>
 <div id="catalog" class="grid"></div>
@@ -40,24 +226,61 @@ footer{text-align:center;padding:20px;color:#777;font-size:12px}
 <h2>Elegí tu turno</h2>
 
 <label for="service">Servicio</label>
-<select id="service"></select>
+<select id="service">
+<option value="">Cargando servicios…</option>
+</select>
 
-<label for="date">Fecha</label>
-<input id="date" type="date">
+<label>Elegí una fecha</label>
 
-<label for="time">Horario</label>
+<div class="calendar">
+ <div class="calendar-head">
+  <button type="button" id="prevMonth" aria-label="Mes anterior">‹</button>
+  <h3 id="monthTitle">Cargando calendario</h3>
+  <button type="button" id="nextMonth" aria-label="Mes siguiente">›</button>
+ </div>
+
+ <div class="calendar-grid" id="calendarGrid"></div>
+
+ <div class="calendar-legend">
+  <span class="legend-item">
+   <span class="legend-dot legend-available"></span>
+   Día habilitado
+  </span>
+  <span class="legend-item">
+   <span class="legend-dot legend-disabled"></span>
+   No disponible
+  </span>
+  <span class="legend-item">
+   <span class="legend-dot legend-selected"></span>
+   Fecha elegida
+  </span>
+ </div>
+
+ <p class="calendar-info" id="calendarInfo">
+ Los días habilitados se calculan según la agenda semanal de MG Estética.
+ </p>
+</div>
+
+<input id="date" type="date" hidden>
+
+<div id="selectedDate" class="selected-date">
+Todavía no seleccionaste una fecha.
+</div>
+
+<label for="time">Horario disponible</label>
 <select id="time">
 <option value="">Primero elegí fecha y servicio</option>
 </select>
+
 <p id="availabilityMsg" class="muted"></p>
 
 <label for="name">Nombre y apellido</label>
-<input id="name" autocomplete="name">
+<input id="name" autocomplete="name" maxlength="100">
 
 <label for="phone">WhatsApp</label>
-<input id="phone" inputmode="tel">
+<input id="phone" inputmode="tel" maxlength="30">
 
-<button id="submit">Enviar solicitud de turno</button>
+<button id="submit" type="button">Enviar solicitud de turno</button>
 
 <p class="notice">
 Al enviar tu solicitud, el sistema intentará reservar el espacio completo del servicio.
@@ -65,18 +288,26 @@ La solicitud quedará pendiente de confirmación de MG Estética.
 No transfieras ni envíes señas hasta recibir confirmación.
 </p>
 </div>
+
 <footer>MG Estética · Agenda de turnos</footer>
+
 </main>
 
 <script type="module">
+
 import{initializeApp}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
+
 import{
- getFirestore,collection,getDocs,getDoc,doc,
+ getFirestore,
+ collection,
+ getDocs,
+ getDoc,
+ doc,
  runTransaction
 }from'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
 
 const firebaseConfig={
- apiKey:'AIzaSyB_yLOsIAhEkcr1blJK46HAhcWylVI-3v0',
+ apiKey:'AIzaSyB_yLOsIAhEkcr1blJK46HAHCWylVI-3v0',
  authDomain:'mg-estetica-turnos.firebaseapp.com',
  projectId:'mg-estetica-turnos',
  storageBucket:'mg-estetica-turnos.firebasestorage.app',
@@ -84,27 +315,64 @@ const firebaseConfig={
  appId:'1:425300609473:web:45bb97101299ae18b00740'
 };
 
-const app=initializeApp(firebaseConfig),db=getFirestore(app);
-const $=id=>document.getElementById(id);
-const catalog=$('catalog'),service=$('service'),date=$('date'),
-time=$('time'),status=$('status'),availabilityMsg=$('availabilityMsg');
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
 
-let services=[],agenda={};
+const $=id=>document.getElementById(id);
+
+const catalog=$('catalog');
+const service=$('service');
+const date=$('date');
+const time=$('time');
+const status=$('status');
+const availabilityMsg=$('availabilityMsg');
+
+let services=[];
+let agenda={};
+
+const dayKeys=[
+ 'sun','mon','tue','wed','thu','fri','sat'
+];
+
+const weekdays=[
+ 'Lun','Mar','Mié','Jue','Vie','Sáb','Dom'
+];
 
 const today=new Date();
-date.min=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10);
 
-const dayKeys=['sun','mon','tue','wed','thu','fri','sat'];
+function dateString(d){
+ const y=d.getFullYear();
+ const m=String(d.getMonth()+1).padStart(2,'0');
+ const day=String(d.getDate()).padStart(2,'0');
+ return `${y}-${m}-${day}`;
+}
+
+const todayString=dateString(today);
+date.min=todayString;
+
+let monthCursor=new Date(
+ today.getFullYear(),
+ today.getMonth(),
+ 1
+);
 
 function esc(x){
  return String(x??'').replace(/[&<>"']/g,c=>({
- '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  '&':'&amp;',
+  '<':'&lt;',
+  '>':'&gt;',
+  '"':'&quot;',
+  "'":'&#39;'
  }[c]));
 }
 
 function safeImageUrl(value){
- try{const u=new URL(value);return u.protocol==='https:'?u.href:''}
- catch{return ''}
+ try{
+  const u=new URL(value);
+  return u.protocol==='https:'?u.href:'';
+ }catch{
+  return '';
+ }
 }
 
 function price(v){
@@ -123,21 +391,172 @@ function clock(min){
  String(min%60).padStart(2,'0');
 }
 
-// Bloques de 5 minutos para detectar cualquier superposición.
+// Bloques de 5 minutos para detectar superposiciones.
 function slotIds(dateValue,start,duration){
  const ids=[];
  const end=start+duration;
+
  for(let m=start;m<end;m+=5){
   const t=clock(m);
   ids.push(dateValue+'_'+t.replace(':','-'));
  }
+
  return ids;
 }
 
 function resetTime(message){
- time.innerHTML='<option value="">'+esc(message)+'</option>';
+ time.innerHTML='';
+ time.add(new Option(message,''));
  availabilityMsg.textContent='';
 }
+
+// Comprueba si el día tiene agenda y al menos un servicio
+// que pueda entrar dentro del horario configurado.
+function dayHasSchedule(dateValue){
+ if(dateValue<todayString)return false;
+
+ const selectedDate=new Date(dateValue+'T12:00:00');
+ const dayKey=dayKeys[selectedDate.getDay()];
+ const d=agenda[dayKey];
+
+ if(!d||!d.enabled||!d.start||!d.end)return false;
+
+ const startDay=minutes(d.start);
+ const endDay=minutes(d.end);
+ const interval=Number(d.interval||30);
+
+ if(endDay<=startDay||interval<=0)return false;
+
+ return services.some(s=>{
+  const duration=Number(s.duration||30);
+
+  if(!Number.isInteger(duration)||duration<=0||duration%5!==0){
+   return false;
+  }
+
+  for(let start=startDay;start+duration<=endDay;start+=interval){
+   return true;
+  }
+
+  return false;
+ });
+}
+
+// Dibuja el calendario mensual.
+function renderCalendar(){
+
+ const grid=$('calendarGrid');
+ const title=$('monthTitle');
+
+ const year=monthCursor.getFullYear();
+ const month=monthCursor.getMonth();
+
+ title.textContent=new Intl.DateTimeFormat('es-AR',{
+  month:'long',
+  year:'numeric'
+ }).format(monthCursor);
+
+ grid.innerHTML='';
+
+ weekdays.forEach(day=>{
+  const el=document.createElement('div');
+  el.className='weekday';
+  el.textContent=day;
+  grid.appendChild(el);
+ });
+
+ const firstDay=new Date(year,month,1);
+ const totalDays=new Date(year,month+1,0).getDate();
+
+ // La semana comienza en lunes.
+ const offset=(firstDay.getDay()+6)%7;
+
+ for(let i=0;i<offset;i++){
+  const empty=document.createElement('div');
+  empty.className='calendar-day empty';
+  grid.appendChild(empty);
+ }
+
+ for(let day=1;day<=totalDays;day++){
+
+  const current=new Date(year,month,day);
+  const value=dateString(current);
+
+  const enabled=dayHasSchedule(value);
+  const selected=date.value===value;
+
+  const btn=document.createElement('button');
+  btn.type='button';
+  btn.className='calendar-day';
+
+  if(enabled)btn.classList.add('available');
+  if(selected)btn.classList.add('selected');
+
+  btn.textContent=day;
+  btn.disabled=!enabled;
+  btn.setAttribute(
+   'aria-label',
+   value+(enabled?' disponible':' no disponible')
+  );
+
+  if(enabled){
+   btn.addEventListener('click',()=>{
+    date.value=value;
+    renderCalendar();
+    updateSelectedDate();
+    refreshTime();
+   });
+  }
+
+  grid.appendChild(btn);
+ }
+
+ $('prevMonth').disabled=
+  year===today.getFullYear()&&month<=today.getMonth();
+
+ $('nextMonth').disabled=false;
+
+ $('calendarInfo').textContent=
+  'Los días marcados en verde tienen agenda habilitada. '+
+  'Los horarios realmente libres se verifican al elegir la fecha.';
+}
+
+function updateSelectedDate(){
+ const box=$('selectedDate');
+
+ if(!date.value){
+  box.textContent='Todavía no seleccionaste una fecha.';
+  return;
+ }
+
+ const d=new Date(date.value+'T12:00:00');
+
+ box.textContent='Fecha elegida: '+
+  new Intl.DateTimeFormat('es-AR',{
+   weekday:'long',
+   day:'numeric',
+   month:'long',
+   year:'numeric'
+  }).format(d);
+}
+
+$('prevMonth').addEventListener('click',()=>{
+ monthCursor=new Date(
+  monthCursor.getFullYear(),
+  monthCursor.getMonth()-1,
+  1
+ );
+ renderCalendar();
+});
+
+$('nextMonth').addEventListener('click',()=>{
+ monthCursor=new Date(
+  monthCursor.getFullYear(),
+  monthCursor.getMonth()+1,
+  1
+ );
+ renderCalendar();
+});
 
 async function loadAgenda(){
  const snap=await getDoc(doc(db,'dailyServices','weekly'));
@@ -145,6 +564,7 @@ async function loadAgenda(){
 }
 
 async function refreshTime(){
+
  resetTime('Buscando horarios…');
 
  if(!date.value||!service.value){
@@ -153,19 +573,22 @@ async function refreshTime(){
  }
 
  const s=services.find(x=>x.id===service.value);
+
  if(!s){
   resetTime('Servicio no disponible');
   return;
  }
 
  const duration=Number(s.duration||30);
+
  if(!Number.isInteger(duration)||duration<=0||duration%5!==0){
   resetTime('Duración no válida');
-  availabilityMsg.textContent='Este servicio tiene una duración que debe ajustarse.';
+  availabilityMsg.textContent=
+   'La duración del servicio debe ser un múltiplo de 5 minutos.';
   return;
  }
 
- if(date.value<date.min){
+ if(date.value<todayString){
   resetTime('Elegí una fecha futura');
   return;
  }
@@ -176,7 +599,8 @@ async function refreshTime(){
 
  if(!d||!d.enabled){
   resetTime('Día no habilitado');
-  availabilityMsg.textContent='MG Estética no habilitó la atención para ese día.';
+  availabilityMsg.textContent=
+   'MG Estética no habilitó la atención para ese día.';
   return;
  }
 
@@ -185,7 +609,8 @@ async function refreshTime(){
   return;
  }
 
- const startDay=minutes(d.start),endDay=minutes(d.end);
+ const startDay=minutes(d.start);
+ const endDay=minutes(d.end);
  const interval=Number(d.interval||30);
 
  if(interval<=0){
@@ -194,7 +619,12 @@ async function refreshTime(){
  }
 
  const candidates=[];
- for(let start=startDay;start+duration<=endDay;start+=interval){
+
+ for(
+  let start=startDay;
+  start+duration<=endDay;
+  start+=interval
+ ){
   candidates.push(start);
  }
 
@@ -204,12 +634,14 @@ async function refreshTime(){
  }
 
  try{
-  // Consultamos los bloqueos de todos los candidatos.
-  const idsByStart=candidates.map(start=>slotIds(date.value,start,duration));
+
+  const idsByStart=candidates.map(start=>
+   slotIds(date.value,start,duration)
+  );
+
   const uniqueIds=[...new Set(idsByStart.flat())];
   const occupied=new Set();
 
-  // Consultas agrupadas para reducir lecturas.
   const snaps=await Promise.all(
    uniqueIds.map(id=>getDoc(doc(db,'slots',id)))
   );
@@ -222,7 +654,7 @@ async function refreshTime(){
    idsByStart[i].every(id=>!occupied.has(id))
   );
 
-  time.innerHTML='<option value="">Seleccioná horario</option>';
+  resetTime('Seleccioná horario');
 
   available.forEach(start=>{
    const t=clock(start);
@@ -231,50 +663,80 @@ async function refreshTime(){
 
   if(!available.length){
    resetTime('No hay horarios disponibles');
-   availabilityMsg.textContent='No quedan horarios libres para este servicio.';
+   availabilityMsg.textContent=
+    'No quedan horarios libres para este servicio.';
   }else{
-   availabilityMsg.textContent='Horarios disponibles: '+available.length;
+   availabilityMsg.textContent=
+    'Horarios disponibles: '+available.length;
   }
+
  }catch(e){
   console.error(e);
   resetTime('No se pudo consultar');
-  availabilityMsg.textContent='No se pudo verificar la disponibilidad.';
+  availabilityMsg.textContent=
+   'No se pudo verificar la disponibilidad.';
  }
 }
 
 async function load(){
+
  try{
+
   const snap=await getDocs(collection(db,'services'));
-  services=snap.docs.map(d=>({id:d.id,...d.data()}))
+
+  services=snap.docs
+   .map(d=>({id:d.id,...d.data()}))
    .filter(s=>s.active!==false);
 
   catalog.innerHTML=services.map(s=>{
+
    const image=safeImageUrl(s.imageUrl);
+
    return `<article class="service">
     ${image?`<img src="${esc(image)}" alt="Foto de ${esc(s.name||'servicio')}" loading="lazy">`:''}
     <b>${esc(s.name||'Servicio')}</b>
-    <div class="muted">${esc(s.duration||30)} minutos · ${esc(price(s.price))}</div>
-    ${s.description?`<p>${esc(s.description).replace(/\n/g,'<br>')}</p>`:''}
+    <div class="muted">
+     ${esc(s.duration||30)} minutos · ${esc(price(s.price))}
+    </div>
+    ${s.description?
+     `<p>${esc(s.description).replace(/\n/g,'<br>')}</p>`:''}
    </article>`;
+
   }).join('')||'<p>Los servicios aún no están publicados.</p>';
 
-  service.innerHTML=services.map(s=>
-   `<option value="${esc(s.id)}">${esc(s.name||'Servicio')}</option>`
-  ).join('');
+  service.innerHTML='';
+
+  if(!services.length){
+   service.add(new Option('No hay servicios disponibles',''));
+  }else{
+   service.add(new Option('Seleccioná un servicio',''));
+
+   services.forEach(s=>{
+    service.add(new Option(s.name||'Servicio',s.id));
+   });
+  }
 
   await loadAgenda();
+
   status.textContent='Servicios y agenda cargados.';
-  await refreshTime();
+
+  renderCalendar();
+  updateSelectedDate();
+  resetTime('Elegí fecha y servicio');
+
  }catch(e){
   status.textContent='No se pudieron cargar los servicios o la agenda.';
   console.error(e);
  }
 }
 
-date.addEventListener('change',refreshTime);
-service.addEventListener('change',refreshTime);
+service.addEventListener('change',()=>{
+ renderCalendar();
+ refreshTime();
+});
 
 $('submit').onclick=async()=>{
+
  const s=services.find(x=>x.id===service.value);
  const n=$('name').value.trim();
  const p=$('phone').value.trim();
@@ -285,12 +747,13 @@ $('submit').onclick=async()=>{
   return;
  }
 
- if(date.value<date.min){
+ if(date.value<todayString){
   alert('Elegí una fecha futura.');
   return;
  }
 
  const duration=Number(s.duration||30);
+
  if(!Number.isInteger(duration)||duration<=0||duration%5!==0){
   alert('La duración de este servicio no es válida.');
   return;
@@ -305,14 +768,16 @@ $('submit').onclick=async()=>{
  btn.textContent='Verificando y reservando…';
 
  try{
+
   const bookingRef=doc(collection(db,'bookingRequests'));
 
-  // Se consultan y escriben los bloqueos en una transacción.
-  // La transacción requiere reglas de Firestore específicas
-  // que configuraremos en el siguiente paso.
   await runTransaction(db,async(transaction)=>{
+
    const slotRefs=ids.map(id=>doc(db,'slots',id));
-   const slotSnaps=await Promise.all(slotRefs.map(r=>transaction.get(r)));
+
+   const slotSnaps=await Promise.all(
+    slotRefs.map(r=>transaction.get(r))
+   );
 
    if(slotSnaps.some(snap=>snap.exists())){
     throw new Error('SLOT_OCCUPIED');
@@ -342,31 +807,43 @@ $('submit').onclick=async()=>{
      createdAt:Date.now()
     });
    });
+
   });
 
-  alert('Solicitud enviada. El horario quedó reservado provisoriamente hasta que MG Estética revise la solicitud.');
+  alert(
+   'Solicitud enviada. El horario quedó reservado provisoriamente hasta que MG Estética revise la solicitud.'
+  );
 
   $('name').value='';
   $('phone').value='';
   time.value='';
 
   await refreshTime();
+
  }catch(e){
+
   console.error(e);
 
   if(e.message==='SLOT_OCCUPIED'){
    alert('Ese horario acaba de ser ocupado. Elegí otro.');
   }else{
-   alert('No se pudo reservar. El sistema todavía necesita la configuración de seguridad de Firebase.');
+   alert(
+    'No se pudo reservar. Revisá las reglas de seguridad de Firebase.'
+   );
   }
+
   await refreshTime();
+
  }finally{
+
   btn.disabled=false;
   btn.textContent='Enviar solicitud de turno';
+
  }
 };
 
 load();
+
 </script>
 </body>
 </html>
