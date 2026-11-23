@@ -246,63 +246,117 @@ let selectedDate=dateKey(new Date());
 let calendarMonth=new Date();
 calendarMonth.setDate(1);
 
-/* AUTENTICACIÓN */
+/* AUTENTICACIÓN CORREGIDA
+   - Informa el código exacto de error de Firebase.
+   - Muestra el UID autenticado cuando no coincide con ADMIN.
+   - Carga el panel solamente para el UID administrador.
+   - Evita mostrar "acceso correcto" antes de verificar el UID.
+*/
 
-onAuthStateChanged(auth,u=>{
- if(u&&u.uid===ADMIN){
-  $('login').classList.add('hidden');
-  $('panel').classList.remove('hidden');
-  loadAll();
-  loadSchedules();
- }else{
+onAuthStateChanged(auth,async u=>{
+ console.log('Estado de autenticación:',{
+  email:u?.email||null,
+  uid:u?.uid||null,
+  projectId:firebaseConfig.projectId
+ });
+
+ if(!u){
   $('login').classList.remove('hidden');
   $('panel').classList.add('hidden');
-  if(u&&u.uid!==ADMIN){
-   $('msg').textContent='Esta cuenta no tiene permiso de administración.';
-  }
+  return;
+ }
+
+ if(u.uid!==ADMIN){
+  $('login').classList.remove('hidden');
+  $('panel').classList.add('hidden');
+  $('msg').textContent=
+   'La cuenta inició sesión, pero no es administradora. UID detectado: '+u.uid+
+   '. UID configurado en el panel: '+ADMIN+'.';
+  console.error('UID sin permisos de administración:',u.uid);
+  return;
+ }
+
+ $('msg').textContent='Acceso correcto.';
+ $('login').classList.add('hidden');
+ $('panel').classList.remove('hidden');
+
+ try{
+  await Promise.all([loadAll(),loadSchedules()]);
+ }catch(e){
+  console.error('Error al cargar el panel:',e);
  }
 });
-
 
 $('loginBtn').onclick=async()=>{
  const email=$('email').value.trim();
  const password=$('pass').value;
-
  const btn=$('loginBtn');
+
+ if(!email||!password){
+  $('msg').textContent='Ingresá tu email y contraseña.';
+  return;
+ }
+
  btn.disabled=true;
- $('msg').textContent='Ingresando…';
+ btn.textContent='Ingresando…';
+ $('msg').textContent='Verificando credenciales…';
 
  try{
-  if(!email||!password){
-   throw new Error('Ingresá tu email y contraseña.');
+  const credential=await signInWithEmailAndPassword(auth,email,password);
+  console.log('Inicio de sesión correcto:',{
+   email:credential.user.email,
+   uid:credential.user.uid,
+   projectId:firebaseConfig.projectId
+  });
+
+  if(credential.user.uid!==ADMIN){
+   $('msg').textContent=
+    'El email y la contraseña son correctos, pero esta cuenta no tiene permiso de administración. UID detectado: '+
+    credential.user.uid+'. UID configurado: '+ADMIN+'.';
+  }else{
+   $('msg').textContent='Credenciales correctas. Abriendo administración…';
   }
 
-  await signInWithEmailAndPassword(auth,email,password);
-  $('msg').textContent='Acceso correcto.';
-
  }catch(e){
-  console.error('Error de inicio de sesión:',e);
+  console.error('Error real de Firebase al iniciar sesión:',{
+   code:e.code,
+   message:e.message,
+   projectId:firebaseConfig.projectId
+  });
 
   const errores={
-   'auth/invalid-credential':'El email o la contraseña no son correctos.',
-   'auth/user-not-found':'No se encontró ese usuario en Firebase.',
+   'auth/invalid-credential':'El email o la contraseña no son correctos, o el usuario no existe en este proyecto Firebase.',
+   'auth/user-not-found':'No se encontró ese usuario en Firebase Authentication.',
    'auth/wrong-password':'La contraseña no es correcta.',
    'auth/invalid-email':'El formato del email no es válido.',
-   'auth/too-many-requests':'Hubo demasiados intentos. Esperá un rato.',
-   'auth/network-request-failed':'Problema de conexión a Internet.',
-   'auth/operation-not-allowed':'El acceso con email y contraseña no está habilitado en Firebase.'
+   'auth/too-many-requests':'Hubo demasiados intentos. Esperá un rato antes de volver a probar.',
+   'auth/network-request-failed':'Problema de conexión a Internet. Revisá la conexión e intentá nuevamente.',
+   'auth/operation-not-allowed':'El acceso con email y contraseña no está habilitado en Firebase Authentication.',
+   'auth/user-disabled':'Esta cuenta está deshabilitada en Firebase Authentication.',
+   'auth/unauthorized-domain':'El dominio desde el que abrís el panel no está autorizado en Firebase Authentication.',
+   'auth/invalid-api-key':'La clave API configurada para Firebase no es válida.',
+   'auth/app-not-authorized':'Esta aplicación no está autorizada para usar el proyecto Firebase configurado.'
   };
 
   $('msg').textContent=
-   errores[e.code]||('Error: '+(e.code||e.message));
+   (errores[e.code]||'No se pudo iniciar sesión. Revisá el error de Firebase.')+
+   ' Código: '+(e.code||'sin código')+'.';
 
  }finally{
   btn.disabled=false;
+  btn.textContent='Iniciar sesión';
  }
 };
 
-
-$('logout').onclick=()=>signOut(auth);
+$('logout').onclick=async()=>{
+ try{
+  await signOut(auth);
+  $('msg').textContent='Sesión cerrada.';
+ }catch(e){
+  console.error('Error al cerrar sesión:',e);
+  alert('No se pudo cerrar la sesión. '+(e.code||e.message||''));
+ }
+};
 
 /* CALENDARIO MENSUAL */
 
