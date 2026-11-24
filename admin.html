@@ -183,7 +183,22 @@ $('saveDate').onclick=async()=>{
 };
 $('clearDate').onclick=async()=>{if(!confirm('¿Quitar todos los servicios configurados de esta fecha?'))return;try{await deleteDoc(doc(db,'specialDates',selectedDate));delete schedules[selectedDate];renderCalendar();renderDateEditor();showMessage($('dateMsg'),'Fecha desconfigurada.','ok')}catch(error){showMessage($('dateMsg'),'Error: '+error.message,'error')}};
 
-function loadImage(file){return new Promise((resolve,reject)=>{const url=URL.createObjectURL(file),image=new Image();image.onload=()=>{URL.revokeObjectURL(url);resolve(image)};image.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('No se pudo leer la imagen.'))};image.src=url})}
+/* ÚNICO CAMBIO: lectura de la imagen mediante FileReader antes de cargarla en Image. */
+function loadImage(file){
+ return new Promise((resolve,reject)=>{
+  const reader=new FileReader();
+  const image=new Image();
+
+  reader.onload=()=>{
+   image.onload=()=>resolve(image);
+   image.onerror=()=>reject(new Error('No se pudo interpretar la imagen seleccionada.'));
+   image.src=reader.result;
+  };
+
+  reader.onerror=()=>reject(new Error('No se pudo leer el archivo de imagen.'));
+  reader.readAsDataURL(file);
+ });
+}
 function canvasToBlob(canvas,type,quality){return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('El navegador no pudo comprimir la imagen.')),type,quality))}
 async function compressImage(file){
  if(!file)return null;if(file.size>MAX_IMAGE_SIZE)throw new Error('La imagen original supera los 15 MB.');
