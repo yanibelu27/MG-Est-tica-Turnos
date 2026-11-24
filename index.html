@@ -196,6 +196,14 @@ footer{
  margin:10px 0 0;
  line-height:1.4;
 }
+.service-hint{
+ background:#f0f4ff;
+ padding:10px;
+ border-radius:8px;
+ font-size:14px;
+ margin:8px 0;
+ color:#333;
+}
 @media(max-width:420px){
  main{padding:10px}
  .panel{padding:13px}
@@ -217,18 +225,14 @@ footer{
 <main>
 
 <div class="panel">
-<h2>Servicios</h2>
+<h2>Nuestros Servicios</h2>
+<p class="muted">Seleccioná una fecha primero para ver qué servicios están disponibles ese día</p>
 <div id="catalog" class="grid"></div>
 <p id="status" class="muted">Conectando…</p>
 </div>
 
 <div class="panel">
 <h2>Elegí tu turno</h2>
-
-<label for="service">Servicio</label>
-<select id="service">
-<option value="">Cargando servicios…</option>
-</select>
 
 <label>Elegí una fecha</label>
 
@@ -244,11 +248,11 @@ footer{
  <div class="calendar-legend">
   <span class="legend-item">
    <span class="legend-dot legend-available"></span>
-   Día habilitado
+   Día con atención
   </span>
   <span class="legend-item">
    <span class="legend-dot legend-disabled"></span>
-   No disponible
+   Sin atención
   </span>
   <span class="legend-item">
    <span class="legend-dot legend-selected"></span>
@@ -257,15 +261,22 @@ footer{
  </div>
 
  <p class="calendar-info" id="calendarInfo">
- Los días habilitados se calculan según la agenda semanal de MG Estética.
+ Los días en verde tienen atención disponible. Al elegir un día verás qué servicios se ofrecen.
  </p>
 </div>
 
 <input id="date" type="date" hidden>
 
-<div id="selectedDate" class="selected-date">
+<div id="selectedDateBox" class="selected-date">
 Todavía no seleccionaste una fecha.
 </div>
+
+<div id="dayServicesSection" class="hidden">
+<label for="service">Servicio disponible ese día</label>
+<div id="dayServicesHint" class="service-hint"></div>
+<select id="service">
+<option value="">Elegí un servicio</option>
+</select>
 
 <label for="time">Horario disponible</label>
 <select id="time">
@@ -281,15 +292,15 @@ Todavía no seleccionaste una fecha.
 <input id="phone" inputmode="tel" maxlength="30">
 
 <button id="submit" type="button">Enviar solicitud de turno</button>
+</div>
 
 <p class="notice">
-Al enviar tu solicitud, el sistema intentará reservar el espacio completo del servicio.
-La solicitud quedará pendiente de confirmación de MG Estética.
-No transfieras ni envíes señas hasta recibir confirmación.
+Al enviar tu solicitud, el sistema reservará el horario de forma provisoria hasta que MG Estética confirme tu turno.
+<strong>No realices transferencias ni envíes señas hasta recibir nuestra confirmación por WhatsApp.</strong>
 </p>
 </div>
 
-<footer>MG Estética · Agenda de turnos</footer>
+<footer>MG Estética · Caracas 1149, Santa Marta · WhatsApp: 11 4173-5931</footer>
 
 </main>
 
@@ -322,23 +333,25 @@ const $=id=>document.getElementById(id);
 
 const catalog=$('catalog');
 const service=$('service');
-const date=$('date');
-const time=$('time');
+const dateInput=$('date');
+const timeSelect=$('time');
 const status=$('status');
 const availabilityMsg=$('availabilityMsg');
+const selectedDateBox=$('selectedDateBox');
+const dayServicesSection=$('dayServicesSection');
+const dayServicesHint=$('dayServicesHint');
 
-let services=[];
-let agenda={};
+let allServices=[];
+let specialDates={};
+let selectedDateServices=[];
 
-const dayKeys=[
- 'sun','mon','tue','wed','thu','fri','sat'
-];
-
-const weekdays=[
- 'Lun','Mar','Mié','Jue','Vie','Sáb','Dom'
-];
-
+const dayKeys=['sun','mon','tue','wed','thu','fri','sat'];
+const weekdays=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 const today=new Date();
+const todayString=dateString(today);
+dateInput.min=todayString;
+
+let monthCursor=new Date(today.getFullYear(),today.getMonth(),1);
 
 function dateString(d){
  const y=d.getFullYear();
@@ -347,32 +360,15 @@ function dateString(d){
  return `${y}-${m}-${day}`;
 }
 
-const todayString=dateString(today);
-date.min=todayString;
-
-let monthCursor=new Date(
- today.getFullYear(),
- today.getMonth(),
- 1
-);
-
 function esc(x){
  return String(x??'').replace(/[&<>"']/g,c=>({
-  '&':'&amp;',
-  '<':'&lt;',
-  '>':'&gt;',
-  '"':'&quot;',
-  "'":'&#39;'
+  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
  }[c]));
 }
 
 function safeImageUrl(value){
- try{
-  const u=new URL(value);
-  return u.protocol==='https:'?u.href:'';
- }catch{
-  return '';
- }
+ try{const u=new URL(value);return u.protocol==='https:'?u.href:'';}
+ catch{return '';}
 }
 
 function price(v){
@@ -391,60 +387,65 @@ function clock(min){
  String(min%60).padStart(2,'0');
 }
 
-// Bloques de 5 minutos para detectar superposiciones.
 function slotIds(dateValue,start,duration){
  const ids=[];
  const end=start+duration;
-
  for(let m=start;m<end;m+=5){
   const t=clock(m);
   ids.push(dateValue+'_'+t.replace(':','-'));
  }
-
  return ids;
 }
 
 function resetTime(message){
- time.innerHTML='';
- time.add(new Option(message,''));
+ timeSelect.innerHTML='';
+ timeSelect.add(new Option(message,''));
  availabilityMsg.textContent='';
 }
 
-// Comprueba si el día tiene agenda y al menos un servicio
-// que pueda entrar dentro del horario configurado.
-function dayHasSchedule(dateValue){
- if(dateValue<todayString)return false;
-
- const selectedDate=new Date(dateValue+'T12:00:00');
- const dayKey=dayKeys[selectedDate.getDay()];
- const d=agenda[dayKey];
-
- if(!d||!d.enabled||!d.start||!d.end)return false;
-
- const startDay=minutes(d.start);
- const endDay=minutes(d.end);
- const interval=Number(d.interval||30);
-
- if(endDay<=startDay||interval<=0)return false;
-
- return services.some(s=>{
-  const duration=Number(s.duration||30);
-
-  if(!Number.isInteger(duration)||duration<=0||duration%5!==0){
-   return false;
-  }
-
-  for(let start=startDay;start+duration<=endDay;start+=interval){
-   return true;
-  }
-
-  return false;
+function formatDateKey(key){
+ return new Date(key+'T12:00:00').toLocaleDateString('es-AR',{
+  weekday:'long',day:'numeric',month:'long'
  });
 }
 
-// Dibuja el calendario mensual.
-function renderCalendar(){
+function updateSelectedDate(){
+ if(!dateInput.value){
+  selectedDateBox.textContent='Todavía no seleccionaste una fecha.';
+  dayServicesSection.classList.add('hidden');
+  return;
+ }
 
+ selectedDateBox.textContent='📅 Fecha elegida: '+formatDateKey(dateInput.value);
+
+ const dayData=specialDates[dateInput.value];
+ selectedDateServices=dayData?.services||[];
+
+ if(selectedDateServices.length===0){
+  dayServicesHint.textContent='⚠️ No hay servicios disponibles para esta fecha.';
+  service.innerHTML='<option value="">Sin servicios disponibles</option>';
+  dayServicesSection.classList.add('hidden');
+  resetTime('Elegí otra fecha');
+  return;
+ }
+
+ dayServicesSection.classList.remove('hidden');
+ dayServicesHint.textContent=`✅ ${selectedDateServices.length} servicio${selectedDateServices.length===1?'':'s'} disponible${selectedDateServices.length===1?'':'s'} este día`;
+
+ service.innerHTML='<option value="">Seleccioná un servicio</option>';
+ selectedDateServices.forEach(s=>{
+  service.add(new Option(`${s.name} · ${s.start} a ${s.end}`,s.serviceId));
+ });
+
+ resetTime('Primero elegí un servicio');
+}
+
+function isDayAvailable(dateValue){
+ if(dateValue<todayString)return false;
+ return !!(specialDates[dateValue]?.services?.length>0);
+}
+
+function renderCalendar(){
  const grid=$('calendarGrid');
  const title=$('monthTitle');
 
@@ -452,23 +453,19 @@ function renderCalendar(){
  const month=monthCursor.getMonth();
 
  title.textContent=new Intl.DateTimeFormat('es-AR',{
-  month:'long',
-  year:'numeric'
+  month:'long',year:'numeric'
  }).format(monthCursor);
 
  grid.innerHTML='';
-
- weekdays.forEach(day=>{
+ weekdays.forEach(d=>{
   const el=document.createElement('div');
   el.className='weekday';
-  el.textContent=day;
+  el.textContent=d;
   grid.appendChild(el);
  });
 
  const firstDay=new Date(year,month,1);
  const totalDays=new Date(year,month+1,0).getDate();
-
- // La semana comienza en lunes.
  const offset=(firstDay.getDay()+6)%7;
 
  for(let i=0;i<offset;i++){
@@ -478,174 +475,95 @@ function renderCalendar(){
  }
 
  for(let day=1;day<=totalDays;day++){
-
   const current=new Date(year,month,day);
   const value=dateString(current);
-
-  const enabled=dayHasSchedule(value);
-  const selected=date.value===value;
+  const available=isDayAvailable(value);
+  const selected=dateInput.value===value;
 
   const btn=document.createElement('button');
   btn.type='button';
   btn.className='calendar-day';
-
-  if(enabled)btn.classList.add('available');
+  if(available)btn.classList.add('available');
   if(selected)btn.classList.add('selected');
-
   btn.textContent=day;
-  btn.disabled=!enabled;
-  btn.setAttribute(
-   'aria-label',
-   value+(enabled?' disponible':' no disponible')
-  );
+  btn.disabled=!available;
+  btn.setAttribute('aria-label',value+(available?' disponible':' sin atención'));
 
-  if(enabled){
+  if(available){
    btn.addEventListener('click',()=>{
-    date.value=value;
+    dateInput.value=value;
     renderCalendar();
     updateSelectedDate();
-    refreshTime();
    });
   }
 
   grid.appendChild(btn);
  }
 
- $('prevMonth').disabled=
-  year===today.getFullYear()&&month<=today.getMonth();
-
- $('nextMonth').disabled=false;
-
- $('calendarInfo').textContent=
-  'Los días marcados en verde tienen agenda habilitada. '+
-  'Los horarios realmente libres se verifican al elegir la fecha.';
-}
-
-function updateSelectedDate(){
- const box=$('selectedDate');
-
- if(!date.value){
-  box.textContent='Todavía no seleccionaste una fecha.';
-  return;
- }
-
- const d=new Date(date.value+'T12:00:00');
-
- box.textContent='Fecha elegida: '+
-  new Intl.DateTimeFormat('es-AR',{
-   weekday:'long',
-   day:'numeric',
-   month:'long',
-   year:'numeric'
-  }).format(d);
+ $('prevMonth').disabled=year===today.getFullYear()&&month<=today.getMonth();
+ $('calendarInfo').textContent='Los días en verde tienen atención. Al tocar un día verás qué servicios se ofrecen.';
 }
 
 $('prevMonth').addEventListener('click',()=>{
- monthCursor=new Date(
-  monthCursor.getFullYear(),
-  monthCursor.getMonth()-1,
-  1
- );
+ monthCursor=new Date(monthCursor.getFullYear(),monthCursor.getMonth()-1,1);
  renderCalendar();
 });
 
 $('nextMonth').addEventListener('click',()=>{
- monthCursor=new Date(
-  monthCursor.getFullYear(),
-  monthCursor.getMonth()+1,
-  1
- );
+ monthCursor=new Date(monthCursor.getFullYear(),monthCursor.getMonth()+1,1);
  renderCalendar();
 });
 
-async function loadAgenda(){
- const snap=await getDoc(doc(db,'dailyServices','weekly'));
- agenda=snap.exists()?(snap.data().days||{}):{};
-}
-
 async function refreshTime(){
-
  resetTime('Buscando horarios…');
 
- if(!date.value||!service.value){
+ if(!dateInput.value||!service.value){
   resetTime('Elegí fecha y servicio');
   return;
  }
 
- const s=services.find(x=>x.id===service.value);
-
- if(!s){
-  resetTime('Servicio no disponible');
+ const dayService=selectedDateServices.find(x=>x.serviceId===service.value);
+ if(!dayService){
+  resetTime('Servicio no disponible este día');
   return;
  }
 
- const duration=Number(s.duration||30);
-
- if(!Number.isInteger(duration)||duration<=0||duration%5!==0){
-  resetTime('Duración no válida');
-  availabilityMsg.textContent=
-   'La duración del servicio debe ser un múltiplo de 5 minutos.';
+ const fullService=allServices.find(s=>s.id===dayService.serviceId);
+ if(!fullService){
+  resetTime('Servicio no encontrado');
   return;
  }
 
- if(date.value<todayString){
-  resetTime('Elegí una fecha futura');
-  return;
- }
+ const duration=Number(fullService.duration||30);
+ const startDay=minutes(dayService.start);
+ const endDay=minutes(dayService.end);
+ const interval=Number(dayService.interval||30);
 
- const selectedDate=new Date(date.value+'T12:00:00');
- const dayKey=dayKeys[selectedDate.getDay()];
- const d=agenda[dayKey];
-
- if(!d||!d.enabled){
-  resetTime('Día no habilitado');
-  availabilityMsg.textContent=
-   'MG Estética no habilitó la atención para ese día.';
-  return;
- }
-
- if(!d.start||!d.end||minutes(d.end)<=minutes(d.start)){
-  resetTime('Agenda no válida');
-  return;
- }
-
- const startDay=minutes(d.start);
- const endDay=minutes(d.end);
- const interval=Number(d.interval||30);
-
- if(interval<=0){
-  resetTime('Intervalo no válido');
+ if(endDay<=startDay||interval<=0||!Number.isInteger(duration)||duration<=0){
+  resetTime('Horarios no configurados correctamente');
   return;
  }
 
  const candidates=[];
-
- for(
-  let start=startDay;
-  start+duration<=endDay;
-  start+=interval
- ){
+ for(let start=startDay;start+duration<=endDay;start+=interval){
   candidates.push(start);
  }
 
  if(!candidates.length){
-  resetTime('No hay horarios');
+  resetTime('No hay horarios disponibles');
   return;
  }
 
  try{
-
   const idsByStart=candidates.map(start=>
-   slotIds(date.value,start,duration)
+   slotIds(dateInput.value,start,duration)
   );
-
   const uniqueIds=[...new Set(idsByStart.flat())];
   const occupied=new Set();
 
   const snaps=await Promise.all(
    uniqueIds.map(id=>getDoc(doc(db,'slots',id)))
   );
-
   snaps.forEach((snap,i)=>{
    if(snap.exists())occupied.add(uniqueIds[i]);
   });
@@ -655,195 +573,39 @@ async function refreshTime(){
   );
 
   resetTime('Seleccioná horario');
-
   available.forEach(start=>{
    const t=clock(start);
-   time.add(new Option(t,t));
+   timeSelect.add(new Option(t,t));
   });
 
   if(!available.length){
-   resetTime('No hay horarios disponibles');
-   availabilityMsg.textContent=
-    'No quedan horarios libres para este servicio.';
+   resetTime('No hay horarios libres');
+   availabilityMsg.textContent='Todos los horarios para este servicio ya están reservados.';
   }else{
-   availabilityMsg.textContent=
-    'Horarios disponibles: '+available.length;
+   availabilityMsg.textContent=`✅ ${available.length} horario${available.length===1?'':'s'} disponible${available.length===1?'':'s'}`;
   }
 
  }catch(e){
   console.error(e);
-  resetTime('No se pudo consultar');
-  availabilityMsg.textContent=
-   'No se pudo verificar la disponibilidad.';
+  resetTime('Error al consultar disponibilidad');
  }
 }
 
-async function load(){
-
+async function loadData(){
  try{
+  const snapServices=await getDocs(collection(db,'services'));
+  allServices=snapServices.docs.map(d=>({id:d.id,...d.data()})).filter(s=>s.active!==false);
 
-  const snap=await getDocs(collection(db,'services'));
-
-  services=snap.docs
-   .map(d=>({id:d.id,...d.data()}))
-   .filter(s=>s.active!==false);
-
-  catalog.innerHTML=services.map(s=>{
-
+  catalog.innerHTML=allServices.map(s=>{
    const image=safeImageUrl(s.imageUrl);
-
    return `<article class="service">
     ${image?`<img src="${esc(image)}" alt="Foto de ${esc(s.name||'servicio')}" loading="lazy">`:''}
     <b>${esc(s.name||'Servicio')}</b>
-    <div class="muted">
-     ${esc(s.duration||30)} minutos · ${esc(price(s.price))}
-    </div>
-    ${s.description?
-     `<p>${esc(s.description).replace(/\n/g,'<br>')}</p>`:''}
+    <div class="muted">${esc(s.duration||30)} min · ${esc(price(s.price))}</div>
+    ${s.description?`<p style="font-size:13px;margin:4px 0 0 0">${esc(s.description)}</p>`:''}
    </article>`;
+  }).join('')||'<p class="muted">Los servicios aún no están publicados.</p>';
 
-  }).join('')||'<p>Los servicios aún no están publicados.</p>';
-
-  service.innerHTML='';
-
-  if(!services.length){
-   service.add(new Option('No hay servicios disponibles',''));
-  }else{
-   service.add(new Option('Seleccioná un servicio',''));
-
-   services.forEach(s=>{
-    service.add(new Option(s.name||'Servicio',s.id));
-   });
-  }
-
-  await loadAgenda();
-
-  status.textContent='Servicios y agenda cargados.';
-
-  renderCalendar();
-  updateSelectedDate();
-  resetTime('Elegí fecha y servicio');
-
- }catch(e){
-  status.textContent='No se pudieron cargar los servicios o la agenda.';
-  console.error(e);
- }
-}
-
-service.addEventListener('change',()=>{
- renderCalendar();
- refreshTime();
-});
-
-$('submit').onclick=async()=>{
-
- const s=services.find(x=>x.id===service.value);
- const n=$('name').value.trim();
- const p=$('phone').value.trim();
- const selectedTime=time.value;
-
- if(!s||!date.value||!selectedTime||!n||!p){
-  alert('Completá todos los datos y elegí un horario disponible.');
-  return;
- }
-
- if(date.value<todayString){
-  alert('Elegí una fecha futura.');
-  return;
- }
-
- const duration=Number(s.duration||30);
-
- if(!Number.isInteger(duration)||duration<=0||duration%5!==0){
-  alert('La duración de este servicio no es válida.');
-  return;
- }
-
- const start=minutes(selectedTime);
- const end=start+duration;
- const ids=slotIds(date.value,start,duration);
-
- const btn=$('submit');
- btn.disabled=true;
- btn.textContent='Verificando y reservando…';
-
- try{
-
-  const bookingRef=doc(collection(db,'bookingRequests'));
-
-  await runTransaction(db,async(transaction)=>{
-
-   const slotRefs=ids.map(id=>doc(db,'slots',id));
-
-   const slotSnaps=await Promise.all(
-    slotRefs.map(r=>transaction.get(r))
-   );
-
-   if(slotSnaps.some(snap=>snap.exists())){
-    throw new Error('SLOT_OCCUPIED');
-   }
-
-   transaction.set(bookingRef,{
-    name:n,
-    phone:p,
-    serviceId:s.id,
-    service:s.name,
-    date:date.value,
-    time:selectedTime,
-    endTime:clock(end),
-    duration,
-    slotIds:ids,
-    status:'Pendiente',
-    createdAt:Date.now()
-   });
-
-   slotRefs.forEach((ref,i)=>{
-    transaction.set(ref,{
-     date:date.value,
-     time:clock(start+i*5),
-     requestId:bookingRef.id,
-     service:s.name,
-     status:'Reservado',
-     createdAt:Date.now()
-    });
-   });
-
-  });
-
-  alert(
-   'Solicitud enviada. El horario quedó reservado provisoriamente hasta que MG Estética revise la solicitud.'
-  );
-
-  $('name').value='';
-  $('phone').value='';
-  time.value='';
-
-  await refreshTime();
-
- }catch(e){
-
-  console.error(e);
-
-  if(e.message==='SLOT_OCCUPIED'){
-   alert('Ese horario acaba de ser ocupado. Elegí otro.');
-  }else{
-   alert(
-    'No se pudo reservar. Revisá las reglas de seguridad de Firebase.'
-   );
-  }
-
-  await refreshTime();
-
- }finally{
-
-  btn.disabled=false;
-  btn.textContent='Enviar solicitud de turno';
-
- }
-};
-
-load();
-
-</script>
-</body>
-</html>
+  const snapDates=await getDocs(collection(db,'specialDates'));
+  specialDates={};
+  snapDates
