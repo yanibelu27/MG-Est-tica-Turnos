@@ -69,7 +69,7 @@ const firebaseConfig = {
 
 
 const app=initializeApp(firebaseConfig),db=getFirestore(app),auth=getAuth(app),storage=getStorage(app);
-auth.languageCode='es';const ADMIN='lvCsIh1rliWqmsV8cPCCnCCZdHj2';const $=id=>document.getElementById(id);
+auth.languageCode='es';const ADMIN='7L0RaRsim3PQi8oG7l2nvioqxmm2'; const $=id=>document.getElementById(id);
 const monthNames=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],weekdays=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function dateKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
