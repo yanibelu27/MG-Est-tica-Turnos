@@ -102,7 +102,7 @@ import {getAuth,signInWithEmailAndPassword,sendPasswordResetEmail,onAuthStateCha
    ref(storage, URL) es la forma correcta de recuperar la referencia. */
 import {getStorage,ref,uploadBytes,getDownloadURL,deleteObject} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
 
-const firebaseConfig={apiKey:"AIzaSyB_yLOsIAhEkcr1blJK46HAhcWylVI-3v0",authDomain:"mg-estetica-turnos.firebaseapp.com",projectId:"mg-estetica-turnos",storageBucket:"mg-estetica-turnos.firebasestorage.app",messagingSenderId:"425300609473",appId:"1:425300609473:web:45bb97101299ae18b00740"};
+const firebaseConfig={apiKey:"AIzaSyBlojGI6d8qF5hgJUYxXSJmz77NGqr3L8A",authDomain:"mg-estetica-turnos.firebaseapp.com",projectId:"mg-estetica-turnos",storageBucket:"mg-estetica-turnos.firebasestorage.app",messagingSenderId:"425300609473",appId:"1:425300609473:web:45bb97101299ae18b00740"};
 const app=initializeApp(firebaseConfig),db=getFirestore(app),auth=getAuth(app),storage=getStorage(app);
 auth.languageCode='es';
 const ADMIN='7L0RaRsim3PQi8oG7l2nvioqxmm2';
@@ -139,9 +139,9 @@ onAuthStateChanged(auth,async user=>{
 $('loginBtn').onclick=async()=>{
  const email=$('email').value.trim(),password=$('pass').value,button=$('loginBtn');
  if(!email||!password){$('msg').textContent='Ingresá email y contraseña.';return}
- button.disabled=true;button.textContent='Ingresando…';$('msg').textContent='';
+ button.disabled=true;button.textContent='Ingresando…';$('msg').textContent='Conectando con Firebase…';
  try{await signInWithEmailAndPassword(auth,email,password)}
- catch(error){const errors={'auth/invalid-credential':'Email o contraseña incorrectos.','auth/user-not-found':'Usuario no encontrado.','auth/too-many-requests':'Demasiados intentos. Esperá unos minutos.','auth/invalid-email':'Formato de email inválido.','auth/api-key-not-valid':'La clave API de Firebase no es válida.','auth/api-key-expired':'La clave API de Firebase expiró.','auth/network-request-failed':'No hay conexión. Revisá internet e intentá nuevamente.','auth/operation-not-allowed':'El acceso con email y contraseña no está habilitado en Firebase.'};$('msg').textContent=errors[error.code]||'No se pudo iniciar sesión: '+error.message;console.error(error)}
+ catch(error){const errors={'auth/invalid-credential':'Email o contraseña incorrectos.','auth/user-not-found':'Usuario no encontrado.','auth/too-many-requests':'Demasiados intentos. Esperá unos minutos.','auth/invalid-email':'Formato de email inválido.','auth/api-key-not-valid':'La clave API de Firebase no es válida. Verificá la clave y sus restricciones en Google Cloud.','auth/api-key-expired':'La clave API de Firebase expiró.','auth/unauthorized-domain':'Este dominio no está autorizado en Firebase Authentication.','auth/network-request-failed':'No hay conexión. Revisá internet e intentá nuevamente.','auth/operation-not-allowed':'El acceso con email y contraseña no está habilitado en Firebase.'};$('msg').textContent=errors[error.code]||'No se pudo iniciar sesión: '+error.message;console.error(error)}
  finally{button.disabled=false;button.textContent='Iniciar sesión'}
 };
 $('pass').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
