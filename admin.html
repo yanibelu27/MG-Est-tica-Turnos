@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -219,7 +218,6 @@ import {
  deleteObject
 } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
 
-
 const firebaseConfig={
  apiKey:"AIzaSyBlojGI6d8qF5hgJUYxXSJmz77NGqr3L8A",
  authDomain:"mg-estetica-turnos.firebaseapp.com",
@@ -316,6 +314,12 @@ function validPrice(v){
  return /^\d{0,9}$/.test(String(v));
 }
 
+function minutesOfDay(value){
+ const parts=String(value).split(':').map(Number);
+ if(parts.length!==2||parts.some(n=>!Number.isInteger(n)))return NaN;
+ return parts[0]*60+parts[1];
+}
+
 document.querySelectorAll('.tab').forEach(tab=>{
  tab.addEventListener('click',()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
@@ -336,7 +340,6 @@ window.addEventListener('unhandledrejection',e=>{
  console.error(e.reason);
  globalError('Se produjo un error: '+(e.reason?.message||String(e.reason||'Error desconocido')));
 });
-
 
 onAuthStateChanged(auth,async user=>{
 
@@ -376,7 +379,6 @@ onAuthStateChanged(auth,async user=>{
  $('msg').textContent='No se pudo iniciar Firebase: '+error.message;
  console.error('Error de autenticación:',error);
 });
-
 
 $('loginBtn').onclick=async()=>{
 
@@ -465,10 +467,9 @@ async function loadSchedules(){
 }
 
 
-// CORREGIDO: las reservas públicas se guardan en "bookings".
+// Las reservas públicas se guardan en "bookings".
 
 async function loadRequests(){
-
  const snap=await getDocs(collection(db,'bookings'));
 
  requestsCache=snap.docs.map(d=>({
@@ -483,7 +484,6 @@ async function loadRequests(){
 
  renderRequests();
 }
-
 
 function renderCalendar(){
 
@@ -502,7 +502,6 @@ function renderCalendar(){
  }
 
  for(let day=1;day<=days;day++){
-
   const key=dateKey(new Date(year,month,day));
   const count=Array.isArray(schedules[key]?.services)?schedules[key].services.length:0;
 
@@ -517,7 +516,6 @@ window.selectDate=async key=>{
  renderCalendar();
  renderDateEditor();
 };
-
 
 function renderDateEditor(){
 
@@ -540,19 +538,19 @@ function renderDateEditor(){
   return `<div class="service-option ${checked?'selected':''}" id="opt_${id}">
    <div class="service-top">
     <input type="checkbox" id="ch_${id}" ${checked?'checked':''} onchange="window.toggleSvcOpt('${id}')">
-    <label for="ch_${id}"><b>${esc(service.name)}</b> · ${Number(service.duration||30)} min</label>
+    <label for="ch_${id}"><b>${esc(service.name)}</b> · ${Number(service.duration||30)} min de duración</label>
    </div>
    <div class="service-config">
     <div>
      <label>Desde</label>
-     <input type="time" id="start_${id}" value="${esc(config?.start||'10:00')}" ${checked?'':'disabled'}>
+     <input type="time" id="start_${id}" value="${esc(config?.start||'10:00')}" ${checked?'':'disabled'} step="900">
     </div>
     <div>
      <label>Hasta</label>
-     <input type="time" id="end_${id}" value="${esc(config?.end||'19:00')}" ${checked?'':'disabled'}>
+     <input type="time" id="end_${id}" value="${esc(config?.end||'19:00')}" ${checked?'':'disabled'} step="900">
     </div>
     <div>
-     <label>Intervalo (min)</label>
+     <label>Intervalo entre comienzos (min)</label>
      <select id="int_${id}" ${checked?'':'disabled'}>
       ${[15,30,45,60,90,120].map(n=>`<option value="${n}" ${Number(config?.interval||30)===n?'selected':''}>${n}</option>`).join('')}
      </select>
@@ -579,7 +577,6 @@ $('nextMonth').onclick=()=>{
  renderCalendar();
 };
 
-
 $('saveDate').onclick=async()=>{
 
  const selectedServices=[];
@@ -593,9 +590,33 @@ $('saveDate').onclick=async()=>{
    const start=$('start_'+id).value;
    const end=$('end_'+id).value;
    const interval=Number($('int_'+id).value);
+   const duration=Number(service.duration);
 
    if(!start||!end||start>=end){
     showMessage($('dateMsg'),'Revisá el horario de inicio y fin de '+service.name,'error');
+    return;
+   }
+
+   if(!validDuration(duration)){
+    showMessage($('dateMsg'),'La duración del servicio '+service.name+' debe estar entre 15 y 600 minutos. Revisala en la pestaña Servicios.','error');
+    return;
+   }
+
+   const startMinutes=minutesOfDay(start);
+   const endMinutes=minutesOfDay(end);
+
+   if(
+    !Number.isFinite(startMinutes)||
+    !Number.isFinite(endMinutes)||
+    startMinutes%15!==0||
+    endMinutes%15!==0
+   ){
+    showMessage($('dateMsg'),'Los horarios Desde y Hasta deben estar alineados a intervalos de 15 minutos.','error');
+    return;
+   }
+
+   if(![15,30,45,60,90,120].includes(interval)){
+    showMessage($('dateMsg'),'Elegí un intervalo válido entre comienzos de turnos.','error');
     return;
    }
 
@@ -605,7 +626,7 @@ $('saveDate').onclick=async()=>{
     start,
     end,
     interval,
-    duration:Number(service.duration||30)
+    duration
    });
   }
  }
@@ -640,7 +661,6 @@ $('saveDate').onclick=async()=>{
   button.disabled=false;
  }
 };
-
 
 $('clearDate').onclick=async()=>{
 
@@ -717,7 +737,6 @@ async function loadImage(file){
  });
 }
 
-
 function canvasToBlob(canvas,type,quality){
 
  return new Promise((resolve,reject)=>{
@@ -730,7 +749,6 @@ function canvasToBlob(canvas,type,quality){
 
  });
 }
-
 
 async function compressImage(file){
 
@@ -833,7 +851,6 @@ async function compressImage(file){
  );
 }
 
-
 function clearPreview(){
 
  if(previewUrl){
@@ -845,11 +862,9 @@ function clearPreview(){
  $('preview').classList.add('hidden');
 }
 
-
 $('photo').onchange=()=>{
 
  clearPreview();
-
  selectedFile=$('photo').files[0]||null;
 
  if(!selectedFile)return;
@@ -868,7 +883,6 @@ $('photo').onchange=()=>{
  $('preview').classList.remove('hidden');
 };
 
-
 async function uploadPhoto(file,id){
 
  if(!file)return '';
@@ -883,7 +897,6 @@ async function uploadPhoto(file,id){
 
  return await getDownloadURL(storageRef);
 }
-
 
 async function removePhoto(photoUrl){
 
@@ -957,13 +970,11 @@ $('add').onclick=async()=>{
   clearPreview();
 
   showMessage($('saveMsg'),'Servicio guardado correctamente.','ok');
-
   await loadServices();
 
  }catch(error){
 
   if(uploadedPhoto)await removePhoto(uploadedPhoto);
-
   showMessage($('saveMsg'),'No se pudo guardar: '+error.message,'error');
 
  }finally{
@@ -1001,7 +1012,7 @@ function renderServices(){
     </div>
     <div>
      <label>Duración (min)</label>
-     <input id="duration_${id}" type="number" min="15" max="600" value="${esc(service.duration||30)}">
+     <input id="duration_${id}" type="number" min="15" max="600" step="15" value="${esc(service.duration||30)}">
     </div>
    </div>
 
@@ -1022,7 +1033,6 @@ function renderServices(){
  }).join('')
  :'Todavía no hay servicios cargados.';
 }
-
 
 window.saveService=async id=>{
 
@@ -1065,14 +1075,12 @@ window.saveService=async id=>{
   }
 
   await loadServices();
-
   alert('Servicio actualizado correctamente.');
 
  }catch(error){
   alert('Error al guardar: '+error.message);
  }
 };
-
 
 window.toggleService=async id=>{
 
@@ -1091,7 +1099,6 @@ window.toggleService=async id=>{
  }
 };
 
-
 window.deleteService=async id=>{
 
  const service=servicesCache.find(x=>x.id===id);
@@ -1108,7 +1115,6 @@ window.deleteService=async id=>{
   }
 
   await loadServices();
-
   alert('Servicio eliminado.');
 
  }catch(error){
@@ -1234,7 +1240,6 @@ window.setRequestStatus=async(id,status)=>{
   }
 
   await batch.commit();
-
   await loadRequests();
 
   alert(
@@ -1248,7 +1253,6 @@ window.setRequestStatus=async(id,status)=>{
  }catch(error){
 
   console.error('Error al actualizar la reserva:',error);
-
   alert('No se pudo actualizar la reserva: '+error.message);
 
  }
@@ -1256,4 +1260,4 @@ window.setRequestStatus=async(id,status)=>{
 
 </script>
 </body>
-   </html>
+</html>
