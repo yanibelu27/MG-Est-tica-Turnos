@@ -58,9 +58,9 @@ import{getFirestore,collection,getDocs,addDoc,updateDoc,doc,deleteDoc,getDoc,set
 import{getAuth,signInWithEmailAndPassword,sendPasswordResetEmail,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
 import{getStorage,ref,uploadBytes,getDownloadURL,deleteObject}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
 
-const firebaseConfig={apiKey:'AIzaSyB_yLOsIAhEkcr1blJK46HAHCWylVI-3v0',authDomain:'mg-estetica-turnos.firebaseapp.com',projectId:'mg-estetica-turnos',storageBucket:'mg-estetica-turnos.firebasestorage.app',messagingSenderId:'425300609473',appId:'1:425300609473:web:45bb97101299ae18b00740'};
+const firebaseConfig={apiKey:'AIzaSyB_yLOsIAhEkcr1blJK46HAhcWylVI-3v0',authDomain:'mg-estetica-turnos.firebaseapp.com',projectId:'mg-estetica-turnos',storageBucket:'mg-estetica-turnos.firebasestorage.app',messagingSenderId:'425300609473',appId:'1:425300609473:web:45bb97101299ae18b00740'};
 const app=initializeApp(firebaseConfig),db=getFirestore(app),auth=getAuth(app),storage=getStorage(app);
-auth.languageCode='es';const ADMIN='lvCsIh1rliWqmsV8cPCCnCCZdHj2';const $=id=>document.getElementById(id);
+auth.languageCode='es';const ADMIN='7L0RaRsim3PQi8oG7l2nvioqxmm2';const $=id=>document.getElementById(id);
 const MAX_IMAGE_SIZE=15*1024*1024,TARGET_IMAGE_SIZE=1.5*1024*1024,MAX_IMAGE_DIMENSION=1200;
 const monthNames=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],weekdays=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -91,119 +91,17 @@ $('saveDate').onclick=async()=>{let arr=[];for(let s of servicesCache.filter(x=>
 $('clearDate').onclick=async()=>{if(!confirm('¿Quitar todos los servicios configurados de esta fecha?'))return;try{await deleteDoc(doc(db,'specialDates',selectedDate));delete schedules[selectedDate];renderCalendar();renderDateEditor();$('dateMsg').textContent='Fecha desconfigurada.'}catch(e){$('dateMsg').textContent='Error: '+e.message}};
 
 let previewUrl=null;
-
-function clearPreview(){
- if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null}
- $('preview').removeAttribute('src');
- $('preview').classList.add('hidden');
-}
-
-async function loadImage(file){
- if(!file||!file.size)throw new Error('El archivo está vacío o no se puede leer.');
- if(typeof createImageBitmap==='function'){
-  try{return await createImageBitmap(file)}
-  catch(error){console.warn('createImageBitmap no pudo abrir la imagen; se probará otro método.',error)}
- }
- return await new Promise((resolve,reject)=>{
-  const reader=new FileReader(),img=new Image();
-  reader.onload=()=>{img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('El navegador no pudo interpretar la imagen.'));img.src=reader.result};
-  reader.onerror=()=>reject(reader.error||new Error('No se pudo leer el archivo.'));
-  reader.readAsDataURL(file);
- });
-}
-
-function canvasToBlob(canvas,type,quality){
- return new Promise((resolve,reject)=>{
-  canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('No se pudo procesar la imagen.')),type,quality);
- });
-}
-
-async function compressImage(file){
- if(!file)return null;
- if(!file.size)throw new Error('El archivo está vacío.');
- if(file.size>MAX_IMAGE_SIZE)throw new Error('La imagen original supera los 15 MB.');
- if(!file.type||!file.type.startsWith('image/'))throw new Error('Elegí un archivo de imagen JPG, PNG o WebP.');
-
- let image;
- try{image=await loadImage(file)}
- catch(error){
-  console.warn('No se pudo comprimir la imagen; se intentará subir el archivo original.',error);
-  return file;
- }
-
- let width=image.naturalWidth||image.width,height=image.naturalHeight||image.height;
- if(!width||!height){if(typeof image.close==='function')image.close();return file}
- const scale=Math.min(1,MAX_IMAGE_DIMENSION/Math.max(width,height));
- width=Math.max(1,Math.round(width*scale));height=Math.max(1,Math.round(height*scale));
-
- const canvas=document.createElement('canvas'),context=canvas.getContext('2d');
- if(!context){if(typeof image.close==='function')image.close();return file}
-
- let best=null,bestType='image/jpeg';
- const formats=[{type:'image/webp',qualities:[.82,.72,.62,.5]},{type:'image/jpeg',qualities:[.82,.72,.62,.5]}];
-
- try{
-  for(let attempt=0;attempt<5;attempt++){
-   canvas.width=width;canvas.height=height;
-   context.clearRect(0,0,width,height);
-   context.drawImage(image,0,0,width,height);
-
-   for(const format of formats){
-    for(const quality of format.qualities){
-     try{
-      const blob=await canvasToBlob(canvas,format.type,quality);
-      if(!best||blob.size<best.size){best=blob;bestType=format.type}
-      if(blob.size<=TARGET_IMAGE_SIZE){best=blob;bestType=format.type;break}
-     }catch(error){console.warn('No se pudo generar el formato '+format.type,error)}
-    }
-    if(best&&best.size<=TARGET_IMAGE_SIZE)break;
-   }
-   if(best&&best.size<=TARGET_IMAGE_SIZE)break;
-   if(width<=500||height<=500)break;
-   width=Math.max(500,Math.round(width*.85));height=Math.max(500,Math.round(height*.85));
-  }
- }finally{
-  if(typeof image.close==='function')image.close();
-  canvas.width=0;canvas.height=0;
- }
-
- if(!best||best.size>MAX_IMAGE_SIZE)return file;
- const ext=bestType==='image/webp'?'webp':'jpg';
- return new File([best],`foto_${Date.now()}.${ext}`,{type:bestType,lastModified:Date.now()});
-}
-
-$('photo').onchange=()=>{
- clearPreview();
- selectedFile=$('photo').files[0]||null;
- if(!selectedFile)return;
- if(selectedFile.size>MAX_IMAGE_SIZE){
-  alert('La imagen original supera los 15 MB.');
-  $('photo').value='';selectedFile=null;return;
- }
- if(!selectedFile.type||!selectedFile.type.startsWith('image/')){
-  alert('Elegí un archivo de imagen.');
-  $('photo').value='';selectedFile=null;return;
- }
- previewUrl=URL.createObjectURL(selectedFile);
- $('preview').src=previewUrl;
- $('preview').classList.remove('hidden');
-};
-
-async function uploadPhoto(file,id){
- if(!file)return '';
- const uploadFile=await compressImage(file);
- const safeName=(uploadFile.name||'foto').replace(/[^\\w.-]/g,'_');
- const path=`services/${id}/${Date.now()}_${safeName}`;
- const storageRef=ref(storage,path);
- await uploadBytes(storageRef,uploadFile,{contentType:uploadFile.type||file.type});
- return await getDownloadURL(storageRef);
-}
+function clearPreview(){if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null}$('preview').removeAttribute('src');$('preview').classList.add('hidden')}
+async function loadImage(file){if(!file||!file.size)throw new Error('El archivo está vacío o no se puede leer.');if(typeof createImageBitmap==='function'){try{return await createImageBitmap(file)}catch(error){console.warn('createImageBitmap no pudo abrir la imagen; se probará otro método.',error)}}return await new Promise((resolve,reject)=>{const reader=new FileReader(),img=new Image();reader.onload=()=>{img.onload=()=>resolve(img);img.onerror=()=>reject(new Error('El navegador no pudo interpretar la imagen.'));img.src=reader.result};reader.onerror=()=>reject(reader.error||new Error('No se pudo leer el archivo.'));reader.readAsDataURL(file)})}
+function canvasToBlob(canvas,type,quality){return new Promise((resolve,reject)=>{canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('No se pudo procesar la imagen.')),type,quality)})}
+async function compressImage(file){if(!file)return null;if(!file.size)throw new Error('El archivo está vacío.');if(file.size>MAX_IMAGE_SIZE)throw new Error('La imagen original supera los 15 MB.');if(!file.type||!file.type.startsWith('image/'))throw new Error('Elegí un archivo de imagen JPG, PNG o WebP.');let image;try{image=await loadImage(file)}catch(error){console.warn('No se pudo comprimir la imagen; se intentará subir el archivo original.',error);return file}let width=image.naturalWidth||image.width,height=image.naturalHeight||image.height;if(!width||!height){if(typeof image.close==='function')image.close();return file}const scale=Math.min(1,MAX_IMAGE_DIMENSION/Math.max(width,height));width=Math.max(1,Math.round(width*scale));height=Math.max(1,Math.round(height*scale));const canvas=document.createElement('canvas'),context=canvas.getContext('2d');if(!context){if(typeof image.close==='function')image.close();return file}let best=null,bestType='image/jpeg';const formats=[{type:'image/webp',qualities:[.82,.72,.62,.5]},{type:'image/jpeg',qualities:[.82,.72,.62,.5]}];try{for(let attempt=0;attempt<5;attempt++){canvas.width=width;canvas.height=height;context.clearRect(0,0,width,height);context.drawImage(image,0,0,width,height);for(const format of formats){for(const quality of format.qualities){try{const blob=await canvasToBlob(canvas,format.type,quality);if(!best||blob.size<best.size){best=blob;bestType=format.type}if(blob.size<=TARGET_IMAGE_SIZE){best=blob;bestType=format.type;break}}catch(error){console.warn('No se pudo generar el formato '+format.type,error)}}if(best&&best.size<=TARGET_IMAGE_SIZE)break}if(best&&best.size<=TARGET_IMAGE_SIZE)break;if(width<=500||height<=500)break;width=Math.max(500,Math.round(width*.85));height=Math.max(500,Math.round(height*.85))}}finally{if(typeof image.close==='function')image.close();canvas.width=0;canvas.height=0}if(!best||best.size>MAX_IMAGE_SIZE)return file;const ext=bestType==='image/webp'?'webp':'jpg';return new File([best],`foto_${Date.now()}.${ext}`,{type:bestType,lastModified:Date.now()})}
+$('photo').onchange=()=>{clearPreview();selectedFile=$('photo').files[0]||null;if(!selectedFile)return;if(selectedFile.size>MAX_IMAGE_SIZE){alert('La imagen original supera los 15 MB.');$('photo').value='';selectedFile=null;return}if(!selectedFile.type||!selectedFile.type.startsWith('image/')){alert('Elegí un archivo de imagen.');$('photo').value='';selectedFile=null;return}previewUrl=URL.createObjectURL(selectedFile);$('preview').src=previewUrl;$('preview').classList.remove('hidden')};
+async function uploadPhoto(file,id){if(!file)return '';const uploadFile=await compressImage(file);const safeName=(uploadFile.name||'foto').replace(/[^\w.-]/g,'_');const path=`services/${id}/${Date.now()}_${safeName}`;const storageRef=ref(storage,path);await uploadBytes(storageRef,uploadFile,{contentType:uploadFile.type||file.type});return await getDownloadURL(storageRef)}
 $('add').onclick=async()=>{let name=$('nm').value.trim(),price=$('pr').value.trim().replace(/\D/g,''),duration=Number($('du').value),description=$('desc').value.trim();if(!name||duration<15||duration>600){$('saveMsg').textContent='Ingresá nombre y duración entre 15 y 600 minutos.';return}let btn=$('add');btn.disabled=true;btn.textContent='Guardando…';try{let id='svc_'+Date.now(),photoUrl=await uploadPhoto(selectedFile,id);await setDoc(doc(db,'services',id),{name,price:price?Number(price):0,duration,description,photoUrl,active:true,createdAt:new Date().toISOString()});$('nm').value='';$('pr').value='';$('du').value='30';$('desc').value='';$('photo').value='';clearPreview();selectedFile=null;$('saveMsg').textContent='Servicio guardado.';await loadServices()}catch(e){$('saveMsg').textContent='No se pudo guardar: '+e.message}finally{btn.disabled=false;btn.textContent='💾 Guardar Servicio'}};
 function renderServices(){$('services').innerHTML=servicesCache.length?servicesCache.map(s=>`<div class="item"><div>${s.photoUrl?`<img class="service-photo" src="${esc(safeUrl(s.photoUrl))}" alt="">`:''}<b>${esc(s.name)}</b><p>${esc(s.description||'')}</p><p class="muted">Precio: ${priceFmt(s.price)} · Duración: ${Number(s.duration||0)} min · ${s.active===false?'Desactivado':'Activo'}</p></div><label>Editar nombre</label><input id="name_${s.id}" value="${esc(s.name)}"><div class="grid"><div><label>Precio ($)</label><input id="price_${s.id}" inputmode="numeric" value="${esc(s.price||0)}"></div><div><label>Duración (min)</label><input id="duration_${s.id}" type="number" min="15" max="600" value="${esc(s.duration||30)}"></div></div><label>Descripción</label><textarea id="desc_${s.id}">${esc(s.description||'')}</textarea><label>Cambiar foto (opcional)</label><input type="file" accept="image/*" id="photo_${s.id}"><div class="actions"><button onclick="window.saveService('${s.id}')">Guardar cambios</button><button class="secondary" onclick="window.toggleService('${s.id}')">${s.active===false?'Activar':'Desactivar'}</button><button class="danger" onclick="window.deleteService('${s.id}')">Eliminar</button></div></div>`).join(''):'Todavía no hay servicios cargados.'}
 window.saveService=async id=>{let s=servicesCache.find(x=>x.id===id),name=$('name_'+id).value.trim(),price=$('price_'+id).value.replace(/\D/g,''),duration=Number($('duration_'+id).value),description=$('desc_'+id).value.trim(),file=$('photo_'+id).files[0];if(!name||duration<15||duration>600){alert('Revisá nombre y duración.');return}if(file&&(file.size>MAX_IMAGE_SIZE||!file.type||!file.type.startsWith('image/'))){alert(file.size>MAX_IMAGE_SIZE?'La foto supera 15 MB.':'Elegí un archivo de imagen.');return}try{let photoUrl=s.photoUrl||'';if(file)photoUrl=await uploadPhoto(file,id);await updateDoc(doc(db,'services',id),{name,price:price?Number(price):0,duration,description,photoUrl});await loadServices();alert('Servicio actualizado.')}catch(e){alert('Error al guardar: '+e.message)}};
 window.toggleService=async id=>{let s=servicesCache.find(x=>x.id===id);try{await updateDoc(doc(db,'services',id),{active:s.active===false?true:false});await loadServices()}catch(e){alert('Error: '+e.message)}};
 window.deleteService=async id=>{if(!confirm('¿Eliminar este servicio? No se borran reservas históricas.'))return;try{await deleteDoc(doc(db,'services',id));await loadServices()}catch(e){alert('Error al eliminar: '+e.message)}};
-
 function renderRequests(){if(!requestsCache.length){$('requests').innerHTML='Todavía no hay solicitudes.';return}$('requests').innerHTML=requestsCache.map(r=>{let status=r.status||'Pendiente';let cl=status.toLowerCase().includes('confirm')?'status-confirmado':status.toLowerCase().includes('cancel')?'status-cancelado':'status-pendiente';return `<div class="item"><b>${esc(r.name||r.customerName||'Cliente')}</b><p>${esc(r.serviceName||r.service||'Servicio')} · ${esc(r.date||'Fecha')} ${esc(r.time||'Horario')}</p><p>WhatsApp: ${esc(r.phone||r.whatsapp||'—')} · ${esc(r.deposit||r.seña||'Seña no especificada')}</p><p class="${cl}">Estado: ${esc(status)}</p><div class="actions"><button class="success" onclick="window.setRequestStatus('${r.id}','Confirmado')">Confirmar</button><button class="secondary" onclick="window.setRequestStatus('${r.id}','Pendiente')">Pendiente</button><button class="danger" onclick="window.setRequestStatus('${r.id}','Cancelado')">Cancelar</button></div></div>`}).join('')}
 window.setRequestStatus=async(id,status)=>{try{await updateDoc(doc(db,'bookingRequests',id),{status,updatedAt:new Date().toISOString()});await loadRequests()}catch(e){alert('No se pudo actualizar. Revisá las reglas de Firestore: '+e.message)}};
 </script>
