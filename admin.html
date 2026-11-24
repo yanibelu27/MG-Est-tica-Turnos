@@ -58,7 +58,16 @@ import{getFirestore,collection,getDocs,addDoc,updateDoc,doc,deleteDoc,getDoc,set
 import{getAuth,signInWithEmailAndPassword,sendPasswordResetEmail,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
 import{getStorage,ref,uploadBytes,getDownloadURL,deleteObject}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
 
-const firebaseConfig={apiKey:'AIzaSyB_yLOsIAhEkcr1blJK46HAHCWylVI-3v0',authDomain:'mg-estetica-turnos.firebaseapp.com',projectId:'mg-estetica-turnos',storageBucket:'mg-estetica-turnos.firebasestorage.app',messagingSenderId:'425300609473',appId:'1:425300609473:web:45bb97101299ae18b00740'};
+const firebaseConfig = {
+  apiKey: "AIzaSyB_yLOsIAhEkcr1blJK46HAhcWylVI-3v0",
+  authDomain: "mg-estetica-turnos.firebaseapp.com",
+  projectId: "mg-estetica-turnos",
+  storageBucket: "mg-estetica-turnos.firebasestorage.app",
+  messagingSenderId: "425300609473",
+  appId: "1:425300609473:web:45bb97101299ae18b00740"
+};
+
+
 const app=initializeApp(firebaseConfig),db=getFirestore(app),auth=getAuth(app),storage=getStorage(app);
 auth.languageCode='es';const ADMIN='lvCsIh1rliWqmsV8cPCCnCCZdHj2';const $=id=>document.getElementById(id);
 const monthNames=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],weekdays=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
