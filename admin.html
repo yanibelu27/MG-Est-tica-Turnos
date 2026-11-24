@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -8,7 +7,8 @@
 <style>
 :root{
  --p:#b83272;--d:#27212a;--l:#eadde5;
- --s:#fff2f8;--g:#218653;--muted:#746975
+ --s:#fff2f8;--g:#218653;--muted:#746975;
+ --rojo:#a83232;--azul:#326fa8;
 }
 *{box-sizing:border-box}
 body{margin:0;background:#faf7f9;color:var(--d);font:16px system-ui}
@@ -27,46 +27,54 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .row{border-bottom:1px solid var(--l);padding:14px 0}
 .hidden{display:none!important}
 .muted{font-size:14px;color:var(--muted)}
-.danger{background:#9e284a}
+.danger{background:var(--rojo)}
 .secondary{background:#5b4b58}
+.success{background:var(--g)}
 .preview{max-width:220px;max-height:180px;object-fit:cover;border-radius:12px;margin-top:10px}
 .service-photo{width:100px;height:85px;object-fit:cover;border-radius:10px;float:left;margin:0 12px 8px 0}
 .actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;clear:both}
-.actions button{margin-top:8px}
+.actions button{margin-top:8px;font-size:14px;padding:8px}
 .calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0}
 .calendar-head button{width:auto;min-width:48px;margin:0}
 .calendar-title{font-size:20px;font-weight:800;text-align:center}
 .calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
-.weekday{text-align:center;font-size:12px;font-weight:750;color:var(--muted);padding:7px 0}
+.weekday{text-align:center;font-size:12px;font-weight:700;color:var(--muted);padding:7px 0}
 .calday{
  min-height:62px;border:1px solid var(--l);border-radius:10px;
  background:#fff;color:var(--d);padding:5px 2px;margin:0;
  display:flex;flex-direction:column;align-items:center;justify-content:center;
- gap:3px;font-size:14px
+ gap:3px;font-size:14px;cursor:pointer;transition:all .2s
 }
+.calday:hover{background:var(--s)}
 .calday.empty{visibility:hidden}
-.calday.selected{background:var(--s);border:2px solid var(--p);color:var(--p)}
+.calday.selected{background:var(--s);border:2px solid var(--p);color:var(--p);font-weight:700}
 .calday.scheduled{background:#e7f5ed;border-color:#9ac9aa}
 .calday.scheduled.selected{background:var(--s);border:2px solid var(--p)}
 .calday small{font-size:10px;color:var(--g);font-weight:700}
-.calday:disabled{opacity:1;cursor:default}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;margin:12px 0}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
-.service-option{border:1px solid var(--l);border-radius:12px;padding:12px;margin:12px 0}
+.service-option{border:1px solid var(--l);border-radius:12px;padding:12px;margin:12px 0;background:#fff}
 .service-option.selected{border-color:var(--p);background:#fffafd}
 .service-top{display:flex;align-items:center;gap:10px}
 .service-top input{width:20px;height:20px;flex:none}
-.service-top label{margin:0;flex:1}
+.service-top label{margin:0;flex:1;cursor:pointer}
 .service-config{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px;margin-top:10px}
 .service-config input,.service-config select{padding:9px}
 .service-config label{font-size:13px;margin:4px 0}
 .date-label{font-size:18px;font-weight:800;color:var(--p)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--l);padding-bottom:10px}
+.tab{padding:10px 16px;border-radius:8px;background:transparent;border:none;cursor:pointer;margin:0;color:var(--muted);font-weight:500}
+.tab.active{background:var(--p);color:white}
+.status-pendiente{color:#b88632;font-weight:600}
+.status-confirmado{color:var(--g);font-weight:600}
+.status-cancelado{color:var(--rojo);font-weight:600}
 footer{text-align:center;padding:20px;color:#777;font-size:12px}
 @media(max-width:430px){
  .calday{min-height:49px;font-size:13px}
  .calendar{gap:3px}
  .weekday{font-size:11px}
  .panel{padding:13px}
+ .service-config{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
@@ -74,13 +82,13 @@ footer{text-align:center;padding:20px;color:#777;font-size:12px}
 
 <header>
 <h1>MG Estética · Administración</h1>
-<p>Panel privado</p>
+<p>Panel de control privado</p>
 </header>
 
 <main>
 
-<section id="login" class="panel">
-<h2>Ingresar</h2>
+<section id="login" class="panel" style="max-width:450px;margin:30px auto">
+<h2 style="text-align:center">🔐 Ingresar</h2>
 <label for="email">Email</label>
 <input id="email" type="email" autocomplete="username" placeholder="tu correo electrónico">
 <label for="pass">Contraseña</label>
@@ -91,14 +99,19 @@ footer{text-align:center;padding:20px;color:#777;font-size:12px}
 </section>
 
 <section id="panel" class="hidden">
+<button id="logout" class="danger" style="width:auto;margin-bottom:15px">🚪 Cerrar sesión</button>
 
+<div class="tabs">
+<button class="tab active" data-tab="calendar">📅 Calendario</button>
+<button class="tab" data-tab="services">💇 Servicios</button>
+<button class="tab" data-tab="requests">📋 Solicitudes</button>
+</div>
+
+<!-- ⭐ CALENDARIO Y DISPONIBILIDAD -->
+<div id="tab-calendar" class="tab-content">
 <div class="panel">
-<button id="logout" class="danger">Cerrar sesión</button>
-<h2>Calendario de disponibilidad</h2>
-<p class="muted">
-Elegí una fecha y configurá qué servicios vas a ofrecer ese día.
-Cada servicio puede tener su propio horario e intervalo.
-</p>
+<h2>📅 Disponibilidad por Fecha</h2>
+<p class="muted">Elegí un día del calendario y configurá qué servicios vas a ofrecer ese día y en qué horarios.</p>
 
 <div class="calendar-head">
 <button id="prevMonth" class="secondary" aria-label="Mes anterior">‹</button>
@@ -109,32 +122,37 @@ Cada servicio puede tener su propio horario e intervalo.
 <div class="calendar" id="calendar"></div>
 
 <div class="legend">
-<span><i class="dot" style="background:#9ac9aa"></i>Fecha con servicios</span>
-<span><i class="dot" style="background:#fff2f8;border:1px solid #b83272"></i>Fecha seleccionada</span>
-<span><i class="dot" style="background:#eee"></i>Sin disponibilidad</span>
+<span><i class="dot" style="background:#9ac9aa"></i>Con servicios configurados</span>
+<span><i class="dot" style="background:#b83272;border:1px solid"></i>Fecha seleccionada</span>
+<span><i class="dot" style="background:#eee"></i>Sin configurar</span>
 </div>
 
-<div class="panel" style="margin:15px 0 0;background:#fffafd">
-<div class="date-label" id="selectedDateLabel">Seleccioná una fecha</div>
+<div class="panel" style="margin:20px 0 0;background:#fffafd">
+<div class="date-label" id="selectedDateLabel">Seleccioná una fecha del calendario ↑</div>
 <p class="muted">Marcá los servicios que vas a ofrecer en esta fecha y configurá sus horarios.</p>
 <div id="dateServices">
 <p class="muted">Primero seleccioná un día del calendario.</p>
 </div>
-<button id="saveDate">Guardar disponibilidad de esta fecha</button>
-<button id="clearDate" class="danger">Quitar disponibilidad de esta fecha</button>
-<p id="dateMsg" class="muted" role="status"></p>
+<div style="display:flex;gap:10px;margin-top:15px">
+<button id="saveDate">✅ Guardar disponibilidad</button>
+<button id="clearDate" class="danger">🗑️ Quitar servicios del día</button>
+</div>
+<p id="dateMsg" class="muted" role="status" style="margin-top:10px"></p>
+</div>
 </div>
 </div>
 
+<!-- ⭐ GESTIÓN DE SERVICIOS -->
+<div id="tab-services" class="tab-content hidden">
 <div class="panel">
-<h2>Servicios · Agregar</h2>
-<label for="nm">Nombre</label>
-<input id="nm" maxlength="100">
+<h2>➕ Agregar Nuevo Servicio</h2>
+<label for="nm">Nombre del servicio</label>
+<input id="nm" maxlength="100" placeholder="Ej: Mesoterapia Corporal">
 
 <div class="grid">
 <div>
 <label for="pr">Precio (ARS)</label>
-<input id="pr" inputmode="numeric">
+<input id="pr" inputmode="numeric" placeholder="Ej: 25000">
 </div>
 <div>
 <label for="du">Duración (minutos)</label>
@@ -143,53 +161,50 @@ Cada servicio puede tener su propio horario e intervalo.
 </div>
 
 <label for="desc">Descripción</label>
-<textarea id="desc" maxlength="1000" placeholder="Descripción del servicio que ofrecés"></textarea>
+<textarea id="desc" maxlength="500" placeholder="Breve descripción del tratamiento…"></textarea>
 
 <label for="photo">Foto del servicio (opcional)</label>
 <input id="photo" type="file" accept="image/*">
-<p class="muted">Foto desde la galería. Máximo 5 MB.</p>
-<img id="preview" class="preview hidden" alt="Vista previa">
+<p class="muted">Formato JPG o PNG. Máximo 5 MB.</p>
+<img id="preview" class="preview hidden" alt="Vista previa de la imagen">
 
-<button id="add">Guardar servicio</button>
+<button id="add">💾 Guardar Servicio</button>
 <p id="saveMsg" class="muted" role="status"></p>
 </div>
 
 <div class="panel">
-<h2>Servicios disponibles</h2>
+<h2>📋 Servicios Disponibles</h2>
 <p class="muted">Podés editar, cambiar fotos, activar/desactivar o eliminar servicios.</p>
-<div id="services">Cargando…</div>
+<div id="services">Cargando servicios…</div>
+</div>
 </div>
 
+<!-- ⭐ SOLICITUDES DE TURNOS -->
+<div id="tab-requests" class="tab-content hidden">
 <div class="panel">
-<h2>Solicitudes de turnos</h2>
-<div id="requests">Cargando…</div>
+<h2>📩 Solicitudes de Turnos</h2>
+<p class="muted">Aquí aparecen las solicitudes pendientes de confirmación. Hacé clic en "Confirmar" cuando hables con la clienta.</p>
+<div id="requests">Cargando solicitudes…</div>
+</div>
 </div>
 
 </section>
 
-<footer>MG Estética · Administración</footer>
+<footer>MG Estética · Caracas 1149, Santa Marta · WhatsApp 11 4173-5931</footer>
 </main>
 
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
-
 import{
- getFirestore,collection,getDocs,addDoc,updateDoc,
- doc,deleteDoc,getDoc,setDoc
+ getFirestore,collection,getDocs,addDoc,updateDoc,doc,deleteDoc,getDoc,setDoc,query,where
 }from'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
-
 import{
- getAuth,signInWithEmailAndPassword,sendPasswordResetEmail,
- onAuthStateChanged,signOut
+ getAuth,signInWithEmailAndPassword,sendPasswordResetEmail,onAuthStateChanged,signOut
 }from'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
+import{getStorage,ref,uploadBytes,getDownloadURL}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
 
-import{
- getStorage,ref,uploadBytes,getDownloadURL
-}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
-
-/* CONFIGURACIÓN FIREBASE ACTUALIZADA */
 const firebaseConfig={
- apiKey:'AIzaSyBlojGI6d8qF5hgJUYxXSJmz77NGqr3L8A',
+ apiKey:'AIzaSyB_yLOsIAhEkcr1blJK46HAHCWylVI-3v0',
  authDomain:'mg-estetica-turnos.firebaseapp.com',
  projectId:'mg-estetica-turnos',
  storageBucket:'mg-estetica-turnos.firebasestorage.app',
@@ -201,7 +216,6 @@ const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 const auth=getAuth(app);
 const storage=getStorage(app);
-
 auth.languageCode='es';
 
 const ADMIN='lvCsIh1rliWqmsV8cPCCnCCZdHj2';
@@ -211,7 +225,6 @@ const monthNames=[
  'enero','febrero','marzo','abril','mayo','junio',
  'julio','agosto','septiembre','octubre','noviembre','diciembre'
 ];
-
 const weekdays=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 
 function esc(x){
@@ -221,10 +234,8 @@ function esc(x){
 }
 
 function safeImageUrl(value){
- try{
-  const u=new URL(value);
-  return u.protocol==='https:'?u.href:'';
- }catch{return ''}
+ try{const u=new URL(value);return u.protocol==='https:'?u.href:'';}
+ catch{return ''}
 }
 
 function dateKey(date){
@@ -239,7 +250,7 @@ function parseDate(key){
  return new Date(y,m-1,d);
 }
 
-function formatDate(key){
+function formatDateKey(key){
  return parseDate(key).toLocaleDateString('es-AR',{
   weekday:'long',day:'numeric',month:'long',year:'numeric'
  });
@@ -251,212 +262,86 @@ let selectedDate=dateKey(new Date());
 let calendarMonth=new Date();
 calendarMonth.setDate(1);
 
-/* AUTENTICACIÓN */
-
-onAuthStateChanged(auth,async u=>{
- console.log('Estado de autenticación:',{
-  email:u?.email||null,
-  uid:u?.uid||null,
-  projectId:firebaseConfig.projectId
+// --- Pestañas ---
+document.querySelectorAll('.tab').forEach(tab=>{
+ tab.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  const tabId=tab.getAttribute('data-tab');
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.add('hidden'));
+  $('tab-'+tabId).classList.remove('hidden');
  });
+});
 
+// --- Autenticación ---
+onAuthStateChanged(auth,async u=>{
  if(!u){
   $('login').classList.remove('hidden');
   $('panel').classList.add('hidden');
   return;
  }
-
  if(u.uid!==ADMIN){
   $('login').classList.remove('hidden');
   $('panel').classList.add('hidden');
-  $('msg').textContent=
-   'La cuenta inició sesión, pero no es administradora. UID detectado: '+u.uid+
-   '. UID configurado en el panel: '+ADMIN+'.';
-  console.error('UID sin permisos de administración:',u.uid);
+  $('msg').textContent='Esta cuenta no tiene permisos de administrador. UID: '+u.uid;
   return;
  }
-
- $('msg').textContent='Acceso correcto.';
  $('login').classList.add('hidden');
  $('panel').classList.remove('hidden');
-
- try{
-  await Promise.all([loadAll(),loadSchedules()]);
- }catch(e){
-  console.error('Error al cargar el panel:',e);
- }
+ $('msg').textContent='';
+ await Promise.all([loadServices(),loadSchedules(),loadRequests()]);
 });
 
 $('loginBtn').onclick=async()=>{
  const email=$('email').value.trim();
  const password=$('pass').value;
- const btn=$('loginBtn');
-
- if(!email||!password){
-  $('msg').textContent='Ingresá tu email y contraseña.';
-  return;
- }
-
- btn.disabled=true;
- btn.textContent='Ingresando…';
- $('msg').textContent='Verificando credenciales…';
-
+ if(!email||!password){$('msg').textContent='Ingresá email y contraseña';return;}
+ $('loginBtn').disabled=true;$('loginBtn').textContent='Ingresando…';
  try{
-  const credential=await signInWithEmailAndPassword(auth,email,password);
-  console.log('Inicio de sesión correcto:',{
-   email:credential.user.email,
-   uid:credential.user.uid,
-   projectId:firebaseConfig.projectId
-  });
-
-  if(credential.user.uid!==ADMIN){
-   $('msg').textContent=
-    'El email y la contraseña son correctos, pero esta cuenta no tiene permiso de administración. UID detectado: '+
-    credential.user.uid+'. UID configurado: '+ADMIN+'.';
-  }else{
-   $('msg').textContent='Credenciales correctas. Abriendo administración…';
-  }
-
+  await signInWithEmailAndPassword(auth,email,password);
+  $('msg').textContent='✅ Bienvenida de nuevo';
  }catch(e){
-  console.error('Error real de Firebase al iniciar sesión:',{
-   code:e.code,
-   message:e.message,
-   projectId:firebaseConfig.projectId
-  });
-
-  const errores={
-   'auth/invalid-credential':'El email o la contraseña no son correctos, o el usuario no existe en este proyecto Firebase.',
-   'auth/user-not-found':'No se encontró ese usuario en Firebase Authentication.',
-   'auth/wrong-password':'La contraseña no es correcta.',
-   'auth/invalid-email':'El formato del email no es válido.',
-   'auth/too-many-requests':'Hubo demasiados intentos. Esperá un rato antes de volver a probar.',
-   'auth/network-request-failed':'Problema de conexión a Internet. Revisá la conexión e intentá nuevamente.',
-   'auth/operation-not-allowed':'El acceso con email y contraseña no está habilitado en Firebase Authentication.',
-   'auth/user-disabled':'Esta cuenta está deshabilitada en Firebase Authentication.',
-   'auth/unauthorized-domain':'El dominio desde el que abrís el panel no está autorizado en Firebase Authentication.',
-   'auth/invalid-api-key':'La clave API configurada para Firebase no es válida.',
-   'auth/app-not-authorized':'Esta aplicación no está autorizada para usar el proyecto Firebase configurado.'
+  const errors={
+   'auth/invalid-credential':'Email o contraseña incorrectos.',
+   'auth/user-not-found':'Usuario no encontrado.',
+   'auth/too-many-requests':'Demasiados intentos. Esperá unos minutos.',
+   'auth/invalid-email':'Formato de email inválido.'
   };
-
-  $('msg').textContent=
-   (errores[e.code]||'No se pudo iniciar sesión. Revisá el error de Firebase.')+
-   ' Código: '+(e.code||'sin código')+'.';
-
- }finally{
-  btn.disabled=false;
-  btn.textContent='Iniciar sesión';
- }
+  $('msg').textContent=errors[e.code]||'Error: '+e.message;
+ }finally{$('loginBtn').disabled=false;$('loginBtn').textContent='Iniciar sesión';}
 };
-
-/* RECUPERACIÓN DE CONTRASEÑA */
 
 $('resetBtn').onclick=async()=>{
  const email=$('email').value.trim();
- const btn=$('resetBtn');
-
- if(!email){
-  $('msg').textContent='Primero escribí tu Gmail en el campo Email.';
-  $('email').focus();
-  return;
- }
-
- if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-  $('msg').textContent='Revisá que el correo electrónico esté escrito correctamente.';
-  $('email').focus();
-  return;
- }
-
- btn.disabled=true;
- btn.textContent='Enviando correo…';
- $('msg').textContent='Solicitando el correo de recuperación a Firebase…';
-
+ if(!email){alert('Escribí tu email primero');return;}
  try{
   await sendPasswordResetEmail(auth,email);
-
-  $('msg').textContent=
-   'Si la dirección corresponde a una cuenta registrada, Firebase enviará un correo para restablecer la contraseña. Revisá Recibidos y Spam y utilizá solamente el correo más reciente.';
-
- }catch(e){
-  console.error('Error al solicitar restablecimiento:',{
-   code:e.code,
-   message:e.message,
-   projectId:firebaseConfig.projectId
-  });
-
-  const errores={
-   'auth/invalid-email':'El formato del correo electrónico no es válido.',
-   'auth/user-not-found':'No se encontró ese usuario en este proyecto de Firebase.',
-   'auth/missing-email':'Ingresá tu dirección de Gmail antes de solicitar la recuperación.',
-   'auth/too-many-requests':'Se solicitaron demasiados correos. Esperá un tiempo antes de volver a intentarlo.',
-   'auth/network-request-failed':'No hay conexión con Firebase. Revisá Internet e intentá nuevamente.',
-   'auth/unauthorized-continue-uri':'La dirección de continuación no está autorizada en Firebase.',
-   'auth/operation-not-allowed':'La recuperación por correo no está habilitada en Firebase Authentication.',
-   'auth/invalid-api-key':'La clave API no es válida. Revisá Google Cloud y la configuración de Firebase.'
-  };
-
-  $('msg').textContent=
-   (errores[e.code]||'Firebase no pudo enviar el correo de recuperación.')+
-   ' Código: '+(e.code||'sin código')+'. Revisá la consola si necesitás más detalles.';
- }finally{
-  btn.disabled=false;
-  btn.textContent='Olvidé mi contraseña';
- }
+  alert('Correo de recuperación enviado. Revisá tu bandeja de entrada.');
+ }catch(e){alert('Error: '+e.message);}
 };
 
-$('logout').onclick=async()=>{
- try{
-  await signOut(auth);
-  $('msg').textContent='Sesión cerrada.';
- }catch(e){
-  console.error('Error al cerrar sesión:',e);
-  alert('No se pudo cerrar la sesión. '+(e.code||e.message||''));
- }
-};
+$('logout').onclick=async()=>{await signOut(auth);};
 
-/* CALENDARIO MENSUAL */
-
-$('prevMonth').onclick=()=>{
- calendarMonth.setMonth(calendarMonth.getMonth()-1);
- renderCalendar();
-};
-
-$('nextMonth').onclick=()=>{
- calendarMonth.setMonth(calendarMonth.getMonth()+1);
- renderCalendar();
-};
-
+// --- Calendario ---
 async function loadSchedules(){
  try{
   const snap=await getDocs(collection(db,'specialDates'));
   schedules={};
-  snap.forEach(d=>{
-   schedules[d.id]=d.data();
-  });
+  snap.forEach(d=>{schedules[d.id]=d.data();});
   renderCalendar();
   renderDateEditor();
- }catch(e){
-  $('dateMsg').textContent='No se pudieron leer las fechas. Revisá las reglas de Firestore.';
-  console.error(e);
- }
+ }catch(e){console.error(e);$('dateMsg').textContent='Error al cargar fechas';}
 }
 
 function renderCalendar(){
  const year=calendarMonth.getFullYear();
  const month=calendarMonth.getMonth();
-
- $('monthTitle').textContent=
-  monthNames[month].charAt(0).toUpperCase()+monthNames[month].slice(1)+' '+year;
-
+ $('monthTitle').textContent=monthNames[month].charAt(0).toUpperCase()+monthNames[month].slice(1)+' '+year;
  const first=new Date(year,month,1);
  const daysInMonth=new Date(year,month+1,0).getDate();
  const offset=(first.getDay()+6)%7;
-
  let html=weekdays.map(d=>`<div class="weekday">${d}</div>`).join('');
-
- for(let i=0;i<offset;i++){
-  html+='<button class="calday empty" disabled></button>';
- }
-
+ for(let i=0;i<offset;i++)html+='<div class="calday empty"></div>';
  for(let day=1;day<=daysInMonth;day++){
   const date=new Date(year,month,day);
   const key=dateKey(date);
@@ -464,394 +349,40 @@ function renderCalendar(){
   const count=Array.isArray(info?.services)?info.services.length:0;
   const scheduled=count>0;
   const selected=key===selectedDate;
-
   html+=`
-   <button type="button"
-    class="calday ${scheduled?'scheduled':''} ${selected?'selected':''}"
-    onclick="window.selectAdminDate('${key}')">
+   <button type="button" class="calday ${scheduled?'scheduled':''} ${selected?'selected':''}"
+    onclick="window.selectDate('${key}')">
     <span>${day}</span>
-    ${scheduled?`<small>${count} servicio${count===1?'':'s'}</small>`:''}
+    ${scheduled?`<small>${count} serv.</small>`:''}
    </button>`;
  }
-
  $('calendar').innerHTML=html;
 }
 
-window.selectAdminDate=async key=>{
+window.selectDate=async key=>{
  selectedDate=key;
  renderCalendar();
  await renderDateEditor();
 };
 
-/* EDITOR DE SERVICIOS POR FECHA */
-
 async function renderDateEditor(){
- $('selectedDateLabel').textContent=formatDate(selectedDate);
+ $('selectedDateLabel').textContent='📅 '+formatDateKey(selectedDate);
  $('dateMsg').textContent='';
-
  if(!servicesCache.length){
-  $('dateServices').innerHTML='<p class="muted">Primero necesitás crear servicios.</p>';
+  $('dateServices').innerHTML='<p class="muted">Primero creá servicios en la pestaña "Servicios".</p>';
   return;
  }
-
  const saved=schedules[selectedDate];
  const savedServices=Array.isArray(saved?.services)?saved.services:[];
-
  $('dateServices').innerHTML=servicesCache.map(s=>{
   const config=savedServices.find(x=>x.serviceId===s.id);
   const checked=!!config;
   const start=config?.start||'10:00';
-  const end=config?.end||'20:00';
+  const end=config?.end||'19:00';
   const interval=Number(config?.interval||30);
-
   return `
-   <div class="service-option ${checked?'selected':''}" id="option_${s.id}">
+   <div class="service-option ${checked?'selected':''}" id="opt_${s.id}">
     <div class="service-top">
-     <input type="checkbox" id="check_${s.id}" ${checked?'checked':''}
-      onchange="window.toggleDateService('${s.id}')">
-     <label for="check_${s.id}">
-      <b>${esc(s.name)}</b>
-      <span class="muted"> · $${esc(s.price||'Consultar')} · ${esc(s.duration||30)} minutos</span>
-     </label>
-    </div>
-
-    <div class="service-config">
-     <div>
-      <label for="start_${s.id}">Desde</label>
-      <input type="time" id="start_${s.id}" value="${esc(start)}" ${checked?'':'disabled'}>
-     </div>
-     <div>
-      <label for="end_${s.id}">Hasta</label>
-      <input type="time" id="end_${s.id}" value="${esc(end)}" ${checked?'':'disabled'}>
-     </div>
-     <div>
-      <label for="interval_${s.id}">Intervalo</label>
-      <select id="interval_${s.id}" ${checked?'':'disabled'}>
-       ${[15,20,30,45,60,90,120].map(v=>
-        `<option value="${v}" ${interval===v?'selected':''}>${v} minutos</option>`
-       ).join('')}
-      </select>
-     </div>
-    </div>
-   </div>`;
- }).join('');
-}
-
-window.toggleDateService=id=>{
- const checked=$('check_'+id).checked;
- $('start_'+id).disabled=!checked;
- $('end_'+id).disabled=!checked;
- $('interval_'+id).disabled=!checked;
- $('option_'+id).classList.toggle('selected',checked);
-};
-
-$('saveDate').onclick=async()=>{
- const chosen=[];
-
- for(const s of servicesCache){
-  if(!$('check_'+s.id)?.checked)continue;
-
-  const start=$('start_'+s.id).value;
-  const end=$('end_'+s.id).value;
-  const interval=Number($('interval_'+s.id).value);
-  const duration=Number(s.duration||30);
-
-  if(!start||!end||start>=end){
-   $('dateMsg').textContent='Revisá los horarios de '+s.name+'.';
-   return;
-  }
-
-  const startMinutes=Number(start.slice(0,2))*60+Number(start.slice(3,5));
-  const endMinutes=Number(end.slice(0,2))*60+Number(end.slice(3,5));
-
-  if(endMinutes-startMinutes<duration){
-   $('dateMsg').textContent='El horario de '+s.name+' es menor que la duración del servicio.';
-   return;
-  }
-
-  chosen.push({
-   serviceId:s.id,
-   name:s.name,
-   start,
-   end,
-   interval
-  });
- }
-
- if(!chosen.length){
-  $('dateMsg').textContent='Seleccioná al menos un servicio para esta fecha.';
-  return;
- }
-
- const btn=$('saveDate');
- btn.disabled=true;
- $('dateMsg').textContent='Guardando disponibilidad…';
-
- try{
-  await setDoc(doc(db,'specialDates',selectedDate),{
-   date:selectedDate,
-   services:chosen,
-   updatedAt:Date.now()
-  });
-
-  schedules[selectedDate]={
-   date:selectedDate,
-   services:chosen,
-   updatedAt:Date.now()
-  };
-
-  renderCalendar();
-  $('dateMsg').textContent='¡Disponibilidad guardada correctamente!';
- }catch(e){
-  console.error(e);
-  $('dateMsg').textContent='No se pudo guardar. Revisá las reglas de Firestore. '+(e.code||'');
- }finally{
-  btn.disabled=false;
- }
-};
-
-$('clearDate').onclick=async()=>{
- if(!confirm('¿Querés quitar todos los servicios disponibles de esta fecha?'))return;
-
- try{
-  await deleteDoc(doc(db,'specialDates',selectedDate));
-  delete schedules[selectedDate];
-  renderCalendar();
-  await renderDateEditor();
-  $('dateMsg').textContent='Disponibilidad eliminada para esta fecha.';
- }catch(e){
-  $('dateMsg').textContent='No se pudo eliminar. '+(e.code||'');
- }
-};
-
-/* SERVICIOS */
-
-$('photo').addEventListener('change',()=>{
- const f=$('photo').files[0],img=$('preview');
-
- if(!f){
-  img.src='';
-  img.classList.add('hidden');
-  return;
- }
-
- if(!f.type.startsWith('image/')||f.size>5*1024*1024){
-  alert('Elegí una imagen de hasta 5 MB.');
-  $('photo').value='';
-  img.classList.add('hidden');
-  return;
- }
-
- img.src=URL.createObjectURL(f);
- img.classList.remove('hidden');
-});
-
-async function uploadServicePhoto(file,id){
- if(!file)return null;
- if(!file.type.startsWith('image/')||file.size>5*1024*1024){
-  throw Error('Imagen inválida o mayor de 5 MB');
- }
-
- const ext=(file.name.split('.').pop()||'jpg')
-  .toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
-
- const path=`services/${id}/${Date.now()}.${ext}`;
- const r=ref(storage,path);
-
- await uploadBytes(r,file,{contentType:file.type});
-
- return{
-  imageUrl:await getDownloadURL(r),
-  imagePath:path
- };
-}
-
-$('add').onclick=async()=>{
- const name=$('nm').value.trim();
- const price=$('pr').value.replace(/\D/g,'');
- const duration=Number($('du').value);
- const description=$('desc').value.trim();
- const file=$('photo').files[0];
-
- if(!name||!Number.isFinite(duration)||duration<15||duration>600){
-  return alert('Ingresá nombre y duración válida (15 a 600 minutos).');
- }
-
- const btn=$('add');
- btn.disabled=true;
- $('saveMsg').textContent='Guardando…';
-
- try{
-  const created=await addDoc(collection(db,'services'),{
-   name,price,duration,description,active:true
-  });
-
-  if(file){
-   const photoData=await uploadServicePhoto(file,created.id);
-   await updateDoc(doc(db,'services',created.id),photoData);
-  }
-
-  $('nm').value='';
-  $('pr').value='';
-  $('du').value='30';
-  $('desc').value='';
-  $('photo').value='';
-  $('preview').src='';
-  $('preview').classList.add('hidden');
-
-  $('saveMsg').textContent='Servicio guardado.';
-  await loadAll();
- }catch(e){
-  $('saveMsg').textContent='Error guardando servicio. '+(e.code||e.message||'');
- }finally{
-  btn.disabled=false;
- }
-};
-
-async function loadAll(){
- try{
-  const ss=await getDocs(collection(db,'services'));
-
-  servicesCache=ss.docs.map(d=>({
-   id:d.id,...d.data()
-  }));
-
-  $('services').innerHTML=servicesCache.map(s=>{
-   const photo=safeImageUrl(s.imageUrl);
-
-   return `
-    <div class="row">
-     ${photo?`<img class="service-photo" src="${esc(photo)}" alt="">`:''}
-     <b>${esc(s.name||'Servicio')}</b>
-     <div class="muted">
-      $${esc(s.price||'Consultar')} · ${esc(s.duration||30)} min ·
-      ${s.active===false?'Inactivo':'Activo'}
-     </div>
-     ${s.description?`<p>${esc(s.description)}</p>`:''}
-     <div class="actions">
-      <button onclick="window.editSvc('${s.id}')">Editar datos</button>
-      <button onclick="window.changePhoto('${s.id}')">Cambiar foto</button>
-      <button class="secondary" onclick="window.toggleSvc('${s.id}',${s.active!==false})">
-       ${s.active===false?'Activar':'Desactivar'}
-      </button>
-      <button class="danger" onclick="window.delSvc('${s.id}')">Eliminar</button>
-     </div>
-    </div>`;
-  }).join('')||'Sin servicios.';
-
-  const bs=await getDocs(collection(db,'bookingRequests'));
-
-  $('requests').innerHTML=bs.docs.map(d=>{
-   const b=d.data();
-
-   return `
-    <div class="row">
-     <b>${esc(b.name)}</b>
-     <div>${esc(b.service)} · ${esc(b.date)} ${esc(b.time)}</div>
-     <div class="muted">
-      WhatsApp: ${esc(b.phone)} · Estado: ${esc(b.status)}
-     </div>
-     <button onclick="window.confirmReq('${d.id}')">
-      Marcar confirmado manualmente
-     </button>
-    </div>`;
-  }).join('')||'Sin solicitudes.';
-
-  await renderDateEditor();
-
- }catch(e){
-  console.error(e);
-  $('services').textContent='No se pudieron cargar los datos. Revisá Firestore.';
- }
-}
-
-window.editSvc=async id=>{
- const s=servicesCache.find(x=>x.id===id);
- if(!s)return;
-
- const n=prompt('Nombre',s.name||'');
- const p=prompt('Precio (solo números)',s.price||'');
- const du=prompt('Duración en minutos',s.duration||30);
- const description=prompt('Descripción',s.description||'');
-
- if(n===null||p===null||du===null||description===null)return;
-
- const duration=Number(du);
-
- if(!n.trim()||duration<15||duration>600){
-  return alert('Revisá nombre y duración.');
- }
-
- try{
-  await updateDoc(doc(db,'services',id),{
-   name:n.trim(),
-   price:p.replace(/\D/g,''),
-   duration,
-   description:description.trim()
-  });
-
-  await loadAll();
-  alert('Servicio actualizado.');
- }catch(e){
-  alert('No se pudo actualizar. '+(e.code||''));
- }
-};
-
-window.changePhoto=async id=>{
- const picker=document.createElement('input');
- picker.type='file';
- picker.accept='image/*';
-
- picker.onchange=async()=>{
-  const file=picker.files[0];
-  if(!file)return;
-
-  try{
-   const data=await uploadServicePhoto(file,id);
-   await updateDoc(doc(db,'services',id),data);
-   alert('Foto actualizada.');
-   await loadAll();
-  }catch(e){
-   alert('No se pudo subir. Revisá Storage y sus reglas. '+(e.code||e.message||''));
-  }
- };
-
- picker.click();
-};
-
-window.toggleSvc=async(id,active)=>{
- try{
-  await updateDoc(doc(db,'services',id),{active:!active});
-  await loadAll();
- }catch(e){
-  alert('No se pudo modificar el servicio. '+(e.code||''));
- }
-};
-
-window.delSvc=async id=>{
- if(!confirm('¿Eliminar servicio?'))return;
-
- try{
-  await deleteDoc(doc(db,'services',id));
-  await loadAll();
- }catch(e){
-  alert('No se pudo eliminar. '+(e.code||''));
- }
-};
-
-window.confirmReq=async id=>{
- if(!confirm('¿Marcar esta solicitud como confirmada manualmente?'))return;
-
- try{
-  await updateDoc(doc(db,'bookingRequests',id),{
-   status:'Confirmado manualmente'
-  });
-  await loadAll();
- }catch(e){
-  alert('No se pudo actualizar la solicitud. '+(e.code||''));
- }
-};
-
-</script>
-</body>
-</html>
+     <input type="checkbox" id="ch_${s.id}" ${checked?'checked':''}
+      onchange="window.toggleSvcOpt('${s.id}')">
+    
