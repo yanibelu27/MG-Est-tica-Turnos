@@ -4,438 +4,1428 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MG Estética | Administración</title>
+
 <style>
-:root{--p:#b83272;--d:#27212a;--l:#eadde5;--s:#fff2f8;--g:#218653;--muted:#746975;--red:#a83232;--blue:#326fa8}
+:root{
+ --p:#b83272;--d:#27212a;--l:#eadde5;--s:#fff2f8;
+ --g:#218653;--muted:#746975;--red:#a83232
+}
 *{box-sizing:border-box}
-body{margin:0;background:#faf7f9;color:var(--d);font:16px system-ui,-apple-system,Segoe UI,sans-serif}
-header{background:linear-gradient(120deg,#351e32,#a83270);color:white;padding:22px}
+body{
+ margin:0;background:#faf7f9;color:var(--d);
+ font:16px system-ui,-apple-system,Segoe UI,sans-serif
+}
+header{
+ background:linear-gradient(120deg,#351e32,#a83270);
+ color:white;padding:22px
+}
 header h1{margin:0 0 5px}
 main{max-width:1000px;margin:auto;padding:14px}
-.panel{background:white;border:1px solid var(--l);border-radius:16px;padding:17px;margin:14px 0}
+.panel{
+ background:white;border:1px solid var(--l);
+ border-radius:16px;padding:17px;margin:14px 0
+}
 label{display:block;margin:12px 0 5px;font-weight:650}
-input,textarea,select,button{width:100%;padding:11px;border:1px solid #d9cbd4;border-radius:10px;font:inherit}
+input,textarea,select,button{
+ width:100%;padding:11px;border:1px solid #d9cbd4;
+ border-radius:10px;font:inherit
+}
 textarea{min-height:90px;resize:vertical}
-button{background:var(--p);color:white;font-weight:700;border:0;cursor:pointer;margin-top:10px}
+button{
+ background:var(--p);color:white;font-weight:700;
+ border:0;cursor:pointer;margin-top:10px
+}
 button:disabled{opacity:.55;cursor:not-allowed}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.grid{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+ gap:10px
+}
 .hidden{display:none!important}
 .muted{font-size:14px;color:var(--muted)}
-.danger{background:var(--red)}.secondary{background:#5b4b58}.success{background:var(--g)}
-.preview{max-width:220px;max-height:180px;object-fit:cover;border-radius:12px;margin-top:10px}
-.service-photo{width:100px;height:85px;object-fit:cover;border-radius:10px;float:left;margin:0 12px 8px 0}
-.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;clear:both}
+.danger{background:var(--red)}
+.secondary{background:#5b4b58}
+.success{background:var(--g)}
+.preview{
+ max-width:220px;max-height:180px;object-fit:cover;
+ border-radius:12px;margin-top:10px
+}
+.service-photo{
+ width:100px;height:85px;object-fit:cover;
+ border-radius:10px;float:left;margin:0 12px 8px 0
+}
+.actions{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+ gap:8px;clear:both
+}
 .actions button{margin-top:8px;font-size:14px;padding:8px}
-.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0}
+.calendar-head{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:10px;margin:14px 0
+}
 .calendar-head button{width:auto;min-width:48px;margin:0}
 .calendar-title{font-size:20px;font-weight:800;text-align:center}
-.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
-.weekday{text-align:center;font-size:12px;font-weight:700;color:var(--muted);padding:7px 0}
-.calday{min-height:62px;border:1px solid var(--l);border-radius:10px;background:#fff;color:var(--d);padding:5px 2px;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:14px;cursor:pointer}
-.calday.empty{visibility:hidden}.calday.selected{background:var(--s);border:2px solid var(--p);color:var(--p);font-weight:700}
-.calday.scheduled{background:#e7f5ed;border-color:#9ac9aa}.calday.scheduled.selected{background:var(--s);border:2px solid var(--p)}
+.calendar{
+ display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px
+}
+.weekday{
+ text-align:center;font-size:12px;font-weight:700;
+ color:var(--muted);padding:7px 0
+}
+.calday{
+ min-height:62px;border:1px solid var(--l);border-radius:10px;
+ background:#fff;color:var(--d);padding:5px 2px;margin:0;
+ display:flex;flex-direction:column;align-items:center;
+ justify-content:center;gap:3px;font-size:14px;cursor:pointer
+}
+.calday.empty{visibility:hidden}
+.calday.selected{
+ background:var(--s);border:2px solid var(--p);
+ color:var(--p);font-weight:700
+}
+.calday.scheduled{background:#e7f5ed;border-color:#9ac9aa}
+.calday.scheduled.selected{background:var(--s);border:2px solid var(--p)}
 .calday small{font-size:10px;color:var(--g);font-weight:700}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;margin:12px 0}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
-.service-option{border:1px solid var(--l);border-radius:12px;padding:12px;margin:12px 0;background:#fff}
+.dot{
+ display:inline-block;width:10px;height:10px;
+ border-radius:50%;margin-right:5px
+}
+.service-option{
+ border:1px solid var(--l);border-radius:12px;
+ padding:12px;margin:12px 0;background:#fff
+}
 .service-option.selected{border-color:var(--p);background:#fffafd}
 .service-top{display:flex;align-items:center;gap:10px}
 .service-top input{width:20px;height:20px;flex:none}
 .service-top label{margin:0;flex:1;cursor:pointer}
-.service-config{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px;margin-top:10px}
+.service-config{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+ gap:9px;margin-top:10px
+}
 .service-config input,.service-config select{padding:9px}
 .service-config label{font-size:13px;margin:4px 0}
 .date-label{font-size:18px;font-weight:800;color:var(--p)}
-.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--l);padding-bottom:10px}
-.tab{padding:10px 16px;border-radius:8px;background:transparent;border:none;cursor:pointer;margin:0;color:var(--muted);font-weight:500;width:auto}
+.tabs{
+ display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;
+ border-bottom:1px solid var(--l);padding-bottom:10px
+}
+.tab{
+ padding:10px 16px;border-radius:8px;background:transparent;
+ border:none;cursor:pointer;margin:0;color:var(--muted);
+ font-weight:500;width:auto
+}
 .tab.active{background:var(--p);color:white}
-.status-pendiente{color:#b88632;font-weight:600}.status-confirmado{color:var(--g);font-weight:600}.status-cancelado{color:var(--red);font-weight:600}
-.item{border:1px solid var(--l);border-radius:12px;padding:12px;margin:12px 0;overflow:auto}
+.status-pendiente{color:#b88632;font-weight:700}
+.status-confirmado{color:var(--g);font-weight:700}
+.status-cancelado{color:var(--red);font-weight:700}
+.item{
+ border:1px solid var(--l);border-radius:12px;
+ padding:12px;margin:12px 0;overflow:auto
+}
 .item:after{content:"";display:block;clear:both}
 .footer{text-align:center;padding:20px;color:#777;font-size:12px}
-@media(max-width:430px){.calday{min-height:49px;font-size:13px}.calendar{gap:3px}.weekday{font-size:11px}.panel{padding:13px}.service-config{grid-template-columns:1fr 1fr}}
+@media(max-width:430px){
+ .calday{min-height:49px;font-size:13px}
+ .calendar{gap:3px}
+ .weekday{font-size:11px}
+ .panel{padding:13px}
+ .service-config{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
+
 <body>
-<header><h1>MG Estética · Administración</h1><p>Panel de control privado</p></header>
+
+<header>
+ <h1>MG Estética · Administración</h1>
+ <p>Panel de control privado</p>
+</header>
+
 <main>
+
 <section id="login" class="panel" style="max-width:450px;margin:30px auto">
-<h2 style="text-align:center">🔐 Ingresar</h2>
-<label for="email">Email</label><input id="email" type="email" autocomplete="username" placeholder="Tu correo electrónico">
-<label for="pass">Contraseña</label><input id="pass" type="password" autocomplete="current-password">
-<button id="loginBtn">Iniciar sesión</button>
-<button id="resetBtn" class="secondary" type="button">Olvidé mi contraseña</button>
-<p class="muted" id="msg" role="status" aria-live="polite"></p>
+ <h2 style="text-align:center">🔐 Ingresar</h2>
+
+ <label for="email">Email</label>
+ <input id="email" type="email" autocomplete="username"
+ placeholder="Tu correo electrónico">
+
+ <label for="pass">Contraseña</label>
+ <input id="pass" type="password" autocomplete="current-password">
+
+ <button id="loginBtn">Iniciar sesión</button>
+ <button id="resetBtn" class="secondary" type="button">
+  Olvidé mi contraseña
+ </button>
+
+ <p class="muted" id="msg" role="status" aria-live="polite"></p>
 </section>
+
 <section id="panel" class="hidden">
-<button id="logout" class="danger" style="width:auto;margin-bottom:15px">🚪 Cerrar sesión</button>
-<div class="tabs">
-<button class="tab active" data-tab="calendar">📅 Calendario</button>
-<button class="tab" data-tab="services">💇 Servicios</button>
-<button class="tab" data-tab="requests">📋 Solicitudes</button>
-</div>
-<div id="tab-calendar" class="tab-content">
-<div class="panel">
-<h2>📅 Disponibilidad por fecha</h2>
-<p class="muted">Elegí un día del calendario y configurá qué servicios vas a ofrecer y en qué horarios.</p>
-<div class="calendar-head"><button id="prevMonth" class="secondary" aria-label="Mes anterior">‹</button><div id="monthTitle" class="calendar-title"></div><button id="nextMonth" class="secondary" aria-label="Mes siguiente">›</button></div>
-<div class="calendar" id="calendar"></div>
-<div class="legend"><span><i class="dot" style="background:#9ac9aa"></i>Con servicios configurados</span><span><i class="dot" style="background:#b83272;border:1px solid"></i>Fecha seleccionada</span><span><i class="dot" style="background:#eee"></i>Sin configurar</span></div>
-<div class="panel" style="margin:20px 0 0;background:#fffafd">
-<div class="date-label" id="selectedDateLabel">Seleccioná una fecha del calendario ↑</div>
-<p class="muted">Marcá los servicios que vas a ofrecer en esta fecha y configurá tus horarios.</p>
-<div id="dateServices"><p class="muted">Primero seleccioná un día del calendario.</p></div>
-<div class="grid" style="margin-top:15px"><button id="saveDate">✅ Guardar disponibilidad</button><button id="clearDate" class="danger">🗑️ Quitar servicios del día</button></div>
-<p id="dateMsg" class="muted" role="status" style="margin-top:10px"></p>
-</div></div></div>
-<div id="tab-services" class="tab-content hidden">
-<div class="panel">
-<h2>➕ Agregar nuevo servicio</h2>
-<label for="nm">Nombre del servicio</label><input id="nm" maxlength="100" placeholder="Ej: Mesoterapia corporal">
-<div class="grid"><div><label for="pr">Precio (ARS)</label><input id="pr" inputmode="numeric" placeholder="Ej: 25000"></div><div><label for="du">Duración (minutos)</label><input id="du" type="number" min="15" max="600" step="15" value="30"></div></div>
-<label for="desc">Descripción</label><textarea id="desc" maxlength="500" placeholder="Breve descripción del tratamiento…"></textarea>
-<label for="photo">Foto del servicio (opcional)</label><input id="photo" type="file" accept="image/jpeg,image/png,image/webp">
-<p class="muted">Imágenes JPG, PNG o WebP. Máximo 15 MB originales. Se comprimen automáticamente antes de subirlas.</p>
-<img id="preview" class="preview hidden" alt="Vista previa de la imagen">
-<button id="add">💾 Guardar servicio</button><p id="saveMsg" class="muted" role="status"></p>
-</div>
-<div class="panel"><h2>📋 Servicios disponibles</h2><p class="muted">Podés editar, cambiar fotos, activar/desactivar o eliminar servicios.</p><div id="services">Cargando servicios…</div></div>
-</div>
-<div id="tab-requests" class="tab-content hidden"><div class="panel"><h2>📩 Solicitudes de turnos</h2><p class="muted">Confirmá cuando hayas verificado la seña. Cancelar una solicitud no elimina el registro.</p><div id="requests">Cargando solicitudes…</div></div></div>
+
+ <button id="logout" class="danger"
+ style="width:auto;margin-bottom:15px">🚪 Cerrar sesión</button>
+
+ <div class="tabs">
+  <button class="tab active" data-tab="calendar">📅 Calendario</button>
+  <button class="tab" data-tab="services">💇 Servicios</button>
+  <button class="tab" data-tab="requests">📋 Solicitudes</button>
+ </div>
+
+ <!-- CALENDARIO -->
+ <div id="tab-calendar" class="tab-content">
+
+  <div class="panel">
+   <h2>📅 Disponibilidad por fecha</h2>
+   <p class="muted">
+    Elegí un día y configurá los servicios y horarios disponibles.
+   </p>
+
+   <div class="calendar-head">
+    <button id="prevMonth" class="secondary">‹</button>
+    <div id="monthTitle" class="calendar-title"></div>
+    <button id="nextMonth" class="secondary">›</button>
+   </div>
+
+   <div class="calendar" id="calendar"></div>
+
+   <div class="legend">
+    <span><i class="dot" style="background:#9ac9aa"></i>
+     Con servicios configurados</span>
+    <span><i class="dot" style="background:#b83272"></i>
+     Fecha seleccionada</span>
+    <span><i class="dot" style="background:#eee"></i>
+     Sin configurar</span>
+   </div>
+
+   <div class="panel" style="margin:20px 0 0;background:#fffafd">
+
+    <div class="date-label" id="selectedDateLabel">
+     Seleccioná una fecha del calendario
+    </div>
+
+    <p class="muted">
+     Marcá los servicios que vas a ofrecer y configurá sus horarios.
+    </p>
+
+    <div id="dateServices">
+     <p class="muted">Primero seleccioná un día.</p>
+    </div>
+
+    <div class="grid" style="margin-top:15px">
+     <button id="saveDate">✅ Guardar disponibilidad</button>
+     <button id="clearDate" class="danger">
+      🗑️ Quitar servicios del día
+     </button>
+    </div>
+
+    <p id="dateMsg" class="muted" role="status"></p>
+   </div>
+  </div>
+ </div>
+
+ <!-- SERVICIOS -->
+ <div id="tab-services" class="tab-content hidden">
+
+  <div class="panel">
+   <h2>➕ Agregar nuevo servicio</h2>
+
+   <label for="nm">Nombre del servicio</label>
+   <input id="nm" maxlength="100"
+   placeholder="Ej: Mesoterapia corporal">
+
+   <div class="grid">
+    <div>
+     <label for="pr">Precio (ARS)</label>
+     <input id="pr" inputmode="numeric" placeholder="Ej: 25000">
+    </div>
+    <div>
+     <label for="du">Duración (minutos)</label>
+     <input id="du" type="number" min="15" max="600"
+     step="5" value="30">
+    </div>
+   </div>
+
+   <label for="desc">Descripción</label>
+   <textarea id="desc" maxlength="500"
+   placeholder="Breve descripción del tratamiento…"></textarea>
+
+   <label for="photo">Foto del servicio (opcional)</label>
+   <input id="photo" type="file"
+   accept="image/jpeg,image/png,image/webp">
+
+   <p class="muted">
+    Imágenes JPG, PNG o WebP. Máximo 15 MB.
+    Se comprimen antes de subirlas.
+   </p>
+
+   <img id="preview" class="preview hidden" alt="Vista previa">
+
+   <button id="add">💾 Guardar servicio</button>
+   <p id="saveMsg" class="muted" role="status"></p>
+  </div>
+
+  <div class="panel">
+   <h2>📋 Servicios disponibles</h2>
+   <p class="muted">
+    Podés editar, cambiar fotos, activar, desactivar o eliminar servicios.
+   </p>
+   <div id="services">Cargando servicios…</div>
+  </div>
+ </div>
+
+ <!-- SOLICITUDES -->
+ <div id="tab-requests" class="tab-content hidden">
+  <div class="panel">
+   <h2>📩 Solicitudes de turnos</h2>
+   <p class="muted">
+    Revisá las solicitudes y verificá la seña antes de confirmar.
+    Las reservas nuevas y las solicitudes anteriores se muestran aquí.
+   </p>
+   <div id="requests">Cargando solicitudes…</div>
+  </div>
+ </div>
+
 </section>
-<footer class="footer">MG Estética · WhatsApp 11 4173-6931</footer>
+
+<footer class="footer">
+ MG Estética · WhatsApp 11 4173-6931
+</footer>
+
 </main>
+
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
-import { getFirestore, collection, getDocs, updateDoc, doc, deleteDoc, setDoc } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
-import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
+
+import {initializeApp}
+ from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
+
+import {
+ getFirestore,collection,getDocs,updateDoc,doc,
+ deleteDoc,setDoc,writeBatch
+} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+
+import {
+ getAuth,signInWithEmailAndPassword,sendPasswordResetEmail,
+ onAuthStateChanged,signOut
+} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
+
+import {
+ getStorage,ref,uploadBytes,getDownloadURL
+} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
+
+
+/* FIREBASE */
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBlojGI6d8qF5hgJUYxXSJmz77NGqr3L8A',
-  authDomain: 'mg-estetica-turnos.firebaseapp.com',
-  projectId: 'mg-estetica-turnos',
-  storageBucket: 'mg-estetica-turnos.firebasestorage.app',
-  messagingSenderId: '425300609473',
-  appId: '1:425300609473:web:45bb97101299ae18b00740'
+ apiKey:'AIzaSyBlojGI6d8qF5hgJUYxXSJmz77NGqr3L8A',
+ authDomain:'mg-estetica-turnos.firebaseapp.com',
+ projectId:'mg-estetica-turnos',
+ storageBucket:'mg-estetica-turnos.firebasestorage.app',
+ messagingSenderId:'425300609473',
+ appId:'1:425300609473:web:45bb97101299ae18b00740'
 };
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
-auth.languageCode = 'es';
-const ADMIN = '7L0RaRsim3PQi8oG7l2nvioqxmm2';
-const $ = id => document.getElementById(id);
-const MAX_IMAGE_SIZE = 15 * 1024 * 1024;
-const TARGET_IMAGE_SIZE = 1.5 * 1024 * 1024;
-const MAX_IMAGE_DIMENSION = 1200;
-const monthNames = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-const weekdays = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-let servicesCache = [], schedules = {}, requestsCache = [];
-let selectedDate = dateKey(new Date());
-let calendarMonth = new Date(); calendarMonth.setDate(1);
-let selectedFile = null, previewUrl = null;
 
-function esc(value) {
-  return String(value ?? '').replace(/[&<>"']/g, ch => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  })[ch]);
-}
-function dateKey(date) {
-  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
-}
-function parseDate(key) {
-  const [year,month,day] = key.split('-').map(Number);
-  return new Date(year,month-1,day);
-}
-function formatDateKey(key) {
-  return parseDate(key).toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-}
-function priceFmt(value) {
-  return '$' + Number(value || 0).toLocaleString('es-AR');
-}
-function safeUrl(value) {
-  try { const url = new URL(value); return url.protocol === 'https:' ? url.href : ''; }
-  catch { return ''; }
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+const auth=getAuth(app);
+const storage=getStorage(app);
+
+auth.languageCode='es';
+
+const ADMIN='7L0RaRsim3PQi8oG7l2nvioqxmm2';
+
+const $=id=>document.getElementById(id);
+
+const MAX_IMAGE_SIZE=15*1024*1024;
+const TARGET_IMAGE_SIZE=1.5*1024*1024;
+const MAX_IMAGE_DIMENSION=1200;
+
+const monthNames=[
+ 'enero','febrero','marzo','abril','mayo','junio',
+ 'julio','agosto','septiembre','octubre','noviembre','diciembre'
+];
+
+const weekdays=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+
+let servicesCache=[];
+let schedules={};
+let requestsCache=[];
+let selectedDate=dateKey(new Date());
+let calendarMonth=new Date();
+calendarMonth.setDate(1);
+let selectedFile=null;
+let previewUrl=null;
+
+
+/* FUNCIONES GENERALES */
+
+function esc(value){
+ return String(value??'').replace(/[&<>"']/g,ch=>({
+  '&':'&amp;',
+  '<':'&lt;',
+  '>':'&gt;',
+  '"':'&quot;',
+  "'":'&#39;'
+ })[ch]);
 }
 
-document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => {
-  document.querySelectorAll('.tab').forEach(item => item.classList.remove('active'));
+function dateKey(date){
+ return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+}
+
+function parseDate(key){
+ const [year,month,day]=key.split('-').map(Number);
+ return new Date(year,month-1,day);
+}
+
+function formatDateKey(key){
+ return parseDate(key).toLocaleDateString('es-AR',{
+  weekday:'long',day:'numeric',month:'long',year:'numeric'
+ });
+}
+
+function priceFmt(value){
+ return '$'+Number(value||0).toLocaleString('es-AR');
+}
+
+function safeUrl(value){
+ try{
+  const url=new URL(value);
+  return url.protocol==='https:'?url.href:'';
+ }catch{
+  return '';
+ }
+}
+
+function showError(error){
+ console.error(error);
+ return error?.message||'Error desconocido';
+}
+
+
+/* PESTAÑAS */
+
+document.querySelectorAll('.tab').forEach(tab=>{
+ tab.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(item=>item.classList.remove('active'));
   tab.classList.add('active');
-  document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
-  $('tab-' + tab.dataset.tab).classList.remove('hidden');
-}));
 
-onAuthStateChanged(auth, async user => {
-  if (!user) {
-    $('login').classList.remove('hidden'); $('panel').classList.add('hidden'); return;
-  }
-  if (user.uid !== ADMIN) {
-    await signOut(auth);
-    $('login').classList.remove('hidden'); $('panel').classList.add('hidden');
-    $('msg').textContent = 'Esta cuenta no tiene permisos de administradora.';
-    return;
-  }
-  $('login').classList.add('hidden'); $('panel').classList.remove('hidden'); $('msg').textContent = '';
-  try { await Promise.all([loadServices(),loadSchedules(),loadRequests()]); }
-  catch (error) { console.error(error); $('msg').textContent = 'Error al cargar datos: ' + error.message; }
+  document.querySelectorAll('.tab-content').forEach(content=>{
+   content.classList.add('hidden');
+  });
+
+  $('tab-'+tab.dataset.tab).classList.remove('hidden');
+ });
 });
 
-$('loginBtn').onclick = async () => {
-  const email = $('email').value.trim(), password = $('pass').value;
-  if (!email || !password) { $('msg').textContent = 'Ingresá tu email y contraseña.'; return; }
-  const button = $('loginBtn'); button.disabled = true; button.textContent = 'Ingresando…';
-  try { await signInWithEmailAndPassword(auth,email,password); }
-  catch (error) {
-    const errors = {
-      'auth/invalid-credential':'Email o contraseña incorrectos.',
-      'auth/user-not-found':'Usuario no encontrado.',
-      'auth/too-many-requests':'Demasiados intentos. Esperá unos minutos.',
-      'auth/invalid-email':'Formato de email inválido.',
-      'auth/api-key-not-valid':'La clave API de Firebase no es válida. Revisá la configuración del proyecto.',
-      'auth/api-key-expired':'La clave API de Firebase expiró. Revisá Google Cloud.',
-      'auth/network-request-failed':'No se pudo conectar. Revisá tu conexión a internet.'
+
+/* AUTENTICACIÓN */
+
+onAuthStateChanged(auth,async user=>{
+
+ if(!user){
+  $('login').classList.remove('hidden');
+  $('panel').classList.add('hidden');
+  return;
+ }
+
+ if(user.uid!==ADMIN){
+  await signOut(auth);
+  $('login').classList.remove('hidden');
+  $('panel').classList.add('hidden');
+  $('msg').textContent='Esta cuenta no tiene permisos de administradora.';
+  return;
+ }
+
+ $('login').classList.add('hidden');
+ $('panel').classList.remove('hidden');
+ $('msg').textContent='';
+
+ try{
+  await Promise.all([
+   loadServices(),
+   loadSchedules(),
+   loadRequests()
+  ]);
+ }catch(error){
+  $('msg').textContent='Error al cargar datos: '+showError(error);
+ }
+});
+
+
+$('loginBtn').onclick=async()=>{
+ const email=$('email').value.trim();
+ const password=$('pass').value;
+
+ if(!email||!password){
+  $('msg').textContent='Ingresá tu email y contraseña.';
+  return;
+ }
+
+ const button=$('loginBtn');
+ button.disabled=true;
+ button.textContent='Ingresando…';
+
+ try{
+  await signInWithEmailAndPassword(auth,email,password);
+ }catch(error){
+  const errors={
+   'auth/invalid-credential':'Email o contraseña incorrectos.',
+   'auth/user-not-found':'Usuario no encontrado.',
+   'auth/too-many-requests':'Demasiados intentos. Esperá unos minutos.',
+   'auth/invalid-email':'Formato de email inválido.',
+   'auth/api-key-not-valid':'La clave API de Firebase no es válida.',
+   'auth/api-key-expired':'La clave API de Firebase expiró.',
+   'auth/network-request-failed':'No se pudo conectar. Revisá internet.'
+  };
+
+  $('msg').textContent=errors[error.code]||'Error: '+error.message;
+
+ }finally{
+  button.disabled=false;
+  button.textContent='Iniciar sesión';
+ }
+};
+
+
+$('resetBtn').onclick=async()=>{
+ const email=$('email').value.trim();
+
+ if(!email){
+  alert('Escribí tu email primero.');
+  return;
+ }
+
+ try{
+  await sendPasswordResetEmail(auth,email);
+  alert('Correo de recuperación enviado. Revisá tu bandeja de entrada y spam.');
+ }catch(error){
+  alert('Error al enviar recuperación: '+error.message);
+ }
+};
+
+$('logout').onclick=()=>signOut(auth);
+
+
+/* CARGA DE DATOS */
+
+async function loadServices(){
+ const snapshot=await getDocs(collection(db,'services'));
+
+ servicesCache=snapshot.docs.map(item=>({
+  id:item.id,
+  ...item.data()
+ }));
+
+ renderServices();
+ renderDateEditor();
+}
+
+async function loadSchedules(){
+ const snapshot=await getDocs(collection(db,'specialDates'));
+
+ schedules={};
+
+ snapshot.forEach(item=>{
+  schedules[item.id]=item.data();
+ });
+
+ renderCalendar();
+ renderDateEditor();
+}
+
+
+/*
+ IMPORTANTE:
+ Las reservas nuevas se guardan en "bookings".
+ También leemos "bookingRequests" para conservar
+ las solicitudes antiguas.
+*/
+
+async function loadRequests(){
+
+ const [newSnapshot,oldSnapshot]=await Promise.all([
+  getDocs(collection(db,'bookings')),
+  getDocs(collection(db,'bookingRequests'))
+ ]);
+
+ const newRequests=newSnapshot.docs.map(item=>({
+  id:item.id,
+  collectionName:'bookings',
+  ...item.data()
+ }));
+
+ const oldRequests=oldSnapshot.docs.map(item=>({
+  id:item.id,
+  collectionName:'bookingRequests',
+  ...item.data()
+ }));
+
+ requestsCache=[...newRequests,...oldRequests];
+
+ requestsCache.sort((a,b)=>
+  String(a.date||'').localeCompare(String(b.date||''))||
+  String(a.time||'').localeCompare(String(b.time||''))
+ );
+
+ renderRequests();
+}
+
+
+/* CALENDARIO */
+
+function renderCalendar(){
+
+ const year=calendarMonth.getFullYear();
+ const month=calendarMonth.getMonth();
+
+ $('monthTitle').textContent=
+  monthNames[month][0].toUpperCase()+monthNames[month].slice(1)+' '+year;
+
+ const first=new Date(year,month,1);
+ const days=new Date(year,month+1,0).getDate();
+ const offset=(first.getDay()+6)%7;
+
+ let html=weekdays.map(day=>
+  `<div class="weekday">${day}</div>`
+ ).join('');
+
+ for(let i=0;i<offset;i++){
+  html+='<div class="calday empty"></div>';
+ }
+
+ for(let day=1;day<=days;day++){
+
+  const key=dateKey(new Date(year,month,day));
+  const info=schedules[key];
+
+  const count=Array.isArray(info?.services)
+   ?info.services.length:0;
+
+  html+=`
+   <button type="button"
+    class="calday ${count?'scheduled':''} ${key===selectedDate?'selected':''}"
+    data-date="${key}">
+    <span>${day}</span>
+    ${count?`<small>${count} serv.</small>`:''}
+   </button>
+  `;
+ }
+
+ $('calendar').innerHTML=html;
+
+ $('calendar').querySelectorAll('[data-date]').forEach(button=>{
+  button.addEventListener('click',()=>{
+   selectedDate=button.dataset.date;
+   renderCalendar();
+   renderDateEditor();
+  });
+ });
+}
+
+
+function renderDateEditor(){
+
+ $('selectedDateLabel').textContent='📅 '+formatDateKey(selectedDate);
+ $('dateMsg').textContent='';
+
+ const activeServices=servicesCache.filter(service=>service.active!==false);
+
+ if(!activeServices.length){
+  $('dateServices').innerHTML=
+   '<p class="muted">Primero cargá servicios en la pestaña Servicios.</p>';
+  return;
+ }
+
+ const saved=Array.isArray(schedules[selectedDate]?.services)
+  ?schedules[selectedDate].services:[];
+
+ $('dateServices').innerHTML=activeServices.map(service=>{
+
+  const config=saved.find(item=>item.serviceId===service.id);
+  const checked=!!config;
+
+  return `
+   <div class="service-option ${checked?'selected':''}" id="opt_${service.id}">
+
+    <div class="service-top">
+     <input type="checkbox" id="ch_${service.id}" ${checked?'checked':''}>
+     <label for="ch_${service.id}">
+      <b>${esc(service.name)}</b> · ${Number(service.duration||30)} min
+     </label>
+    </div>
+
+    <div class="service-config">
+
+     <div>
+      <label for="start_${service.id}">Desde</label>
+      <input type="time" id="start_${service.id}"
+       value="${esc(config?.start||'10:00')}" ${checked?'':'disabled'}>
+     </div>
+
+     <div>
+      <label for="end_${service.id}">Hasta</label>
+      <input type="time" id="end_${service.id}"
+       value="${esc(config?.end||'19:00')}" ${checked?'':'disabled'}>
+     </div>
+
+     <div>
+      <label for="int_${service.id}">Intervalo (min)</label>
+      <select id="int_${service.id}" ${checked?'':'disabled'}>
+       ${[15,30,45,60,90,120].map(n=>
+        `<option value="${n}" ${Number(config?.interval||30)===n?'selected':''}>${n}</option>`
+       ).join('')}
+      </select>
+     </div>
+
+    </div>
+   </div>
+  `;
+ }).join('');
+
+ activeServices.forEach(service=>{
+
+  $('ch_'+service.id).addEventListener('change',()=>{
+
+   const enabled=$('ch_'+service.id).checked;
+
+   $('opt_'+service.id).classList.toggle('selected',enabled);
+
+   ['start_','end_','int_'].forEach(prefix=>{
+    $(prefix+service.id).disabled=!enabled;
+   });
+  });
+ });
+}
+
+
+$('prevMonth').onclick=()=>{
+ calendarMonth.setMonth(calendarMonth.getMonth()-1);
+ renderCalendar();
+};
+
+$('nextMonth').onclick=()=>{
+ calendarMonth.setMonth(calendarMonth.getMonth()+1);
+ renderCalendar();
+};
+
+
+/* GUARDAR DISPONIBILIDAD */
+
+$('saveDate').onclick=async()=>{
+
+ const selected=servicesCache.filter(service=>service.active!==false);
+ const list=[];
+
+ for(const service of selected){
+
+  if($('ch_'+service.id)?.checked){
+
+   const start=$('start_'+service.id).value;
+   const end=$('end_'+service.id).value;
+   const interval=Number($('int_'+service.id).value);
+
+   if(!start||!end||start>=end){
+    $('dateMsg').textContent=
+     'Revisá el horario de inicio y fin de '+service.name+'.';
+    return;
+   }
+
+   list.push({
+    serviceId:service.id,
+    name:service.name,
+    start,
+    end,
+    interval,
+    duration:Number(service.duration||30)
+   });
+  }
+ }
+
+ if(!list.length){
+  $('dateMsg').textContent='Marcá al menos un servicio para esta fecha.';
+  return;
+ }
+
+ const button=$('saveDate');
+ button.disabled=true;
+
+ try{
+
+  await setDoc(doc(db,'specialDates',selectedDate),{
+   date:selectedDate,
+   services:list,
+   updatedAt:new Date().toISOString()
+  });
+
+  schedules[selectedDate]={date:selectedDate,services:list};
+
+  renderCalendar();
+
+  $('dateMsg').textContent='Disponibilidad guardada correctamente.';
+
+ }catch(error){
+
+  $('dateMsg').textContent='Error al guardar: '+showError(error);
+
+ }finally{
+  button.disabled=false;
+ }
+};
+
+
+$('clearDate').onclick=async()=>{
+
+ if(!confirm('¿Quitar todos los servicios configurados de esta fecha?')){
+  return;
+ }
+
+ try{
+
+  await deleteDoc(doc(db,'specialDates',selectedDate));
+
+  delete schedules[selectedDate];
+
+  renderCalendar();
+  renderDateEditor();
+
+  $('dateMsg').textContent='Fecha desconfigurada.';
+
+ }catch(error){
+  $('dateMsg').textContent='Error: '+showError(error);
+ }
+};
+
+
+/* FOTOS */
+
+function clearPreview(){
+
+ if(previewUrl){
+  URL.revokeObjectURL(previewUrl);
+  previewUrl=null;
+ }
+
+ $('preview').removeAttribute('src');
+ $('preview').classList.add('hidden');
+}
+
+
+$('photo').onchange=()=>{
+
+ clearPreview();
+
+ selectedFile=$('photo').files[0]||null;
+
+ if(!selectedFile)return;
+
+ if(selectedFile.size>MAX_IMAGE_SIZE){
+  alert('La imagen original supera los 15 MB.');
+  $('photo').value='';
+  selectedFile=null;
+  return;
+ }
+
+ if(!['image/jpeg','image/png','image/webp'].includes(selectedFile.type)){
+  alert('Elegí una imagen JPG, PNG o WebP.');
+  $('photo').value='';
+  selectedFile=null;
+  return;
+ }
+
+ previewUrl=URL.createObjectURL(selectedFile);
+ $('preview').src=previewUrl;
+ $('preview').classList.remove('hidden');
+};
+
+
+async function compressImage(file){
+
+ if(!file)return null;
+
+ if(!file.size)throw new Error('El archivo está vacío.');
+
+ if(file.size>MAX_IMAGE_SIZE){
+  throw new Error('La imagen original supera los 15 MB.');
+ }
+
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
+  throw new Error('Elegí una imagen JPG, PNG o WebP.');
+ }
+
+ let image;
+
+ try{
+
+  if(typeof createImageBitmap==='function'){
+   image=await createImageBitmap(file);
+  }else{
+   image=await new Promise((resolve,reject)=>{
+
+    const reader=new FileReader();
+    const img=new Image();
+
+    reader.onload=()=>{
+     img.onload=()=>resolve(img);
+     img.onerror=()=>reject(new Error('No se pudo interpretar la imagen.'));
+     img.src=reader.result;
     };
-    $('msg').textContent = errors[error.code] || 'Error: ' + error.message;
-  } finally { button.disabled = false; button.textContent = 'Iniciar sesión'; }
-};
-$('resetBtn').onclick = async () => {
-  const email = $('email').value.trim();
-  if (!email) { alert('Escribí tu email primero.'); return; }
-  try { await sendPasswordResetEmail(auth,email); alert('Correo de recuperación enviado. Revisá tu bandeja de entrada y spam.'); }
-  catch (error) { alert('Error al enviar recuperación: ' + error.message); }
-};
-$('logout').onclick = () => signOut(auth);
 
-async function loadServices() {
-  const snapshot = await getDocs(collection(db,'services'));
-  servicesCache = snapshot.docs.map(item => ({id:item.id,...item.data()}));
-  renderServices(); renderDateEditor();
-}
-async function loadSchedules() {
-  const snapshot = await getDocs(collection(db,'specialDates'));
-  schedules = {};
-  snapshot.forEach(item => { schedules[item.id] = item.data(); });
-  renderCalendar(); renderDateEditor();
-}
-async function loadRequests() {
-  const snapshot = await getDocs(collection(db,'bookingRequests'));
-  requestsCache = snapshot.docs.map(item => ({id:item.id,...item.data()}));
-  requestsCache.sort((a,b) => String(a.date||'').localeCompare(String(b.date||'')) || String(a.time||'').localeCompare(String(b.time||'')));
-  renderRequests();
-}
-
-function renderCalendar() {
-  const year = calendarMonth.getFullYear(), month = calendarMonth.getMonth();
-  $('monthTitle').textContent = monthNames[month][0].toUpperCase() + monthNames[month].slice(1) + ' ' + year;
-  const first = new Date(year,month,1), days = new Date(year,month+1,0).getDate();
-  const offset = (first.getDay()+6)%7;
-  let html = weekdays.map(day => `<div class="weekday">${day}</div>`).join('');
-  for (let i=0;i<offset;i++) html += '<div class="calday empty"></div>';
-  for (let day=1;day<=days;day++) {
-    const key = dateKey(new Date(year,month,day));
-    const info = schedules[key], count = Array.isArray(info?.services) ? info.services.length : 0;
-    html += `<button type="button" class="calday ${count?'scheduled':''} ${key===selectedDate?'selected':''}" data-date="${key}"><span>${day}</span>${count?`<small>${count} serv.</small>`:''}</button>`;
+    reader.onerror=()=>reject(reader.error);
+    reader.readAsDataURL(file);
+   });
   }
-  $('calendar').innerHTML = html;
-  $('calendar').querySelectorAll('[data-date]').forEach(button => button.addEventListener('click', async () => {
-    selectedDate = button.dataset.date; renderCalendar(); renderDateEditor();
-  }));
-}
-function renderDateEditor() {
-  $('selectedDateLabel').textContent = '📅 ' + formatDateKey(selectedDate);
-  $('dateMsg').textContent = '';
-  if (!servicesCache.some(service => service.active !== false)) {
-    $('dateServices').innerHTML = '<p class="muted">Primero cargá servicios en la pestaña Servicios.</p>'; return;
-  }
-  const saved = Array.isArray(schedules[selectedDate]?.services) ? schedules[selectedDate].services : [];
-  $('dateServices').innerHTML = servicesCache.filter(service => service.active !== false).map(service => {
-    const config = saved.find(item => item.serviceId === service.id), checked = !!config;
-    return `<div class="service-option ${checked?'selected':''}" id="opt_${service.id}">
-      <div class="service-top"><input type="checkbox" id="ch_${service.id}" ${checked?'checked':''}><label for="ch_${service.id}"><b>${esc(service.name)}</b> · ${Number(service.duration||30)} min</label></div>
-      <div class="service-config">
-        <div><label for="start_${service.id}">Desde</label><input type="time" id="start_${service.id}" value="${esc(config?.start||'10:00')}" ${checked?'':'disabled'}></div>
-        <div><label for="end_${service.id}">Hasta</label><input type="time" id="end_${service.id}" value="${esc(config?.end||'19:00')}" ${checked?'':'disabled'}></div>
-        <div><label for="int_${service.id}">Intervalo (min)</label><select id="int_${service.id}" ${checked?'':'disabled'}>${[15,30,45,60,90,120].map(n=>`<option value="${n}" ${Number(config?.interval||30)===n?'selected':''}>${n}</option>`).join('')}</select></div>
-      </div></div>`;
-  }).join('');
-  servicesCache.filter(service => service.active !== false).forEach(service => {
-    $('ch_'+service.id).addEventListener('change', () => {
-      const enabled = $('ch_'+service.id).checked;
-      $('opt_'+service.id).classList.toggle('selected',enabled);
-      ['start_','end_','int_'].forEach(prefix => $(prefix+service.id).disabled = !enabled);
-    });
-  });
-}
-$('prevMonth').onclick = () => { calendarMonth.setMonth(calendarMonth.getMonth()-1); renderCalendar(); };
-$('nextMonth').onclick = () => { calendarMonth.setMonth(calendarMonth.getMonth()+1); renderCalendar(); };
 
-$('saveDate').onclick = async () => {
-  const selected = servicesCache.filter(service => service.active !== false), list = [];
-  for (const service of selected) {
-    if ($('ch_'+service.id)?.checked) {
-      const start = $('start_'+service.id).value, end = $('end_'+service.id).value;
-      const interval = Number($('int_'+service.id).value);
-      if (!start || !end || start >= end) { $('dateMsg').textContent = 'Revisá el horario de inicio y fin de ' + service.name + '.'; return; }
-      list.push({serviceId:service.id,name:service.name,start,end,interval,duration:Number(service.duration||30)});
+ }catch(error){
+  console.warn(error);
+  return file;
+ }
+
+ let width=image.naturalWidth||image.width;
+ let height=image.naturalHeight||image.height;
+
+ if(!width||!height){
+  if(image.close)image.close();
+  return file;
+ }
+
+ const scale=Math.min(1,MAX_IMAGE_DIMENSION/Math.max(width,height));
+
+ width=Math.max(1,Math.round(width*scale));
+ height=Math.max(1,Math.round(height*scale));
+
+ const canvas=document.createElement('canvas');
+ const context=canvas.getContext('2d');
+
+ if(!context){
+  if(image.close)image.close();
+  return file;
+ }
+
+ let bestBlob=null;
+ let bestType='image/jpeg';
+
+ try{
+
+  for(let attempt=0;attempt<5;attempt++){
+
+   canvas.width=width;
+   canvas.height=height;
+
+   context.clearRect(0,0,width,height);
+   context.drawImage(image,0,0,width,height);
+
+   for(const type of ['image/webp','image/jpeg']){
+
+    for(const quality of [0.82,0.72,0.62,0.5]){
+
+     const blob=await new Promise((resolve,reject)=>{
+      canvas.toBlob(result=>
+       result?resolve(result):reject(new Error('No se pudo procesar la imagen.')),
+       type,quality
+      );
+     });
+
+     if(!bestBlob||blob.size<bestBlob.size){
+      bestBlob=blob;
+      bestType=type;
+     }
+
+     if(blob.size<=TARGET_IMAGE_SIZE){
+      bestBlob=blob;
+      bestType=type;
+      break;
+     }
     }
+
+    if(bestBlob&&bestBlob.size<=TARGET_IMAGE_SIZE)break;
+   }
+
+   if(bestBlob&&bestBlob.size<=TARGET_IMAGE_SIZE)break;
+
+   if(width<=500||height<=500)break;
+
+   width=Math.max(500,Math.round(width*0.85));
+   height=Math.max(500,Math.round(height*0.85));
   }
-  if (!list.length) { $('dateMsg').textContent = 'Marcá al menos un servicio para esta fecha.'; return; }
-  const button = $('saveDate'); button.disabled = true;
-  try {
-    await setDoc(doc(db,'specialDates',selectedDate),{date:selectedDate,services:list,updatedAt:new Date().toISOString()});
-    schedules[selectedDate] = {date:selectedDate,services:list};
-    renderCalendar(); $('dateMsg').textContent = 'Disponibilidad guardada correctamente.';
-  } catch (error) { $('dateMsg').textContent = 'Error al guardar: ' + error.message; }
-  finally { button.disabled = false; }
-};
-$('clearDate').onclick = async () => {
-  if (!confirm('¿Quitar todos los servicios configurados de esta fecha?')) return;
-  try {
-    await deleteDoc(doc(db,'specialDates',selectedDate));
-    delete schedules[selectedDate]; renderCalendar(); renderDateEditor();
-    $('dateMsg').textContent = 'Fecha desconfigurada.';
-  } catch (error) { $('dateMsg').textContent = 'Error: ' + error.message; }
-};
 
-function clearPreview() {
-  if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
-  $('preview').removeAttribute('src'); $('preview').classList.add('hidden');
-}
-$('photo').onchange = () => {
-  clearPreview(); selectedFile = $('photo').files[0] || null;
-  if (!selectedFile) return;
-  if (selectedFile.size > MAX_IMAGE_SIZE) { alert('La imagen original supera los 15 MB.'); $('photo').value=''; selectedFile=null; return; }
-  if (!['image/jpeg','image/png','image/webp'].includes(selectedFile.type)) { alert('Elegí una imagen JPG, PNG o WebP.'); $('photo').value=''; selectedFile=null; return; }
-  previewUrl = URL.createObjectURL(selectedFile); $('preview').src = previewUrl; $('preview').classList.remove('hidden');
-};
-async function compressImage(file) {
-  if (!file) return null;
-  if (!file.size) throw new Error('El archivo está vacío.');
-  if (file.size > MAX_IMAGE_SIZE) throw new Error('La imagen original supera los 15 MB.');
-  if (!['image/jpeg','image/png','image/webp'].includes(file.type)) throw new Error('Elegí una imagen JPG, PNG o WebP.');
-  let image;
-  try {
-    if (typeof createImageBitmap === 'function') image = await createImageBitmap(file);
-    else image = await new Promise((resolve,reject) => {
-      const reader = new FileReader(), img = new Image();
-      reader.onload = () => { img.onload = () => resolve(img); img.onerror = () => reject(new Error('No se pudo interpretar la imagen.')); img.src = reader.result; };
-      reader.onerror = () => reject(reader.error || new Error('No se pudo leer el archivo.'));
-      reader.readAsDataURL(file);
-    });
-  } catch (error) { console.warn('No se pudo comprimir; se usará la imagen original.',error); return file; }
-  let width = image.naturalWidth || image.width, height = image.naturalHeight || image.height;
-  if (!width || !height) { if (image.close) image.close(); return file; }
-  const scale = Math.min(1,MAX_IMAGE_DIMENSION/Math.max(width,height));
-  width = Math.max(1,Math.round(width*scale)); height = Math.max(1,Math.round(height*scale));
-  const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
-  if (!context) { if (image.close) image.close(); return file; }
-  let bestBlob = null, bestType = 'image/jpeg';
-  try {
-    for (let attempt=0;attempt<5;attempt++) {
-      canvas.width=width; canvas.height=height; context.clearRect(0,0,width,height); context.drawImage(image,0,0,width,height);
-      for (const type of ['image/webp','image/jpeg']) {
-        for (const quality of [0.82,0.72,0.62,0.5]) {
-          const blob = await new Promise((resolve,reject) => canvas.toBlob(result => result ? resolve(result) : reject(new Error('No se pudo procesar la imagen.')),type,quality));
-          if (!bestBlob || blob.size < bestBlob.size) { bestBlob=blob; bestType=type; }
-          if (blob.size <= TARGET_IMAGE_SIZE) { bestBlob=blob; bestType=type; break; }
-        }
-        if (bestBlob && bestBlob.size <= TARGET_IMAGE_SIZE) break;
-      }
-      if (bestBlob && bestBlob.size <= TARGET_IMAGE_SIZE) break;
-      if (width<=500 || height<=500) break;
-      width=Math.max(500,Math.round(width*0.85)); height=Math.max(500,Math.round(height*0.85));
-    }
-  } finally { if (image.close) image.close(); canvas.width=0; canvas.height=0; }
-  if (!bestBlob || bestBlob.size > MAX_IMAGE_SIZE) return file;
-  const extension = bestType === 'image/webp' ? 'webp' : 'jpg';
-  return new File([bestBlob],`foto_${Date.now()}.${extension}`,{type:bestType,lastModified:Date.now()});
-}
-async function uploadPhoto(file,serviceId) {
-  if (!file) return '';
-  const uploadFile = await compressImage(file);
-  const safeName = (uploadFile.name || 'foto').replace(/[^\w.-]/g,'_');
-  const path = `services/${serviceId}/${Date.now()}_${safeName}`;
-  const storageRef = ref(storage,path);
-  await uploadBytes(storageRef,uploadFile,{contentType:uploadFile.type || file.type});
-  return await getDownloadURL(storageRef);
-}
-$('add').onclick = async () => {
-  const name=$('nm').value.trim(), price=$('pr').value.trim().replace(/\D/g,''), duration=Number($('du').value), description=$('desc').value.trim();
-  if (!name || duration<15 || duration>600 || !Number.isFinite(duration)) { $('saveMsg').textContent='Ingresá un nombre y una duración entre 15 y 600 minutos.'; return; }
-  const button=$('add'); button.disabled=true; button.textContent='Guardando…';
-  try {
-    const id='svc_'+Date.now(), photoUrl=await uploadPhoto(selectedFile,id);
-    await setDoc(doc(db,'services',id),{name,price:price?Number(price):0,duration,description,photoUrl,active:true,createdAt:new Date().toISOString()});
-    $('nm').value=''; $('pr').value=''; $('du').value='30'; $('desc').value=''; $('photo').value='';
-    clearPreview(); selectedFile=null; $('saveMsg').textContent='Servicio guardado correctamente.'; await loadServices();
-  } catch (error) { $('saveMsg').textContent='No se pudo guardar: '+error.message; }
-  finally { button.disabled=false; button.textContent='💾 Guardar servicio'; }
-};
+ }finally{
 
-function renderServices() {
-  $('services').innerHTML = servicesCache.length ? servicesCache.map(service => `
-    <div class="item">
-      <div>${service.photoUrl && safeUrl(service.photoUrl) ? `<img class="service-photo" src="${esc(safeUrl(service.photoUrl))}" alt="">` : ''}
-      <b>${esc(service.name)}</b><p>${esc(service.description||'')}</p>
-      <p class="muted">Precio: ${priceFmt(service.price)} · Duración: ${Number(service.duration||0)} min · ${service.active===false?'Desactivado':'Activo'}</p></div>
-      <label for="name_${service.id}">Editar nombre</label><input id="name_${service.id}" maxlength="100" value="${esc(service.name)}">
-      <div class="grid"><div><label for="price_${service.id}">Precio ($)</label><input id="price_${service.id}" inputmode="numeric" value="${esc(service.price||0)}"></div>
-      <div><label for="duration_${service.id}">Duración (min)</label><input id="duration_${service.id}" type="number" min="15" max="600" value="${esc(service.duration||30)}"></div></div>
-      <label for="desc_${service.id}">Descripción</label><textarea id="desc_${service.id}" maxlength="500">${esc(service.description||'')}</textarea>
-      <label for="photo_${service.id}">Cambiar foto (opcional)</label><input type="file" accept="image/jpeg,image/png,image/webp" id="photo_${service.id}">
-      <div class="actions"><button data-action="save" data-id="${service.id}">Guardar cambios</button><button class="secondary" data-action="toggle" data-id="${service.id}">${service.active===false?'Activar':'Desactivar'}</button><button class="danger" data-action="delete" data-id="${service.id}">Eliminar</button></div>
-    </div>`).join('') : 'Todavía no hay servicios cargados.';
-  $('services').querySelectorAll('button[data-action]').forEach(button => {
-    const id=button.dataset.id, action=button.dataset.action;
-    button.addEventListener('click', () => {
-      if (action==='save') saveService(id);
-      if (action==='toggle') toggleService(id);
-      if (action==='delete') deleteService(id);
-    });
+  if(image.close)image.close();
+
+  canvas.width=0;
+  canvas.height=0;
+ }
+
+ if(!bestBlob||bestBlob.size>MAX_IMAGE_SIZE)return file;
+
+ const extension=bestType==='image/webp'?'webp':'jpg';
+
+ return new File(
+  [bestBlob],
+  `foto_${Date.now()}.${extension}`,
+  {type:bestType,lastModified:Date.now()}
+ );
+}
+
+
+async function uploadPhoto(file,serviceId){
+
+ if(!file)return '';
+
+ const uploadFile=await compressImage(file);
+
+ const safeName=(uploadFile.name||'foto').replace(/[^\w.-]/g,'_');
+
+ const path=`services/${serviceId}/${Date.now()}_${safeName}`;
+
+ const storageRef=ref(storage,path);
+
+ await uploadBytes(storageRef,uploadFile,{
+  contentType:uploadFile.type||file.type
+ });
+
+ return await getDownloadURL(storageRef);
+}
+
+
+/* AGREGAR SERVICIO */
+
+$('add').onclick=async()=>{
+
+ const name=$('nm').value.trim();
+ const price=$('pr').value.trim().replace(/\D/g,'');
+ const duration=Number($('du').value);
+ const description=$('desc').value.trim();
+
+ if(!name||!Number.isInteger(duration)||duration<15||duration>600||duration%5!==0){
+  $('saveMsg').textContent=
+   'Ingresá un nombre y una duración válida (15 a 600 minutos, múltiplo de 5).';
+  return;
+ }
+
+ const button=$('add');
+ button.disabled=true;
+ button.textContent='Guardando…';
+
+ try{
+
+  const id='svc_'+Date.now();
+  const photoUrl=await uploadPhoto(selectedFile,id);
+
+  await setDoc(doc(db,'services',id),{
+   name,
+   price:price?Number(price):0,
+   duration,
+   description,
+   photoUrl,
+   active:true,
+   createdAt:new Date().toISOString()
   });
-}
-async function saveService(id) {
-  const service=servicesCache.find(item=>item.id===id);
-  const name=$('name_'+id).value.trim(), price=$('price_'+id).value.replace(/\D/g,''), duration=Number($('duration_'+id).value);
-  const description=$('desc_'+id).value.trim(), file=$('photo_'+id).files[0];
-  if (!name || duration<15 || duration>600 || !Number.isFinite(duration)) { alert('Revisá el nombre y la duración (15 a 600 minutos).'); return; }
-  if (file && (file.size>MAX_IMAGE_SIZE || !['image/jpeg','image/png','image/webp'].includes(file.type))) { alert(file.size>MAX_IMAGE_SIZE?'La foto supera los 15 MB.':'Elegí una imagen JPG, PNG o WebP.'); return; }
-  try {
-    const photoUrl=file ? await uploadPhoto(file,id) : (service.photoUrl||'');
-    await updateDoc(doc(db,'services',id),{name,price:price?Number(price):0,duration,description,photoUrl});
-    await loadServices(); alert('Servicio actualizado correctamente.');
-  } catch (error) { alert('Error al guardar: '+error.message); }
-}
-async function toggleService(id) {
-  const service=servicesCache.find(item=>item.id===id);
-  try { await updateDoc(doc(db,'services',id),{active:service.active===false}); await loadServices(); }
-  catch (error) { alert('Error: '+error.message); }
-}
-async function deleteService(id) {
-  if (!confirm('¿Eliminar este servicio? No se borrarán reservas históricas.')) return;
-  try { await deleteDoc(doc(db,'services',id)); await loadServices(); }
-  catch (error) { alert('Error al eliminar: '+error.message); }
+
+  $('nm').value='';
+  $('pr').value='';
+  $('du').value='30';
+  $('desc').value='';
+  $('photo').value='';
+
+  clearPreview();
+  selectedFile=null;
+
+  $('saveMsg').textContent='Servicio guardado correctamente.';
+
+  await loadServices();
+
+ }catch(error){
+
+  $('saveMsg').textContent='No se pudo guardar: '+showError(error);
+
+ }finally{
+
+  button.disabled=false;
+  button.textContent='💾 Guardar servicio';
+ }
+};
+
+
+/* MOSTRAR SERVICIOS */
+
+function renderServices(){
+
+ $('services').innerHTML=servicesCache.length
+ ?servicesCache.map(service=>`
+
+  <div class="item">
+
+   <div>
+    ${service.photoUrl&&safeUrl(service.photoUrl)
+     ?`<img class="service-photo" src="${esc(safeUrl(service.photoUrl))}" alt="">`
+     :''}
+
+    <b>${esc(service.name)}</b>
+
+    <p>${esc(service.description||'')}</p>
+
+    <p class="muted">
+     Precio: ${priceFmt(service.price)}
+     · Duración: ${Number(service.duration||0)} min
+     · ${service.active===false?'Desactivado':'Activo'}
+    </p>
+   </div>
+
+   <label for="name_${service.id}">Editar nombre</label>
+   <input id="name_${service.id}" maxlength="100"
+    value="${esc(service.name)}">
+
+   <div class="grid">
+    <div>
+     <label for="price_${service.id}">Precio ($)</label>
+     <input id="price_${service.id}" inputmode="numeric"
+      value="${esc(service.price||0)}">
+    </div>
+
+    <div>
+     <label for="duration_${service.id}">Duración (min)</label>
+     <input id="duration_${service.id}" type="number"
+      min="15" max="600" step="5"
+      value="${esc(service.duration||30)}">
+    </div>
+   </div>
+
+   <label for="desc_${service.id}">Descripción</label>
+   <textarea id="desc_${service.id}" maxlength="500">${esc(service.description||'')}</textarea>
+
+   <label for="photo_${service.id}">Cambiar foto (opcional)</label>
+   <input type="file" accept="image/jpeg,image/png,image/webp"
+    id="photo_${service.id}">
+
+   <div class="actions">
+    <button data-action="save" data-id="${service.id}">Guardar cambios</button>
+    <button class="secondary" data-action="toggle" data-id="${service.id}">
+     ${service.active===false?'Activar':'Desactivar'}
+    </button>
+    <button class="danger" data-action="delete" data-id="${service.id}">
+     Eliminar
+    </button>
+   </div>
+
+  </div>
+
+ `).join('')
+ :'Todavía no hay servicios cargados.';
+
+ $('services').querySelectorAll('button[data-action]').forEach(button=>{
+
+  const id=button.dataset.id;
+  const action=button.dataset.action;
+
+  button.addEventListener('click',()=>{
+
+   if(action==='save')saveService(id);
+   if(action==='toggle')toggleService(id);
+   if(action==='delete')deleteService(id);
+
+  });
+ });
 }
 
-function renderRequests() {
-  if (!requestsCache.length) { $('requests').innerHTML='Todavía no hay solicitudes.'; return; }
-  $('requests').innerHTML=requestsCache.map(request => {
-    const status=request.status||'Pendiente';
-    const className=status.toLowerCase().includes('confirm')?'status-confirmado':status.toLowerCase().includes('cancel')?'status-cancelado':'status-pendiente';
-    return `<div class="item"><b>${esc(request.name||request.customerName||'Cliente')}</b>
-      <p>${esc(request.serviceName||request.service||'Servicio')} · ${esc(request.date||'Fecha')} ${esc(request.time||'Horario')}</p>
-      <p>WhatsApp: ${esc(request.phone||request.whatsapp||'—')} · ${esc(request.deposit||request.seña||'Seña no especificada')}</p>
-      <p class="${className}">Estado: ${esc(status)}</p>
-      <div class="actions"><button class="success" data-status="Confirmado" data-id="${request.id}">Confirmar</button>
-      <button class="secondary" data-status="Pendiente" data-id="${request.id}">Pendiente</button>
-      <button class="danger" data-status="Cancelado" data-id="${request.id}">Cancelar</button></div></div>`;
-  }).join('');
-  $('requests').querySelectorAll('button[data-status]').forEach(button => button.addEventListener('click',()=>setRequestStatus(button.dataset.id,button.dataset.status)));
+
+/* EDITAR SERVICIO */
+
+async function saveService(id){
+
+ const service=servicesCache.find(item=>item.id===id);
+
+ if(!service)return;
+
+ const name=$('name_'+id).value.trim();
+ const price=$('price_'+id).value.replace(/\D/g,'');
+ const duration=Number($('duration_'+id).value);
+ const description=$('desc_'+id).value.trim();
+ const file=$('photo_'+id).files[0];
+
+ if(!name||!Number.isInteger(duration)||duration<15||duration>600||duration%5!==0){
+  alert('Revisá el nombre y la duración (15 a 600 minutos, múltiplo de 5).');
+  return;
+ }
+
+ if(file&&(file.size>MAX_IMAGE_SIZE||
+  !['image/jpeg','image/png','image/webp'].includes(file.type))){
+
+  alert(file.size>MAX_IMAGE_SIZE
+   ?'La foto supera los 15 MB.'
+   :'Elegí una imagen JPG, PNG o WebP.');
+
+  return;
+ }
+
+ try{
+
+  const photoUrl=file
+   ?await uploadPhoto(file,id)
+   :(service.photoUrl||'');
+
+  await updateDoc(doc(db,'services',id),{
+   name,
+   price:price?Number(price):0,
+   duration,
+   description,
+   photoUrl
+  });
+
+  await loadServices();
+
+  alert('Servicio actualizado correctamente.');
+
+ }catch(error){
+  alert('Error al guardar: '+showError(error));
+ }
 }
-async function setRequestStatus(id,status) {
-  try { await updateDoc(doc(db,'bookingRequests',id),{status,updatedAt:new Date().toISOString()}); await loadRequests(); }
-  catch (error) { alert('No se pudo actualizar. Revisá las reglas de Firestore: '+error.message); }
+
+
+/* ACTIVAR / DESACTIVAR */
+
+async function toggleService(id){
+
+ const service=servicesCache.find(item=>item.id===id);
+
+ if(!service)return;
+
+ try{
+
+  await updateDoc(doc(db,'services',id),{
+   active:service.active===false
+  });
+
+  await loadServices();
+
+ }catch(error){
+  alert('Error: '+showError(error));
+ }
 }
+
+
+/* ELIMINAR SERVICIO */
+
+async function deleteService(id){
+
+ if(!confirm('¿Eliminar este servicio? No se borrarán reservas históricas.')){
+  return;
+ }
+
+ try{
+
+  await deleteDoc(doc(db,'services',id));
+
+  await loadServices();
+
+ }catch(error){
+  alert('Error: '+showError(error));
+ }
+}
+
+
+/* SOLICITUDES Y RESERVAS */
+
+function normalizeStatus(status){
+
+ const value=String(status||'pending').toLowerCase();
+
+ if(value.includes('confirm'))return 'confirmed';
+ if(value.includes('cancel'))return 'cancelled';
+
+ return 'pending';
+}
+
+function statusLabel(status){
+
+ const normalized=normalizeStatus(status);
+
+ if(normalized==='confirmed')return 'Confirmado';
+ if(normalized==='cancelled')return 'Cancelado';
+
+ return 'Pendiente';
+}
+
+function renderRequests(){
+
+ if(!requestsCache.length){
+  $('requests').innerHTML='Todavía no hay solicitudes de turnos.';
+  return;
+ }
+
+ $('requests').innerHTML=requestsCache.map(request=>{
+
+  const status=statusLabel(request.status);
+
+  const normalized=normalizeStatus(request.status);
+
+  const className=
+   normalized==='confirmed'?'status-confirmado':
+   normalized==='cancelled'?'status-cancelado':
+   'status-pendiente';
+
+  const serviceName=request.serviceName||request.service||'Servicio';
+
+  const name=request.name||request.customerName||'Cliente';
+
+  const phone=request.phone||request.whatsapp||'—';
+
+  const collectionLabel=request.collectionName==='bookings'
+   ?'Reserva nueva'
+   :'Solicitud anterior';
+
+  return `
+
+   <div class="item">
+
+    <p class="muted">${collectionLabel}</p>
+
+    <b>${esc(name)}</b>
+
+    <p>
+     ${esc(serviceName)}
+     · ${esc(request.date||'Fecha')}
+     · ${esc(request.time||'Horario')}
+    </p>
+
+    <p>
+     WhatsApp: ${esc(phone)}
+    </p>
+
+    <p>
+     Duración: ${esc(request.duration||'—')} minutos
+    </p>
+
+    <p>
+     Seña: ${esc(request.deposit||request.seña||'No especificada')}
+    </p>
+
+    <p class="${className}">
+     Estado: ${status}
+    </p>
+
+    ${normalized==='cancelled'
+     ?'<p class="muted">Esta solicitud está cancelada.</p>'
+     :`
+      <div class="actions">
+
+       <button class="success"
+        data-status="confirmed"
+        data-id="${esc(request.id)}"
+        data-collection="${request.collectionName}">
+        Confirmar
+       </button>
+
+       <button class="danger"
+        data-status="cancelled"
+        data-id="${esc(request.id)}"
+        data-collection="${request.collectionName}">
+        Cancelar
+       </button>
+
+      </div>
+     `
+    }
+
+   </div>
+
+  `;
+
+ }).join('');
+
+
+ $('requests').querySelectorAll('button[data-status]').forEach(button=>{
+
+  button.addEventListener('click',()=>{
+
+   setRequestStatus(
+    button.dataset.id,
+    button.dataset.status,
+    button.dataset.collection
+   );
+
+  });
+ });
+}
+
+
+/*
+ Actualiza la reserva en la colección correspondiente.
+ Al cancelar, también elimina los bloqueos horarios
+ asociados a sus slotIds para liberar esos horarios.
+*/
+
+async function setRequestStatus(id,status,collectionName){
+
+ const request=requestsCache.find(item=>
+  item.id===id&&item.collectionName===collectionName
+ );
+
+ if(!request)return;
+
+ const actionLabel=status==='confirmed'?'confirmar':'cancelar';
+
+ if(!confirm('¿Querés '+actionLabel+' esta solicitud?'))return;
+
+ try{
+
+  const batch=writeBatch(db);
+
+  const requestRef=doc(db,collectionName,id);
+
+  let storedStatus=status;
+
+  // Mantener los estados históricos de bookingRequests.
+  if(collectionName==='bookingRequests'){
+   storedStatus=status==='confirmed'
+    ?'Confirmado'
+    :'Cancelado';
+  }
+
+  batch.update(requestRef,{
+   status:storedStatus,
+   updatedAt:new Date().toISOString()
+  });
+
+  /*
+   Si se cancela una reserva, se liberan los intervalos
+   guardados en slotIds. El documento de la reserva
+   permanece guardado como historial.
+  */
+
+  if(status==='cancelled'&&Array.isArray(request.slotIds)){
+
+   request.slotIds.forEach(slotId=>{
+
+    if(typeof slotId==='string'&&slotId.length){
+
+     batch.delete(doc(db,'slots',slotId));
+
+    }
+
+   });
+  }
+
+  await batch.commit();
+
+  await loadRequests();
+
+  alert(status==='confirmed'
+   ?'Reserva confirmada correctamente.'
+   :'Solicitud cancelada. Se liberaron los horarios asociados.');
+
+ }catch(error){
+
+  alert(
+   'No se pudo actualizar la solicitud: '+showError(error)+
+   '. Revisá las reglas de Firestore.'
+  );
+
+ }
+}
+
 </script>
+
 </body>
 </html>
