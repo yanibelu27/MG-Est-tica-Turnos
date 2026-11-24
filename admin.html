@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="es">
 <head>
@@ -186,8 +187,9 @@ import{
  getStorage,ref,uploadBytes,getDownloadURL
 }from'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
 
+/* CONFIGURACIÓN FIREBASE ACTUALIZADA */
 const firebaseConfig={
- apiKey:'AIzaSyB_yLOsIAhEkcr1blJK46HAHCWylVI-3v0',
+ apiKey:'AIzaSyBlojGI6d8qF5hgJUYxXSJmz77NGqr3L8A',
  authDomain:'mg-estetica-turnos.firebaseapp.com',
  projectId:'mg-estetica-turnos',
  storageBucket:'mg-estetica-turnos.firebasestorage.app',
@@ -200,7 +202,6 @@ const db=getFirestore(app);
 const auth=getAuth(app);
 const storage=getStorage(app);
 
-// Solicita a Firebase los correos de acción en español.
 auth.languageCode='es';
 
 const ADMIN='lvCsIh1rliWqmsV8cPCCnCCZdHj2';
@@ -250,11 +251,7 @@ let selectedDate=dateKey(new Date());
 let calendarMonth=new Date();
 calendarMonth.setDate(1);
 
-/* AUTENTICACIÓN
-   - Verifica el UID administrador antes de mostrar el panel.
-   - Permite iniciar sesión con Firebase Authentication.
-   - Permite solicitar un correo nuevo para restablecer la contraseña.
-*/
+/* AUTENTICACIÓN */
 
 onAuthStateChanged(auth,async u=>{
  console.log('Estado de autenticación:',{
@@ -352,6 +349,7 @@ $('loginBtn').onclick=async()=>{
 };
 
 /* RECUPERACIÓN DE CONTRASEÑA */
+
 $('resetBtn').onclick=async()=>{
  const email=$('email').value.trim();
  const btn=$('resetBtn');
@@ -373,8 +371,6 @@ $('resetBtn').onclick=async()=>{
  $('msg').textContent='Solicitando el correo de recuperación a Firebase…';
 
  try{
-  // Se usa el manejador de acciones predeterminado de Firebase.
-  // No se construye manualmente el enlace ni se reutilizan códigos anteriores.
   await sendPasswordResetEmail(auth,email);
 
   $('msg').textContent=
@@ -394,7 +390,8 @@ $('resetBtn').onclick=async()=>{
    'auth/too-many-requests':'Se solicitaron demasiados correos. Esperá un tiempo antes de volver a intentarlo.',
    'auth/network-request-failed':'No hay conexión con Firebase. Revisá Internet e intentá nuevamente.',
    'auth/unauthorized-continue-uri':'La dirección de continuación no está autorizada en Firebase.',
-   'auth/operation-not-allowed':'La recuperación por correo no está habilitada en Firebase Authentication.'
+   'auth/operation-not-allowed':'La recuperación por correo no está habilitada en Firebase Authentication.',
+   'auth/invalid-api-key':'La clave API no es válida. Revisá Google Cloud y la configuración de Firebase.'
   };
 
   $('msg').textContent=
@@ -480,7 +477,6 @@ function renderCalendar(){
  $('calendar').innerHTML=html;
 }
 
-/* Se expone esta función porque los botones del calendario se generan dinámicamente. */
 window.selectAdminDate=async key=>{
  selectedDate=key;
  renderCalendar();
