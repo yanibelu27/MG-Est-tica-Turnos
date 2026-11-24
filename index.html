@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="es">
 <head>
@@ -159,8 +160,12 @@ function esc(x){
 }
 
 function safeImageUrl(value){
- try{const u=new URL(value);return u.protocol==='https:'?u.href:'';}
- catch{return '';}
+ try{
+  const u=new URL(value);
+  return u.protocol==='https:'?u.href:'';
+ }catch{
+  return '';
+ }
 }
 
 function price(v){
@@ -170,13 +175,23 @@ function price(v){
 }
 
 function minutes(hhmm){
- const [h,m]=String(hhmm).split(':').map(Number);
- return h*60+m;
+ const parts=String(hhmm).split(':').map(Number);
+ if(parts.length!==2||parts.some(n=>!Number.isFinite(n)))return NaN;
+ return parts[0]*60+parts[1];
 }
 
+/*
+ Duración estricta:
+ acepta valores como 60, "60" o "60 min".
+ No inventa una duración si el servicio está mal configurado.
+*/
 function durationMinutes(value){
- const n=Number.parseInt(String(value??'').match(/\d+/)?.[0]||'30',10);
- return Number.isFinite(n)&&n>0?n:30;
+ const match=String(value??'').match(/\d+/);
+ if(!match)return null;
+
+ const n=Number.parseInt(match[0],10);
+
+ return Number.isInteger(n)&&n>=15&&n<=600?n:null;
 }
 
 function clock(min){
@@ -184,7 +199,8 @@ function clock(min){
 }
 
 function localDateTime(dateValue,timeValue){
- const [y,m,d]=dateValue.split('-').map(Number),[h,min]=timeValue.split(':').map(Number);
+ const [y,m,d]=dateValue.split('-').map(Number);
+ const [h,min]=timeValue.split(':').map(Number);
  return new Date(y,m-1,d,h,min,0,0);
 }
 
@@ -193,7 +209,9 @@ function minAdvanceOK(dateValue,timeValue){
 }
 
 function formatDateKey(key){
- return new Date(key+'T12:00:00').toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ return new Date(key+'T12:00:00').toLocaleDateString('es-AR',{
+  weekday:'long',day:'numeric',month:'long',year:'numeric'
+ });
 }
 
 function resetTime(message){
@@ -208,8 +226,10 @@ function serviceById(id){
 
 function normalizeScheduleEntry(entry){
  if(!entry||!entry.serviceId)return null;
+
  const full=serviceById(entry.serviceId);
  if(!full||full.active===false)return null;
+
  return {
   serviceId:entry.serviceId,
   name:entry.name||full.name||'Servicio',
@@ -238,16 +258,28 @@ function getServicesForDate(dateValue){
   if(targets.length){
    entries=entries.map(e=>{
     if(!targets.some(t=>t.serviceId===e.serviceId))return e;
-    return {...e,start:times[0],end:times[times.length-1],interval:0,explicitTimes:times};
+
+    return {
+     ...e,
+     start:times[0],
+     end:times[times.length-1],
+     interval:0,
+     explicitTimes:times
+    };
    });
   }
  }
+
  return entries;
 }
 
 function candidateTimes(entry,fullService){
  const duration=durationMinutes(fullService.duration);
- const start=minutes(entry.start),end=minutes(entry.end);
+
+ if(!duration)return [];
+
+ const start=minutes(entry.start);
+ const end=minutes(entry.end);
 
  if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start)return [];
 
@@ -259,24 +291,31 @@ function candidateTimes(entry,fullService){
  }
 
  const interval=Number(entry.interval||30);
+
  if(!Number.isFinite(interval)||interval<=0)return [];
 
  const out=[];
- for(let m=start;m+duration<=end;m+=interval)out.push(clock(m));
+
+ for(let m=start;m+duration<=end;m+=interval){
+  out.push(clock(m));
+ }
+
  return out;
 }
 
 function isDayAvailable(dateValue){
  if(dateValue<todayString)return false;
+
  return getServicesForDate(dateValue).some(entry=>{
   const full=serviceById(entry.serviceId);
+
   return full&&candidateTimes(entry,full).some(t=>minAdvanceOK(dateValue,t));
  });
-
 }
 
 function updateSelectedDate(){
  refreshCounter++;
+
  const dateValue=dateInput.value;
 
  if(!dateValue){
@@ -297,10 +336,15 @@ function updateSelectedDate(){
  }
 
  dayServicesSection.classList.remove('hidden');
+
  dayServicesHint.textContent=`✅ ${selectedDateServices.length} servicio${selectedDateServices.length===1?'':'s'} disponible${selectedDateServices.length===1?'':'s'} este día`;
+
  service.innerHTML='<option value="">Seleccioná un servicio</option>';
 
- selectedDateServices.forEach(s=>service.add(new Option(s.name,s.serviceId)));
+ selectedDateServices.forEach(s=>{
+  service.add(new Option(s.name,s.serviceId));
+ });
+
  resetTime('Primero elegí un servicio');
 }
 
@@ -308,7 +352,10 @@ function renderCalendar(){
  const grid=$('calendarGrid'),title=$('monthTitle');
  const year=monthCursor.getFullYear(),month=monthCursor.getMonth();
 
- title.textContent=new Intl.DateTimeFormat('es-AR',{month:'long',year:'numeric'}).format(monthCursor);
+ title.textContent=new Intl.DateTimeFormat('es-AR',{
+  month:'long',year:'numeric'
+ }).format(monthCursor);
+
  grid.innerHTML='';
 
  weekdays.forEach(d=>{
@@ -318,7 +365,8 @@ function renderCalendar(){
   grid.appendChild(el);
  });
 
- const firstDay=new Date(year,month,1),totalDays=new Date(year,month+1,0).getDate();
+ const firstDay=new Date(year,month,1);
+ const totalDays=new Date(year,month+1,0).getDate();
  const offset=(firstDay.getDay()+6)%7;
 
  for(let i=0;i<offset;i++){
@@ -329,11 +377,13 @@ function renderCalendar(){
 
  for(let day=1;day<=totalDays;day++){
   const value=dateString(new Date(year,month,day));
-  const available=isDayAvailable(value),selected=dateInput.value===value;
+  const available=isDayAvailable(value);
+  const selected=dateInput.value===value;
   const btn=document.createElement('button');
 
   btn.type='button';
   btn.className='calendar-day';
+
   if(available)btn.classList.add('available');
   if(selected)btn.classList.add('selected');
 
@@ -341,17 +391,20 @@ function renderCalendar(){
   btn.disabled=!available;
   btn.setAttribute('aria-label',value+(available?' disponible':' sin atención'));
 
-  if(available)btn.addEventListener('click',()=>{
-   dateInput.value=value;
-   resultBox.innerHTML='';
-   renderCalendar();
-   updateSelectedDate();
-  });
+  if(available){
+   btn.addEventListener('click',()=>{
+    dateInput.value=value;
+    resultBox.innerHTML='';
+    renderCalendar();
+    updateSelectedDate();
+   });
+  }
 
   grid.appendChild(btn);
  }
 
  $('prevMonth').disabled=year===today.getFullYear()&&month<=today.getMonth();
+
  $('calendarInfo').textContent='Los días en verde tienen servicios y horarios que cumplen la anticipación mínima de 48 horas.';
 }
 
@@ -365,27 +418,57 @@ $('nextMonth').addEventListener('click',()=>{
  renderCalendar();
 });
 
+/*
+ Cada bloque representa 30 minutos.
+ Se incluyen todos los bloques que se cruzan con el turno.
+*/
 function blockSlotIds(dateValue,start,duration){
- const end=start+duration,ids=new Set();
+ const end=start+duration;
+ const ids=new Set();
 
  for(let m=Math.floor(start/30)*30;m<end;m+=30){
-  if(m>=0&&m<1440)ids.add(dateValue+'_'+clock(m));
+  if(m>=0&&m<1440){
+   ids.add(dateValue+'_'+clock(m));
+  }
  }
 
  return [...ids];
 }
 
-
-// NUEVO CONTROL DE SOLAPAMIENTOS
-// Cada documento de slots representa un bloque ocupado de 30 minutos.
-// Se comparan los intervalos reales, no solamente la hora de inicio.
-
 function overlaps(startA,endA,startB,endB){
  return startA<endB&&endA>startB;
 }
 
+function getSlotTime(slotDoc){
+ const data=slotDoc.data();
+
+ if(
+  typeof data.time==='string'&&
+  /^([01]\d|2[0-3]):[0-5]\d$/.test(data.time)
+ ){
+  return data.time;
+ }
+
+ const parts=slotDoc.id.split('_');
+ const possibleTime=parts.slice(1).join('_');
+
+ if(/^([01]\d|2[0-3]):[0-5]\d$/.test(possibleTime)){
+  return possibleTime;
+ }
+
+ return null;
+}
+
+function slotIsOccupied(data){
+ return data.busy===true||
+  Boolean(data.bookingId)||
+  data.status==='confirmed'||
+  data.status==='pending';
+}
+
 async function refreshTime(){
  const requestId=++refreshCounter;
+
  resetTime('Buscando horarios…');
 
  if(!dateInput.value||!service.value){
@@ -402,7 +485,15 @@ async function refreshTime(){
  }
 
  const duration=durationMinutes(full.duration);
- const candidates=candidateTimes(dayEntry,full).filter(t=>minAdvanceOK(dateInput.value,t));
+
+ if(!duration){
+  resetTime('Duración no configurada');
+  availabilityMsg.textContent='Este servicio tiene una duración inválida. Contactá a MG Estética.';
+  return;
+ }
+
+ const candidates=candidateTimes(dayEntry,full)
+  .filter(t=>minAdvanceOK(dateInput.value,t));
 
  if(!candidates.length){
   resetTime('No hay horarios con 48 horas de anticipación');
@@ -410,9 +501,10 @@ async function refreshTime(){
  }
 
  try{
-
-  // Consultar todos los bloqueos públicos de la fecha elegida.
-  // No se consultan los datos privados de la colección bookings.
+  /*
+   Se leen solamente los bloqueos públicos de slots.
+   No se consulta la colección privada bookings.
+  */
   const slotsQuery=query(
    collection(db,'slots'),
    where('date','==',dateInput.value)
@@ -427,14 +519,11 @@ async function refreshTime(){
   slotsSnap.forEach(snap=>{
    const data=snap.data();
 
-   if(
-    data.busy===true||
-    data.bookingId||
-    data.status==='confirmed'||
-    data.status==='pending'
-   ){
-    if(typeof data.time==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(data.time)){
-     const occupiedStart=minutes(data.time);
+   if(slotIsOccupied(data)){
+    const timeValue=getSlotTime(snap);
+
+    if(timeValue){
+     const occupiedStart=minutes(timeValue);
 
      occupiedIntervals.push({
       start:occupiedStart,
@@ -448,8 +537,6 @@ async function refreshTime(){
    const candidateStart=minutes(time);
    const candidateEnd=candidateStart+duration;
 
-   // Si cualquier parte del turno se cruza con un bloque ocupado,
-   // ese horario no se muestra como disponible.
    return !occupiedIntervals.some(occupied=>
     overlaps(
      candidateStart,
@@ -461,7 +548,10 @@ async function refreshTime(){
   });
 
   resetTime('Seleccioná horario');
-  available.forEach(time=>timeSelect.add(new Option(time,time)));
+
+  available.forEach(time=>{
+   timeSelect.add(new Option(time,time));
+  });
 
   if(!available.length){
    resetTime('No hay horarios libres');
@@ -480,8 +570,14 @@ async function refreshTime(){
  }
 }
 
-service.addEventListener('change',refreshTime);
-timeSelect.addEventListener('change',()=>{resultBox.innerHTML='';});
+service.addEventListener('change',()=>{
+ resultBox.innerHTML='';
+ refreshTime();
+});
+
+timeSelect.addEventListener('change',()=>{
+ resultBox.innerHTML='';
+});
 
 function showResult(message,type){
  resultBox.className='result '+type;
@@ -498,8 +594,11 @@ function getWhatsappNumber(){
 }
 
 async function submitBooking(){
- const dateValue=dateInput.value,timeValue=timeSelect.value,serviceId=service.value;
- const name=$('name').value.trim(),phone=$('phone').value.trim();
+ const dateValue=dateInput.value;
+ const timeValue=timeSelect.value;
+ const serviceId=service.value;
+ const name=$('name').value.trim();
+ const phone=$('phone').value.trim();
 
  if(!dateValue||!serviceId||!timeValue){
   showResult('Elegí una fecha, un servicio y un horario.','error');
@@ -532,7 +631,35 @@ async function submitBooking(){
  }
 
  const duration=durationMinutes(full.duration);
- const slotIds=blockSlotIds(dateValue,minutes(timeValue),duration);
+
+ if(!duration){
+  showResult('La duración de este servicio no está correctamente configurada. Contactá a MG Estética.','error');
+  return;
+ }
+
+ /*
+  Evita aceptar un horario que no pertenezca a los horarios
+  configurados para ese servicio y esa fecha.
+ */
+ const validTimes=candidateTimes(entry,full);
+
+ if(!validTimes.includes(timeValue)){
+  showResult('El horario elegido ya no corresponde a este servicio. Actualizá la disponibilidad e intentá nuevamente.','error');
+  await refreshTime();
+  return;
+ }
+
+ const start=minutes(timeValue);
+ const slotIds=blockSlotIds(dateValue,start,duration);
+
+ /*
+  Las reglas actuales de Firestore permiten entre 1 y 20
+  elementos en bookings.slotIds.
+ */
+ if(slotIds.length<1||slotIds.length>20){
+  showResult('Este horario necesita más de 20 bloques de reserva y no puede registrarse con la configuración actual. Elegí otro horario o pedí a MG Estética que revise la duración.','error');
+  return;
+ }
 
  const submit=$('submit');
  submit.disabled=true;
@@ -545,6 +672,10 @@ async function submitBooking(){
    const slotRefs=slotIds.map(id=>doc(db,'slots',id));
    const slotSnaps=[];
 
+   /*
+    Primero se leen todos los documentos.
+    Después se realizan las escrituras.
+   */
    for(const ref of slotRefs){
     slotSnaps.push(await transaction.get(ref));
    }
@@ -553,12 +684,16 @@ async function submitBooking(){
     if(snap.exists()){
      const data=snap.data();
 
-     if(data.busy===true||data.bookingId||data.status==='confirmed'||data.status==='pending'){
+     if(slotIsOccupied(data)){
       throw new Error('Ese horario acaba de ser ocupado. Elegí otro horario.');
      }
     }
    }
 
+   /*
+    La reserva y sus bloqueos se guardan juntos
+    en una única transacción.
+   */
    transaction.set(bookingRef,{
     name,
     phone,
@@ -589,6 +724,7 @@ async function submitBooking(){
   showResult('¡Solicitud registrada! MG Estética recibió tu pedido. Ahora podés enviar los datos por WhatsApp para coordinar la confirmación.','ok');
 
   const wa=getWhatsappNumber();
+
   const message=[
    'Hola, MG Estética. Acabo de solicitar un turno:',
    `Nombre: ${name}`,
@@ -619,7 +755,12 @@ async function submitBooking(){
 
  }catch(e){
   console.error(e);
-  showResult(e.message||'No se pudo registrar la solicitud. Revisá tu conexión e intentá nuevamente.','error');
+
+  showResult(
+   e.message||'No se pudo registrar la solicitud. Revisá tu conexión e intentá nuevamente.',
+   'error'
+  );
+
   await refreshTime();
 
  }finally{
@@ -640,37 +781,52 @@ async function loadData(){
 
   catalog.innerHTML=allServices.map(s=>{
    const image=safeImageUrl(s.imageUrl||s.photoUrl);
+   const duration=durationMinutes(s.duration);
+   const durationText=duration?`${duration} min`:'Duración no configurada';
 
    return `<article class="service">
     ${image?`<img src="${esc(image)}" alt="Foto de ${esc(s.name||'servicio')}" loading="lazy">`:''}
     <b>${esc(s.name||'Servicio')}</b>
-    <div class="muted">${esc(s.duration||30)} min · ${esc(price(s.price))}</div>
+    <div class="muted">${esc(durationText)} · ${esc(price(s.price))}</div>
     ${s.description?`<p style="font-size:13px;margin:4px 0 0">${esc(s.description)}</p>`:''}
    </article>`;
   }).join('')||'<p class="muted">Los servicios aún no están publicados.</p>';
 
   const snapDates=await getDocs(collection(db,'specialDates'));
+
   specialDates={};
-  snapDates.forEach(d=>{specialDates[d.id]=d.data()||{};});
+
+  snapDates.forEach(d=>{
+   specialDates[d.id]=d.data()||{};
+  });
 
   const snapDaily=await getDocs(collection(db,'dailyServices'));
+
   dailyServices={};
-  snapDaily.forEach(d=>{dailyServices[d.id]=d.data()||{};});
+
+  snapDaily.forEach(d=>{
+   dailyServices[d.id]=d.data()||{};
+  });
 
   try{
    const settingsSnap=await getDoc(doc(db,'settings','public'));
+
    publicSettings=settingsSnap.exists()?settingsSnap.data():{};
+
   }catch(e){
    console.warn('No se pudieron leer los ajustes públicos; se usará el WhatsApp predeterminado.',e);
   }
 
   status.textContent=`✅ ${allServices.length} servicios cargados. Elegí una fecha marcada en verde.`;
+
   renderCalendar();
   updateSelectedDate();
 
  }catch(e){
   console.error(e);
+
   status.textContent='No se pudieron cargar los datos. Verificá la conexión y las reglas de acceso de Firebase.';
+
   $('calendarInfo').textContent='No fue posible cargar el calendario.';
  }
 }
