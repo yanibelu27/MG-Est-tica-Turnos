@@ -4,1481 +4,235 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MG Estética | Administración</title>
-
 <style>
-:root{
-  --p:#b83272;--d:#27212a;--l:#eadde5;
-  --s:#fff2f8;--g:#218653;--muted:#746975;
-  --red:#a83232;--blue:#326fa8
-}
-*{box-sizing:border-box}
-body{
-  margin:0;background:#faf7f9;color:var(--d);
-  font:16px system-ui,-apple-system,Segoe UI,sans-serif
-}
-header{
-  background:linear-gradient(120deg,#351e32,#a83270);
-  color:white;padding:22px
-}
-main{max-width:1000px;margin:auto;padding:14px}
-.panel{
-  background:white;border:1px solid var(--l);
-  border-radius:16px;padding:17px;margin:14px 0
-}
+:root{--p:#b83272;--d:#27212a;--l:#eadde5;--s:#fff2f8;--g:#218653;--muted:#746975;--red:#a83232}
+*{box-sizing:border-box}body{margin:0;background:#faf7f9;color:var(--d);font:16px system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:linear-gradient(120deg,#351e32,#a83270);color:white;padding:22px}
+main{max-width:1000px;margin:auto;padding:14px}.panel{background:white;border:1px solid var(--l);border-radius:16px;padding:17px;margin:14px 0}
 label{display:block;margin:12px 0 5px;font-weight:650}
-input,textarea,select,button{
-  width:100%;padding:11px;border:1px solid #d9cbd4;
-  border-radius:10px;font:inherit
-}
-textarea{min-height:90px;resize:vertical}
-button{
-  background:var(--p);color:white;font-weight:700;
-  border:0;cursor:pointer;margin-top:10px
-}
-button:disabled{opacity:.55;cursor:not-allowed}
-.grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-  gap:10px
-}
-.hidden{display:none!important}
-.muted{font-size:14px;color:var(--muted)}
-.danger{background:var(--red)}
-.secondary{background:#5b4b58}
-.success{background:var(--g)}
-.preview{
-  max-width:220px;max-height:180px;object-fit:cover;
-  border-radius:12px;margin-top:10px
-}
-.service-photo{
-  width:100px;height:85px;object-fit:cover;
-  border-radius:10px;float:left;margin:0 12px 8px 0
-}
-.actions{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-  gap:8px;clear:both
-}
+input,textarea,select,button{width:100%;padding:11px;border:1px solid #d9cbd4;border-radius:10px;font:inherit}
+textarea{min-height:90px;resize:vertical}button{background:var(--p);color:white;font-weight:700;border:0;cursor:pointer;margin-top:10px}
+button:disabled{opacity:.55;cursor:not-allowed}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.hidden{display:none!important}.muted{font-size:14px;color:var(--muted)}.danger{background:var(--red)}.secondary{background:#5b4b58}.success{background:var(--g)}
+.preview{max-width:220px;max-height:180px;object-fit:cover;border-radius:12px;margin-top:10px}
+.service-photo{width:100px;height:85px;object-fit:cover;border-radius:10px;float:left;margin:0 12px 8px 0}
+.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;clear:both}
 .actions button{margin-top:8px;font-size:14px;padding:8px}
-.calendar-head{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:10px;margin:14px 0
-}
-.calendar-head button{width:auto;min-width:48px;margin:0}
-.calendar-title{font-size:20px;font-weight:800;text-align:center}
-.calendar{
-  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px
-}
-.weekday{
-  text-align:center;font-size:12px;font-weight:700;
-  color:var(--muted);padding:7px 0
-}
-.calday{
-  min-height:62px;border:1px solid var(--l);border-radius:10px;
-  background:#fff;color:var(--d);padding:5px 2px;margin:0;
-  display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:3px;font-size:14px;cursor:pointer
-}
-.calday.empty{visibility:hidden}
-.calday.selected{
-  background:var(--s);border:2px solid var(--p);
-  color:var(--p);font-weight:700
-}
-.calday.scheduled{background:#e7f5ed;border-color:#9ac9aa}
-.calday.scheduled.selected{background:var(--s);border:2px solid var(--p)}
+.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0}
+.calendar-head button{width:auto;min-width:48px;margin:0}.calendar-title{font-size:20px;font-weight:800;text-align:center}
+.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.weekday{text-align:center;font-size:12px;font-weight:700;color:var(--muted);padding:7px 0}
+.calday{min-height:62px;border:1px solid var(--l);border-radius:10px;background:#fff;color:var(--d);padding:5px 2px;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:14px;cursor:pointer}
+.calday.empty{visibility:hidden}.calday.selected{background:var(--s);border:2px solid var(--p);color:var(--p);font-weight:700}
+.calday.scheduled{background:#e7f5ed;border-color:#9ac9aa}.calday.scheduled.selected{background:var(--s);border:2px solid var(--p)}
 .calday small{font-size:10px;color:var(--g);font-weight:700}
 .legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;margin:12px 0}
-.dot{
-  display:inline-block;width:10px;height:10px;
-  border-radius:50%;margin-right:5px
-}
-.service-option{
-  border:1px solid var(--l);border-radius:12px;
-  padding:12px;margin:12px 0;background:#fff
-}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+.service-option{border:1px solid var(--l);border-radius:12px;padding:12px;margin:12px 0;background:#fff}
 .service-option.selected{border-color:var(--p);background:#fffafd}
-.service-top{display:flex;align-items:center;gap:10px}
-.service-top input{width:20px;height:20px;flex:none}
+.service-top{display:flex;align-items:center;gap:10px}.service-top input{width:20px;height:20px;flex:none}
 .service-top label{margin:0;flex:1;cursor:pointer}
-.service-config{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-  gap:9px;margin-top:10px
-}
-.service-config input,.service-config select{padding:9px}
-.service-config label{font-size:13px;margin:4px 0}
+.service-config{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px;margin-top:10px}
+.service-config input,.service-config select{padding:9px}.service-config label{font-size:13px;margin:4px 0}
 .date-label{font-size:18px;font-weight:800;color:var(--p)}
-.tabs{
-  display:flex;flex-wrap:wrap;gap:8px;
-  margin-bottom:20px;border-bottom:1px solid var(--l);padding-bottom:10px
-}
-.tab{
-  padding:10px 16px;border-radius:8px;background:transparent;
-  border:none;cursor:pointer;margin:0;color:var(--muted);
-  font-weight:500;width:auto
-}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;border-bottom:1px solid var(--l);padding-bottom:10px}
+.tab{padding:10px 16px;border-radius:8px;background:transparent;border:none;cursor:pointer;margin:0;color:var(--muted);font-weight:500;width:auto}
 .tab.active{background:var(--p);color:white}
-.status-pendiente{color:#b88632;font-weight:600}
-.status-confirmado{color:var(--g);font-weight:600}
-.status-cancelado{color:var(--red);font-weight:600}
-.item{
-  border:1px solid var(--l);border-radius:12px;
-  padding:12px;margin:12px 0;overflow:auto
-}
-.item:after{content:"";display:block;clear:both}
-.footer{text-align:center;padding:20px;color:#777;font-size:12px}
-.message-error{color:var(--red)}
-.message-ok{color:var(--g)}
-@media(max-width:430px){
-  .calday{min-height:49px;font-size:13px}
-  .calendar{gap:3px}
-  .weekday{font-size:11px}
-  .panel{padding:13px}
-  .service-config{grid-template-columns:1fr 1fr}
-}
+.status-pendiente{color:#b88632;font-weight:600}.status-confirmado{color:var(--g);font-weight:600}.status-cancelado{color:var(--red);font-weight:600}
+.item{border:1px solid var(--l);border-radius:12px;padding:12px;margin:12px 0;overflow:auto}.item:after{content:"";display:block;clear:both}
+.footer{text-align:center;padding:20px;color:#777;font-size:12px}.message-error{color:var(--red)}.message-ok{color:var(--g)}
+#globalMsg{padding:10px 12px;border-radius:10px;background:#fff2f2;color:#a83232;margin:10px 0}
+@media(max-width:430px){.calday{min-height:49px;font-size:13px}.calendar{gap:3px}.weekday{font-size:11px}.panel{padding:13px}.service-config{grid-template-columns:1fr 1fr}}
 </style>
 </head>
-
 <body>
-<header>
-  <h1>MG Estética · Administración</h1>
-  <p>Panel de control privado</p>
-</header>
-
+<header><h1>MG Estética · Administración</h1><p>Panel de control privado</p></header>
 <main>
-
 <section id="login" class="panel" style="max-width:450px;margin:30px auto">
-  <h2 style="text-align:center">🔐 Ingresar</h2>
-
-  <label for="email">Email</label>
-  <input id="email" type="email" autocomplete="username"
-         placeholder="Tu correo electrónico">
-
-  <label for="pass">Contraseña</label>
-  <input id="pass" type="password" autocomplete="current-password">
-
-  <button id="loginBtn">Iniciar sesión</button>
-  <button id="resetBtn" class="secondary" type="button">
-    Olvidé mi contraseña
-  </button>
-
-  <p class="muted" id="msg" role="status" aria-live="polite"></p>
+<h2 style="text-align:center">🔐 Ingresar</h2>
+<label for="email">Email</label><input id="email" type="email" autocomplete="username" placeholder="Tu correo electrónico">
+<label for="pass">Contraseña</label><input id="pass" type="password" autocomplete="current-password">
+<button id="loginBtn" type="button">Iniciar sesión</button>
+<button id="resetBtn" class="secondary" type="button">Olvidé mi contraseña</button>
+<p class="muted" id="msg" role="status" aria-live="polite"></p>
 </section>
-
 <section id="panel" class="hidden">
-
-  <button id="logout" class="danger"
-          style="width:auto;margin-bottom:15px">
-    🚪 Cerrar sesión
-  </button>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="calendar">📅 Calendario</button>
-    <button class="tab" data-tab="services">💇 Servicios</button>
-    <button class="tab" data-tab="requests">📋 Solicitudes</button>
-  </div>
-
-  <!-- CALENDARIO -->
-  <div id="tab-calendar" class="tab-content">
-
-    <div class="panel">
-      <h2>📅 Disponibilidad por Fecha</h2>
-      <p class="muted">
-        Elegí un día del calendario y configurá qué servicios
-        vas a ofrecer y en qué horarios.
-      </p>
-
-      <div class="calendar-head">
-        <button id="prevMonth" class="secondary"
-                aria-label="Mes anterior">‹</button>
-        <div id="monthTitle" class="calendar-title"></div>
-        <button id="nextMonth" class="secondary"
-                aria-label="Mes siguiente">›</button>
-      </div>
-
-      <div class="calendar" id="calendar"></div>
-
-      <div class="legend">
-        <span><i class="dot" style="background:#9ac9aa"></i>
-          Con servicios configurados</span>
-        <span><i class="dot" style="background:#b83272;border:1px solid"></i>
-          Fecha seleccionada</span>
-        <span><i class="dot" style="background:#eee"></i>
-          Sin configurar</span>
-      </div>
-
-      <div class="panel" style="margin:20px 0 0;background:#fffafd">
-        <div class="date-label" id="selectedDateLabel">
-          Seleccioná una fecha del calendario ↑
-        </div>
-
-        <p class="muted">
-          Marcá los servicios que vas a ofrecer en esta fecha
-          y configurá sus horarios.
-        </p>
-
-        <div id="dateServices">
-          <p class="muted">Primero seleccioná un día del calendario.</p>
-        </div>
-
-        <div class="grid" style="margin-top:15px">
-          <button id="saveDate">✅ Guardar disponibilidad</button>
-          <button id="clearDate" class="danger">
-            🗑️ Quitar servicios del día
-          </button>
-        </div>
-
-        <p id="dateMsg" class="muted" role="status"></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- SERVICIOS -->
-  <div id="tab-services" class="tab-content hidden">
-
-    <div class="panel">
-      <h2>➕ Agregar Nuevo Servicio</h2>
-
-      <label for="nm">Nombre del servicio</label>
-      <input id="nm" maxlength="100"
-             placeholder="Ej: Mesoterapia Corporal">
-
-      <div class="grid">
-        <div>
-          <label for="pr">Precio (ARS)</label>
-          <input id="pr" inputmode="numeric" placeholder="Ej: 25000">
-        </div>
-        <div>
-          <label for="du">Duración (minutos)</label>
-          <input id="du" type="number" min="15" max="600"
-                 step="15" value="30">
-        </div>
-      </div>
-
-      <label for="desc">Descripción</label>
-      <textarea id="desc" maxlength="500"
-                placeholder="Breve descripción del tratamiento…"></textarea>
-
-      <label for="photo">Foto del servicio (opcional)</label>
-      <input id="photo" type="file"
-             accept="image/jpeg,image/png,image/webp">
-
-      <p class="muted">
-        JPG, PNG o WebP. Máximo 15 MB originales.
-        La imagen se comprime automáticamente antes de subirla.
-      </p>
-
-      <img id="preview" class="preview hidden" alt="Vista previa">
-
-      <button id="add">💾 Guardar Servicio</button>
-      <p id="saveMsg" class="muted" role="status"></p>
-    </div>
-
-    <div class="panel">
-      <h2>📋 Servicios Disponibles</h2>
-      <p class="muted">
-        Podés editar, cambiar fotos, activar/desactivar
-        o eliminar servicios.
-      </p>
-      <div id="services">Cargando servicios…</div>
-    </div>
-  </div>
-
-  <!-- SOLICITUDES -->
-  <div id="tab-requests" class="tab-content hidden">
-    <div class="panel">
-      <h2>📩 Solicitudes de Turnos</h2>
-      <p class="muted">
-        Confirmá cuando hayas verificado la seña.
-        Cancelar una solicitud no elimina el registro.
-      </p>
-      <div id="requests">Cargando solicitudes…</div>
-    </div>
-  </div>
-
+<div id="globalMsg" class="hidden" role="alert"></div>
+<button id="logout" class="danger" style="width:auto;margin-bottom:15px" type="button">🚪 Cerrar sesión</button>
+<div class="tabs">
+<button class="tab active" data-tab="calendar" type="button">📅 Calendario</button>
+<button class="tab" data-tab="services" type="button">💇 Servicios</button>
+<button class="tab" data-tab="requests" type="button">📋 Solicitudes</button>
+</div>
+<div id="tab-calendar" class="tab-content">
+<div class="panel">
+<h2>📅 Disponibilidad por Fecha</h2><p class="muted">Elegí un día del calendario y configurá qué servicios vas a ofrecer y en qué horarios.</p>
+<div class="calendar-head"><button id="prevMonth" class="secondary" aria-label="Mes anterior" type="button">‹</button><div id="monthTitle" class="calendar-title"></div><button id="nextMonth" class="secondary" aria-label="Mes siguiente" type="button">›</button></div>
+<div class="calendar" id="calendar"></div>
+<div class="legend"><span><i class="dot" style="background:#9ac9aa"></i>Con servicios configurados</span><span><i class="dot" style="background:#b83272;border:1px solid"></i>Fecha seleccionada</span><span><i class="dot" style="background:#eee"></i>Sin configurar</span></div>
+<div class="panel" style="margin:20px 0 0;background:#fffafd">
+<div class="date-label" id="selectedDateLabel">Seleccioná una fecha del calendario ↑</div>
+<p class="muted">Marcá los servicios que vas a ofrecer en esta fecha y configurá sus horarios.</p>
+<div id="dateServices"><p class="muted">Primero seleccioná un día del calendario.</p></div>
+<div class="grid" style="margin-top:15px"><button id="saveDate" type="button">✅ Guardar disponibilidad</button><button id="clearDate" class="danger" type="button">🗑️ Quitar servicios del día</button></div>
+<p id="dateMsg" class="muted" role="status"></p>
+</div></div></div>
+<div id="tab-services" class="tab-content hidden">
+<div class="panel">
+<h2>➕ Agregar Nuevo Servicio</h2>
+<label for="nm">Nombre del servicio</label><input id="nm" maxlength="100" placeholder="Ej: Mesoterapia Corporal">
+<div class="grid"><div><label for="pr">Precio (ARS)</label><input id="pr" inputmode="numeric" placeholder="Ej: 25000"></div><div><label for="du">Duración (minutos)</label><input id="du" type="number" min="15" max="600" step="15" value="30"></div></div>
+<label for="desc">Descripción</label><textarea id="desc" maxlength="500" placeholder="Breve descripción del tratamiento…"></textarea>
+<label for="photo">Foto del servicio (opcional)</label><input id="photo" type="file" accept="image/jpeg,image/png,image/webp">
+<p class="muted">JPG, PNG o WebP. Máximo 15 MB originales. La imagen se comprime automáticamente antes de subirla.</p>
+<img id="preview" class="preview hidden" alt="Vista previa">
+<button id="add" type="button">💾 Guardar Servicio</button><p id="saveMsg" class="muted" role="status"></p>
+</div>
+<div class="panel"><h2>📋 Servicios Disponibles</h2><p class="muted">Podés editar, cambiar fotos, activar/desactivar o eliminar servicios.</p><div id="services">Cargando servicios…</div></div>
+</div>
+<div id="tab-requests" class="tab-content hidden"><div class="panel"><h2>📩 Solicitudes de Turnos</h2><p class="muted">Confirmá cuando hayas verificado la seña. Cancelar una solicitud no elimina el registro.</p><div id="requests">Cargando solicitudes…</div></div></div>
 </section>
-
-<footer class="footer">
-  MG Estética · WhatsApp 11 4173-6931
-</footer>
-
+<footer class="footer">MG Estética · WhatsApp 11 4173-6931</footer>
 </main>
-
 <script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
+import {getFirestore,collection,getDocs,updateDoc,doc,deleteDoc,setDoc} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+import {getAuth,signInWithEmailAndPassword,sendPasswordResetEmail,onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
+/* refFromURL se quitó: no forma parte de los exports del SDK modular.
+   ref(storage, URL) es la forma correcta de recuperar la referencia. */
+import {getStorage,ref,uploadBytes,getDownloadURL,deleteObject} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
 
-import {initializeApp}
-  from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
-
-import {
-  getFirestore,collection,getDocs,updateDoc,doc,
-  deleteDoc,setDoc
-} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
-
-import {
-  getAuth,signInWithEmailAndPassword,sendPasswordResetEmail,
-  onAuthStateChanged,signOut
-} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
-
-import {
-  getStorage,ref,refFromURL,uploadBytes,
-  getDownloadURL,deleteObject
-} from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-storage.js';
-
-
-/* CONFIGURACIÓN FIREBASE */
-
-const firebaseConfig = {
-  apiKey: "AIzaSyB_yLOsIAhEkcr1blJK46HAhcWylVI-3v0",
-  authDomain: "mg-estetica-turnos.firebaseapp.com",
-  projectId: "mg-estetica-turnos",
-  storageBucket: "mg-estetica-turnos.firebasestorage.app",
-  messagingSenderId: "425300609473",
-  appId: "1:425300609473:web:45bb97101299ae18b00740"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const storage = getStorage(app);
-
-auth.languageCode = 'es';
-
-const ADMIN = '7L0RaRsim3PQi8oG7l2nvioqxmm2';
-const $ = id => document.getElementById(id);
-
-const MAX_IMAGE_SIZE = 15 * 1024 * 1024;
-const TARGET_IMAGE_SIZE = 1.5 * 1024 * 1024;
-const MAX_IMAGE_DIMENSION = 1200;
-
-
-/* DATOS Y ESTADO */
-
-const monthNames = [
-  'enero','febrero','marzo','abril','mayo','junio',
-  'julio','agosto','septiembre','octubre','noviembre','diciembre'
-];
-
-const weekdays = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-
-let servicesCache = [];
-let schedules = {};
-let requestsCache = [];
-
-let selectedDate = dateKey(new Date());
-let calendarMonth = new Date();
+const firebaseConfig={apiKey:"AIzaSyB_yLOsIAhEkcr1blJK46HAhcWylVI-3v0",authDomain:"mg-estetica-turnos.firebaseapp.com",projectId:"mg-estetica-turnos",storageBucket:"mg-estetica-turnos.firebasestorage.app",messagingSenderId:"425300609473",appId:"1:425300609473:web:45bb97101299ae18b00740"};
+const app=initializeApp(firebaseConfig),db=getFirestore(app),auth=getAuth(app),storage=getStorage(app);
+auth.languageCode='es';
+const ADMIN='7L0RaRsim3PQi8oG7l2nvioqxmm2';
+const $=id=>document.getElementById(id);
+const MAX_IMAGE_SIZE=15*1024*1024,TARGET_IMAGE_SIZE=1.5*1024*1024,MAX_IMAGE_DIMENSION=1200;
+const monthNames=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const weekdays=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+let servicesCache=[],schedules={},requestsCache=[],selectedDate=dateKey(new Date()),calendarMonth=new Date(),selectedFile=null,previewUrl=null,authReady=false;
 calendarMonth.setDate(1);
-
-let selectedFile = null;
-let previewUrl = null;
-
-
-/* FUNCIONES GENERALES */
-
-function dateKey(d){
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-
-function parseDate(k){
-  const [y,m,d] = k.split('-').map(Number);
-  return new Date(y,m-1,d);
-}
-
-function formatDateKey(k){
-  return parseDate(k).toLocaleDateString('es-AR',{
-    weekday:'long',day:'numeric',month:'long',year:'numeric'
-  });
-}
-
-function priceFmt(n){
-  return '$'+Number(n||0).toLocaleString('es-AR');
-}
-
-function esc(x){
-  return String(x??'').replace(/[&<>"']/g,c=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[c]));
-}
-
-function safeUrl(v){
-  try{
-    const u = new URL(v);
-    return u.protocol === 'https:' ? u.href : '';
-  }catch{
-    return '';
-  }
-}
-
-function showMessage(element,message,type=''){
-  element.textContent = message;
-  element.className = 'muted '+(
-    type === 'error' ? 'message-error' :
-    type === 'ok' ? 'message-ok' : ''
-  );
-}
-
-function validDuration(value){
-  return Number.isInteger(Number(value))
-    && Number(value) >= 15
-    && Number(value) <= 600;
-}
-
-function validPrice(value){
-  return /^\d{0,9}$/.test(String(value));
-}
-
-
-/* NAVEGACIÓN ENTRE PESTAÑAS */
-
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.addEventListener('click',()=>{
-    document.querySelectorAll('.tab').forEach(x=>{
-      x.classList.remove('active');
-    });
-
-    tab.classList.add('active');
-
-    document.querySelectorAll('.tab-content').forEach(c=>{
-      c.classList.add('hidden');
-    });
-
-    $('tab-'+tab.dataset.tab).classList.remove('hidden');
-  });
-});
-
-
-/* AUTENTICACIÓN */
+function dateKey(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function parseDate(k){const [y,m,d]=k.split('-').map(Number);return new Date(y,m-1,d)}
+function formatDateKey(k){return parseDate(k).toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+function priceFmt(n){return '$'+Number(n||0).toLocaleString('es-AR')}
+function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function safeUrl(v){try{const u=new URL(v);return u.protocol==='https:'?u.href:''}catch{return ''}}
+function showMessage(el,message,type=''){el.textContent=message;el.className='muted '+(type==='error'?'message-error':type==='ok'?'message-ok':'')}
+function globalError(message){$('globalMsg').textContent=message;$('globalMsg').classList.remove('hidden')}
+function validDuration(v){return Number.isInteger(Number(v))&&Number(v)>=15&&Number(v)<=600}
+function validPrice(v){return /^\d{0,9}$/.test(String(v))}
+document.querySelectorAll('.tab').forEach(tab=>tab.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));tab.classList.add('active');document.querySelectorAll('.tab-content').forEach(c=>c.classList.add('hidden'));$('tab-'+tab.dataset.tab).classList.remove('hidden')}));
+/* Captura errores que antes podían dejar el botón sin respuesta visible. */
+window.addEventListener('error',e=>{console.error(e.error||e.message);if(!authReady)$('msg').textContent='No se pudo iniciar el panel. Recargá la página; si continúa, informá este mensaje: '+(e.message||'error de JavaScript')});
+window.addEventListener('unhandledrejection',e=>{console.error(e.reason);globalError('Se produjo un error: '+(e.reason?.message||String(e.reason||'Error desconocido')))});
 
 onAuthStateChanged(auth,async user=>{
+ authReady=true;
+ if(!user){$('login').classList.remove('hidden');$('panel').classList.add('hidden');return}
+ if(user.uid!==ADMIN){await signOut(auth);$('login').classList.remove('hidden');$('panel').classList.add('hidden');$('msg').textContent='Esta cuenta no tiene permisos de administrador.';return}
+ $('login').classList.add('hidden');$('panel').classList.remove('hidden');$('msg').textContent='';$('globalMsg').classList.add('hidden');
+ try{await Promise.all([loadServices(),loadSchedules(),loadRequests()])}
+ catch(error){console.error('Error al cargar el panel:',error);globalError('Ingresaste, pero hubo un problema al cargar los datos: '+error.message)}
+},error=>{$('msg').textContent='No se pudo iniciar Firebase: '+error.message;console.error('Error de autenticación:',error)});
 
-  if(!user){
-    $('login').classList.remove('hidden');
-    $('panel').classList.add('hidden');
-    return;
-  }
-
-  if(user.uid !== ADMIN){
-    await signOut(auth);
-
-    $('login').classList.remove('hidden');
-    $('panel').classList.add('hidden');
-
-    $('msg').textContent =
-      'Esta cuenta no tiene permisos de administrador.';
-
-    return;
-  }
-
-  $('login').classList.add('hidden');
-  $('panel').classList.remove('hidden');
-  $('msg').textContent = '';
-
-  try{
-    await Promise.all([
-      loadServices(),
-      loadSchedules(),
-      loadRequests()
-    ]);
-  }catch(error){
-    console.error(error);
-    $('msg').textContent = 'Error al cargar datos: '+error.message;
-  }
-});
-
-
-$('loginBtn').onclick = async()=>{
-
-  const email = $('email').value.trim();
-  const password = $('pass').value;
-
-  if(!email || !password){
-    $('msg').textContent = 'Ingresá email y contraseña.';
-    return;
-  }
-
-  const button = $('loginBtn');
-  button.disabled = true;
-  button.textContent = 'Ingresando…';
-
-  try{
-    await signInWithEmailAndPassword(auth,email,password);
-  }catch(error){
-
-    const errors = {
-      'auth/invalid-credential':'Email o contraseña incorrectos.',
-      'auth/user-not-found':'Usuario no encontrado.',
-      'auth/too-many-requests':'Demasiados intentos. Esperá unos minutos.',
-      'auth/invalid-email':'Formato de email inválido.',
-      'auth/api-key-not-valid':'La clave API de Firebase no es válida.',
-      'auth/api-key-expired':'La clave API de Firebase expiró.'
-    };
-
-    $('msg').textContent =
-      errors[error.code] || 'Error: '+error.message;
-
-  }finally{
-    button.disabled = false;
-    button.textContent = 'Iniciar sesión';
-  }
+$('loginBtn').onclick=async()=>{
+ const email=$('email').value.trim(),password=$('pass').value,button=$('loginBtn');
+ if(!email||!password){$('msg').textContent='Ingresá email y contraseña.';return}
+ button.disabled=true;button.textContent='Ingresando…';$('msg').textContent='';
+ try{await signInWithEmailAndPassword(auth,email,password)}
+ catch(error){const errors={'auth/invalid-credential':'Email o contraseña incorrectos.','auth/user-not-found':'Usuario no encontrado.','auth/too-many-requests':'Demasiados intentos. Esperá unos minutos.','auth/invalid-email':'Formato de email inválido.','auth/api-key-not-valid':'La clave API de Firebase no es válida.','auth/api-key-expired':'La clave API de Firebase expiró.','auth/network-request-failed':'No hay conexión. Revisá internet e intentá nuevamente.','auth/operation-not-allowed':'El acceso con email y contraseña no está habilitado en Firebase.'};$('msg').textContent=errors[error.code]||'No se pudo iniciar sesión: '+error.message;console.error(error)}
+ finally{button.disabled=false;button.textContent='Iniciar sesión'}
 };
+$('pass').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
+$('resetBtn').onclick=async()=>{const email=$('email').value.trim();if(!email){alert('Escribí tu email primero.');return}try{await sendPasswordResetEmail(auth,email);alert('Correo de recuperación enviado. Revisá tu bandeja de entrada y spam.')}catch(error){alert('Error al enviar recuperación: '+error.message)}};
+$('logout').onclick=async()=>{try{await signOut(auth)}catch(error){globalError('No se pudo cerrar sesión: '+error.message)}};
 
-
-$('resetBtn').onclick = async()=>{
-
-  const email = $('email').value.trim();
-
-  if(!email){
-    alert('Escribí tu email primero.');
-    return;
-  }
-
-  try{
-    await sendPasswordResetEmail(auth,email);
-    alert('Correo de recuperación enviado. Revisá tu bandeja de entrada y spam.');
-  }catch(error){
-    alert('Error al enviar recuperación: '+error.message);
-  }
-};
-
-
-$('logout').onclick = async()=>{
-  await signOut(auth);
-};
-
-
-/* CARGA DE DATOS */
-
-async function loadServices(){
-
-  const snap = await getDocs(collection(db,'services'));
-
-  servicesCache = snap.docs.map(d=>({
-    id:d.id,
-    ...d.data()
-  }));
-
-  renderServices();
-  renderDateEditor();
-}
-
-
-async function loadSchedules(){
-
-  const snap = await getDocs(collection(db,'specialDates'));
-
-  schedules = {};
-
-  snap.forEach(d=>{
-    schedules[d.id] = d.data();
-  });
-
-  renderCalendar();
-  renderDateEditor();
-}
-
-
-async function loadRequests(){
-
-  const snap = await getDocs(collection(db,'bookingRequests'));
-
-  requestsCache = snap.docs.map(d=>({
-    id:d.id,
-    ...d.data()
-  }));
-
-  requestsCache.sort((a,b)=>
-    String(a.date||'').localeCompare(String(b.date||'')) ||
-    String(a.time||'').localeCompare(String(b.time||''))
-  );
-
-  renderRequests();
-}
-
-
-/* CALENDARIO */
-
+async function loadServices(){const snap=await getDocs(collection(db,'services'));servicesCache=snap.docs.map(d=>({id:d.id,...d.data()}));renderServices();renderDateEditor()}
+async function loadSchedules(){const snap=await getDocs(collection(db,'specialDates'));schedules={};snap.forEach(d=>schedules[d.id]=d.data());renderCalendar();renderDateEditor()}
+async function loadRequests(){const snap=await getDocs(collection(db,'bookingRequests'));requestsCache=snap.docs.map(d=>({id:d.id,...d.data()}));requestsCache.sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))||String(a.time||'').localeCompare(String(b.time||'')));renderRequests()}
 function renderCalendar(){
-
-  const year = calendarMonth.getFullYear();
-  const month = calendarMonth.getMonth();
-
-  $('monthTitle').textContent =
-    monthNames[month][0].toUpperCase()+
-    monthNames[month].slice(1)+' '+year;
-
-  const first = new Date(year,month,1);
-  const days = new Date(year,month+1,0).getDate();
-  const offset = (first.getDay()+6)%7;
-
-  let html = weekdays.map(day=>
-    `<div class="weekday">${day}</div>`
-  ).join('');
-
-  for(let i=0;i<offset;i++){
-    html += '<div class="calday empty"></div>';
-  }
-
-  for(let day=1;day<=days;day++){
-
-    const key = dateKey(new Date(year,month,day));
-    const info = schedules[key];
-
-    const count = Array.isArray(info?.services)
-      ? info.services.length : 0;
-
-    html += `
-      <button type="button"
-        class="calday ${count?'scheduled':''} ${key===selectedDate?'selected':''}"
-        onclick="window.selectDate('${key}')">
-
-        <span>${day}</span>
-        ${count?`<small>${count} serv.</small>`:''}
-      </button>
-    `;
-  }
-
-  $('calendar').innerHTML = html;
+ const year=calendarMonth.getFullYear(),month=calendarMonth.getMonth(),first=new Date(year,month,1),days=new Date(year,month+1,0).getDate(),offset=(first.getDay()+6)%7;
+ $('monthTitle').textContent=monthNames[month][0].toUpperCase()+monthNames[month].slice(1)+' '+year;
+ let html=weekdays.map(day=>`<div class="weekday">${day}</div>`).join('');
+ for(let i=0;i<offset;i++)html+='<div class="calday empty"></div>';
+ for(let day=1;day<=days;day++){const key=dateKey(new Date(year,month,day)),count=Array.isArray(schedules[key]?.services)?schedules[key].services.length:0;html+=`<button type="button" class="calday ${count?'scheduled':''} ${key===selectedDate?'selected':''}" onclick="window.selectDate('${key}')"><span>${day}</span>${count?`<small>${count} serv.</small>`:''}</button>`}
+ $('calendar').innerHTML=html;
 }
-
-
-window.selectDate = async key=>{
-
-  selectedDate = key;
-
-  renderCalendar();
-
-  await renderDateEditor();
-};
-
-
+window.selectDate=async key=>{selectedDate=key;renderCalendar();renderDateEditor()};
 function renderDateEditor(){
-
-  $('selectedDateLabel').textContent =
-    '📅 '+formatDateKey(selectedDate);
-
-  $('dateMsg').textContent = '';
-
-  if(!servicesCache.length){
-
-    $('dateServices').innerHTML =
-      '<p class="muted">Primero creá servicios en la pestaña Servicios.</p>';
-
-    return;
-  }
-
-  const saved = Array.isArray(schedules[selectedDate]?.services)
-    ? schedules[selectedDate].services : [];
-
-  $('dateServices').innerHTML =
-    servicesCache
-      .filter(service=>service.active!==false)
-      .map(service=>{
-
-        const config = saved.find(x=>x.serviceId===service.id);
-        const checked = !!config;
-        const id = esc(service.id);
-
-        return `
-          <div class="service-option ${checked?'selected':''}" id="opt_${id}">
-
-            <div class="service-top">
-              <input type="checkbox"
-                id="ch_${id}"
-                ${checked?'checked':''}
-                onchange="window.toggleSvcOpt('${id}')">
-
-              <label for="ch_${id}">
-                <b>${esc(service.name)}</b>
-                · ${Number(service.duration||30)} min
-              </label>
-            </div>
-
-            <div class="service-config">
-
-              <div>
-                <label>Desde</label>
-                <input type="time"
-                  id="start_${id}"
-                  value="${esc(config?.start||'10:00')}"
-                  ${checked?'':'disabled'}>
-              </div>
-
-              <div>
-                <label>Hasta</label>
-                <input type="time"
-                  id="end_${id}"
-                  value="${esc(config?.end||'19:00')}"
-                  ${checked?'':'disabled'}>
-              </div>
-
-              <div>
-                <label>Intervalo (min)</label>
-                <select id="int_${id}" ${checked?'':'disabled'}>
-                  ${[15,30,45,60,90,120].map(n=>`
-                    <option value="${n}"
-                      ${Number(config?.interval||30)===n?'selected':''}>
-                      ${n}
-                    </option>
-                  `).join('')}
-                </select>
-              </div>
-
-            </div>
-          </div>
-        `;
-      }).join('');
+ $('selectedDateLabel').textContent='📅 '+formatDateKey(selectedDate);$('dateMsg').textContent='';
+ if(!servicesCache.length){$('dateServices').innerHTML='<p class="muted">Primero creá servicios en la pestaña Servicios.</p>';return}
+ const saved=Array.isArray(schedules[selectedDate]?.services)?schedules[selectedDate].services:[];
+ $('dateServices').innerHTML=servicesCache.filter(s=>s.active!==false).map(service=>{
+  const config=saved.find(x=>x.serviceId===service.id),checked=!!config,id=esc(service.id);
+  return `<div class="service-option ${checked?'selected':''}" id="opt_${id}"><div class="service-top"><input type="checkbox" id="ch_${id}" ${checked?'checked':''} onchange="window.toggleSvcOpt('${id}')"><label for="ch_${id}"><b>${esc(service.name)}</b> · ${Number(service.duration||30)} min</label></div><div class="service-config"><div><label>Desde</label><input type="time" id="start_${id}" value="${esc(config?.start||'10:00')}" ${checked?'':'disabled'}></div><div><label>Hasta</label><input type="time" id="end_${id}" value="${esc(config?.end||'19:00')}" ${checked?'':'disabled'}></div><div><label>Intervalo (min)</label><select id="int_${id}" ${checked?'':'disabled'}>${[15,30,45,60,90,120].map(n=>`<option value="${n}" ${Number(config?.interval||30)===n?'selected':''}>${n}</option>`).join('')}</select></div></div></div>`
+ }).join('');
 }
-
-
-window.toggleSvcOpt = id=>{
-
-  const enabled = $('ch_'+id).checked;
-
-  $('opt_'+id).classList.toggle('selected',enabled);
-
-  ['start_'+id,'end_'+id,'int_'+id].forEach(element=>{
-    $(element).disabled = !enabled;
-  });
+window.toggleSvcOpt=id=>{const enabled=$('ch_'+id).checked;$('opt_'+id).classList.toggle('selected',enabled);['start_'+id,'end_'+id,'int_'+id].forEach(k=>$(k).disabled=!enabled)};
+$('prevMonth').onclick=()=>{calendarMonth.setMonth(calendarMonth.getMonth()-1);renderCalendar()};
+$('nextMonth').onclick=()=>{calendarMonth.setMonth(calendarMonth.getMonth()+1);renderCalendar()};
+$('saveDate').onclick=async()=>{
+ const selectedServices=[];
+ for(const service of servicesCache.filter(x=>x.active!==false)){const id=service.id;if($('ch_'+id)?.checked){const start=$('start_'+id).value,end=$('end_'+id).value,interval=Number($('int_'+id).value);if(!start||!end||start>=end){showMessage($('dateMsg'),'Revisá el horario de inicio y fin de '+service.name,'error');return}selectedServices.push({serviceId:id,name:service.name,start,end,interval,duration:Number(service.duration||30)})}}
+ if(!selectedServices.length){showMessage($('dateMsg'),'Marcá al menos un servicio para esta fecha.','error');return}
+ const button=$('saveDate');button.disabled=true;
+ try{await setDoc(doc(db,'specialDates',selectedDate),{date:selectedDate,services:selectedServices,updatedAt:new Date().toISOString()});schedules[selectedDate]={date:selectedDate,services:selectedServices};renderCalendar();showMessage($('dateMsg'),'Disponibilidad guardada.','ok')}
+ catch(error){showMessage($('dateMsg'),'Error al guardar: '+error.message,'error')}
+ finally{button.disabled=false}
 };
+$('clearDate').onclick=async()=>{if(!confirm('¿Quitar todos los servicios configurados de esta fecha?'))return;try{await deleteDoc(doc(db,'specialDates',selectedDate));delete schedules[selectedDate];renderCalendar();renderDateEditor();showMessage($('dateMsg'),'Fecha desconfigurada.','ok')}catch(error){showMessage($('dateMsg'),'Error: '+error.message,'error')}};
 
-
-$('prevMonth').onclick = ()=>{
-  calendarMonth.setMonth(calendarMonth.getMonth()-1);
-  renderCalendar();
-};
-
-
-$('nextMonth').onclick = ()=>{
-  calendarMonth.setMonth(calendarMonth.getMonth()+1);
-  renderCalendar();
-};
-
-
-/* GUARDAR DISPONIBILIDAD */
-
-$('saveDate').onclick = async()=>{
-
-  const selectedServices = [];
-
-  for(const service of servicesCache.filter(x=>x.active!==false)){
-
-    const id = service.id;
-
-    if($('ch_'+id)?.checked){
-
-      const start = $('start_'+id).value;
-      const end = $('end_'+id).value;
-      const interval = Number($('int_'+id).value);
-
-      if(!start || !end || start>=end){
-        showMessage(
-          $('dateMsg'),
-          'Revisá el horario de inicio y fin de '+service.name,
-          'error'
-        );
-        return;
-      }
-
-      selectedServices.push({
-        serviceId:id,
-        name:service.name,
-        start,
-        end,
-        interval,
-        duration:Number(service.duration||30)
-      });
-    }
-  }
-
-  if(!selectedServices.length){
-    showMessage(
-      $('dateMsg'),
-      'Marcá al menos un servicio para esta fecha.',
-      'error'
-    );
-    return;
-  }
-
-  try{
-
-    await setDoc(doc(db,'specialDates',selectedDate),{
-      date:selectedDate,
-      services:selectedServices,
-      updatedAt:new Date().toISOString()
-    });
-
-    schedules[selectedDate] = {
-      date:selectedDate,
-      services:selectedServices
-    };
-
-    renderCalendar();
-
-    showMessage($('dateMsg'),'Disponibilidad guardada.','ok');
-
-  }catch(error){
-
-    showMessage(
-      $('dateMsg'),
-      'Error al guardar: '+error.message,
-      'error'
-    );
-  }
-};
-
-
-$('clearDate').onclick = async()=>{
-
-  if(!confirm('¿Quitar todos los servicios configurados de esta fecha?')){
-    return;
-  }
-
-  try{
-
-    await deleteDoc(doc(db,'specialDates',selectedDate));
-
-    delete schedules[selectedDate];
-
-    renderCalendar();
-    renderDateEditor();
-
-    showMessage($('dateMsg'),'Fecha desconfigurada.','ok');
-
-  }catch(error){
-
-    showMessage($('dateMsg'),'Error: '+error.message,'error');
-  }
-};
-
-
-/* COMPRESIÓN DE IMÁGENES */
-
-function loadImage(file){
-
-  return new Promise((resolve,reject)=>{
-
-    const url = URL.createObjectURL(file);
-    const image = new Image();
-
-    image.onload = ()=>{
-      URL.revokeObjectURL(url);
-      resolve(image);
-    };
-
-    image.onerror = ()=>{
-      URL.revokeObjectURL(url);
-      reject(new Error('No se pudo leer la imagen.'));
-    };
-
-    image.src = url;
-  });
-}
-
-
-function canvasToBlob(canvas,type,quality){
-
-  return new Promise((resolve,reject)=>{
-
-    canvas.toBlob(blob=>{
-      if(blob) resolve(blob);
-      else reject(new Error('El navegador no pudo comprimir la imagen.'));
-    },type,quality);
-
-  });
-}
-
-
+function loadImage(file){return new Promise((resolve,reject)=>{const url=URL.createObjectURL(file),image=new Image();image.onload=()=>{URL.revokeObjectURL(url);resolve(image)};image.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('No se pudo leer la imagen.'))};image.src=url})}
+function canvasToBlob(canvas,type,quality){return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('El navegador no pudo comprimir la imagen.')),type,quality))}
 async function compressImage(file){
-
-  if(!file) return null;
-
-  if(file.size>MAX_IMAGE_SIZE){
-    throw new Error('La imagen original supera los 15 MB.');
-  }
-
-  if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
-    throw new Error('Formato no permitido. Utilizá JPG, PNG o WebP.');
-  }
-
-  const image = await loadImage(file);
-
-  let width = image.naturalWidth;
-  let height = image.naturalHeight;
-
-  if(!width || !height){
-    throw new Error('La imagen no tiene dimensiones válidas.');
-  }
-
-  const scale = Math.min(
-    1,
-    MAX_IMAGE_DIMENSION/Math.max(width,height)
-  );
-
-  width = Math.round(width*scale);
-  height = Math.round(height*scale);
-
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-
-  if(!context){
-    throw new Error('No se pudo preparar la imagen.');
-  }
-
-  let result = null;
-  let outputType = 'image/webp';
-
-  const formats = [
-    {type:'image/webp',qualities:[0.82,0.72,0.62,0.50]},
-    {type:'image/jpeg',qualities:[0.82,0.72,0.62,0.50]}
-  ];
-
-  for(let attempt=0;attempt<5;attempt++){
-
-    canvas.width = width;
-    canvas.height = height;
-
-    context.clearRect(0,0,width,height);
-    context.drawImage(image,0,0,width,height);
-
-    for(const format of formats){
-
-      for(const quality of format.qualities){
-
-        try{
-
-          const blob = await canvasToBlob(
-            canvas,format.type,quality
-          );
-
-          if(!result || blob.size<result.size){
-            result = blob;
-            outputType = format.type;
-          }
-
-          if(blob.size<=TARGET_IMAGE_SIZE){
-            result = blob;
-            outputType = format.type;
-            break;
-          }
-
-        }catch(error){
-          console.warn('Formato no disponible:',format.type);
-        }
-      }
-
-      if(result && result.size<=TARGET_IMAGE_SIZE) break;
-    }
-
-    if(result && result.size<=TARGET_IMAGE_SIZE) break;
-
-    if(width<=500 || height<=500) break;
-
-    width = Math.max(500,Math.round(width*0.85));
-    height = Math.max(500,Math.round(height*0.85));
-  }
-
-  if(!result){
-    throw new Error('No se pudo comprimir la fotografía.');
-  }
-
-  if(result.size>MAX_IMAGE_SIZE){
-    throw new Error(
-      'La imagen comprimida sigue superando el límite permitido.'
-    );
-  }
-
-  const extension = outputType==='image/webp'?'webp':'jpg';
-
-  return new File(
-    [result],
-    `foto_${Date.now()}.${extension}`,
-    {
-      type:outputType,
-      lastModified:Date.now()
-    }
-  );
+ if(!file)return null;if(file.size>MAX_IMAGE_SIZE)throw new Error('La imagen original supera los 15 MB.');
+ if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw new Error('Formato no permitido. Utilizá JPG, PNG o WebP.');
+ const image=await loadImage(file);let width=image.naturalWidth,height=image.naturalHeight;if(!width||!height)throw new Error('La imagen no tiene dimensiones válidas.');
+ const scale=Math.min(1,MAX_IMAGE_DIMENSION/Math.max(width,height));width=Math.round(width*scale);height=Math.round(height*scale);
+ const canvas=document.createElement('canvas'),context=canvas.getContext('2d');if(!context)throw new Error('No se pudo preparar la imagen.');
+ let result=null,outputType='image/webp';const formats=[{type:'image/webp',qualities:[.82,.72,.62,.5]},{type:'image/jpeg',qualities:[.82,.72,.62,.5]}];
+ for(let attempt=0;attempt<5;attempt++){canvas.width=width;canvas.height=height;context.clearRect(0,0,width,height);context.drawImage(image,0,0,width,height);
+  for(const format of formats){for(const quality of format.qualities){try{const blob=await canvasToBlob(canvas,format.type,quality);if(!result||blob.size<result.size){result=blob;outputType=format.type}if(blob.size<=TARGET_IMAGE_SIZE){result=blob;outputType=format.type;break}}catch(e){console.warn('Formato no disponible:',format.type)}}if(result&&result.size<=TARGET_IMAGE_SIZE)break}
+  if(result&&result.size<=TARGET_IMAGE_SIZE)break;if(width<=500||height<=500)break;width=Math.max(500,Math.round(width*.85));height=Math.max(500,Math.round(height*.85))
+ }
+ if(!result)throw new Error('No se pudo comprimir la fotografía.');if(result.size>MAX_IMAGE_SIZE)throw new Error('La imagen comprimida sigue superando el límite permitido.');
+ const extension=outputType==='image/webp'?'webp':'jpg';return new File([result],`foto_${Date.now()}.${extension}`,{type:outputType,lastModified:Date.now()})
 }
-
-
-/* VISTA PREVIA */
-
-function clearPreview(){
-
-  if(previewUrl){
-    URL.revokeObjectURL(previewUrl);
-    previewUrl = null;
-  }
-
-  $('preview').src = '';
-  $('preview').classList.add('hidden');
-}
-
-
-$('photo').onchange = ()=>{
-
-  clearPreview();
-
-  selectedFile = $('photo').files[0]||null;
-
-  if(!selectedFile) return;
-
-  if(selectedFile.size>MAX_IMAGE_SIZE){
-    alert('La imagen original supera los 15 MB.');
-    $('photo').value = '';
-    selectedFile = null;
-    return;
-  }
-
-  if(!['image/jpeg','image/png','image/webp'].includes(selectedFile.type)){
-    alert('Elegí una imagen JPG, PNG o WebP.');
-    $('photo').value = '';
-    selectedFile = null;
-    return;
-  }
-
-  previewUrl = URL.createObjectURL(selectedFile);
-
-  $('preview').src = previewUrl;
-  $('preview').classList.remove('hidden');
+function clearPreview(){if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null}$('preview').src='';$('preview').classList.add('hidden')}
+$('photo').onchange=()=>{clearPreview();selectedFile=$('photo').files[0]||null;if(!selectedFile)return;if(selectedFile.size>MAX_IMAGE_SIZE||!['image/jpeg','image/png','image/webp'].includes(selectedFile.type)){alert(selectedFile.size>MAX_IMAGE_SIZE?'La imagen original supera los 15 MB.':'Elegí una imagen JPG, PNG o WebP.');$('photo').value='';selectedFile=null;return}previewUrl=URL.createObjectURL(selectedFile);$('preview').src=previewUrl;$('preview').classList.remove('hidden')};
+async function uploadPhoto(file,id){if(!file)return '';const compressed=await compressImage(file),path=`services/${id}/${Date.now()}_${compressed.name}`,storageRef=ref(storage,path);await uploadBytes(storageRef,compressed,{contentType:compressed.type});return await getDownloadURL(storageRef)}
+async function removePhoto(photoUrl){if(!photoUrl)return;try{const storageRef=ref(storage,photoUrl);await deleteObject(storageRef)}catch(error){console.warn('No se pudo eliminar la foto anterior:',error)}}
+$('add').onclick=async()=>{
+ const name=$('nm').value.trim(),priceText=$('pr').value.trim().replace(/\D/g,''),duration=Number($('du').value),description=$('desc').value.trim();
+ if(!name||name.length>100){showMessage($('saveMsg'),'Ingresá un nombre válido de hasta 100 caracteres.','error');return}
+ if(!validDuration(duration)){showMessage($('saveMsg'),'La duración debe estar entre 15 y 600 minutos.','error');return}
+ if(priceText&&!validPrice(priceText)){showMessage($('saveMsg'),'Revisá el precio ingresado.','error');return}
+ const button=$('add');button.disabled=true;button.textContent='Guardando…';let uploadedPhoto='';
+ try{const id='svc_'+Date.now();if(selectedFile)uploadedPhoto=await uploadPhoto(selectedFile,id);await setDoc(doc(db,'services',id),{name,price:priceText?Number(priceText):0,duration,description,photoUrl:uploadedPhoto,active:true,createdAt:new Date().toISOString()});$('nm').value='';$('pr').value='';$('du').value='30';$('desc').value='';$('photo').value='';selectedFile=null;clearPreview();showMessage($('saveMsg'),'Servicio guardado correctamente.','ok');await loadServices()}
+ catch(error){if(uploadedPhoto)await removePhoto(uploadedPhoto);showMessage($('saveMsg'),'No se pudo guardar: '+error.message,'error')}
+ finally{button.disabled=false;button.textContent='💾 Guardar Servicio'}
 };
-
-
-/* SUBIR Y ELIMINAR FOTOGRAFÍAS */
-
-async function uploadPhoto(file,id){
-
-  if(!file) return '';
-
-  const compressed = await compressImage(file);
-
-  const path =
-    `services/${id}/${Date.now()}_${compressed.name}`;
-
-  const storageRef = ref(storage,path);
-
-  await uploadBytes(storageRef,compressed,{
-    contentType:compressed.type
-  });
-
-  return await getDownloadURL(storageRef);
-}
-
-
-async function removePhoto(photoUrl){
-
-  if(!photoUrl) return;
-
-  try{
-
-    const storageRef = refFromURL(storage,photoUrl);
-
-    await deleteObject(storageRef);
-
-  }catch(error){
-
-    console.warn('No se pudo eliminar la foto anterior:',error);
-  }
-}
-
-
-/* AGREGAR SERVICIO */
-
-$('add').onclick = async()=>{
-
-  const name = $('nm').value.trim();
-  const priceText = $('pr').value.trim().replace(/\D/g,'');
-  const duration = Number($('du').value);
-  const description = $('desc').value.trim();
-
-  if(!name || name.length>100){
-    showMessage(
-      $('saveMsg'),
-      'Ingresá un nombre válido de hasta 100 caracteres.',
-      'error'
-    );
-    return;
-  }
-
-  if(!validDuration(duration)){
-    showMessage(
-      $('saveMsg'),
-      'La duración debe estar entre 15 y 600 minutos.',
-      'error'
-    );
-    return;
-  }
-
-  if(priceText && !validPrice(priceText)){
-    showMessage($('saveMsg'),'Revisá el precio ingresado.','error');
-    return;
-  }
-
-  const button = $('add');
-
-  button.disabled = true;
-  button.textContent = 'Guardando…';
-
-  let uploadedPhoto = '';
-
-  try{
-
-    const id = 'svc_'+Date.now();
-
-    if(selectedFile){
-      uploadedPhoto = await uploadPhoto(selectedFile,id);
-    }
-
-    await setDoc(doc(db,'services',id),{
-      name,
-      price:priceText?Number(priceText):0,
-      duration,
-      description,
-      photoUrl:uploadedPhoto,
-      active:true,
-      createdAt:new Date().toISOString()
-    });
-
-    $('nm').value = '';
-    $('pr').value = '';
-    $('du').value = '30';
-    $('desc').value = '';
-    $('photo').value = '';
-
-    selectedFile = null;
-    clearPreview();
-
-    showMessage($('saveMsg'),'Servicio guardado correctamente.','ok');
-
-    await loadServices();
-
-  }catch(error){
-
-    if(uploadedPhoto){
-      await removePhoto(uploadedPhoto);
-    }
-
-    showMessage(
-      $('saveMsg'),
-      'No se pudo guardar: '+error.message,
-      'error'
-    );
-
-  }finally{
-
-    button.disabled = false;
-    button.textContent = '💾 Guardar Servicio';
-  }
-};
-
-
-/* MOSTRAR SERVICIOS */
-
 function renderServices(){
-
-  $('services').innerHTML = servicesCache.length
-    ? servicesCache.map(service=>{
-
-      const id = esc(service.id);
-
-      return `
-        <div class="item">
-
-          <div>
-            ${service.photoUrl
-              ? `<img class="service-photo"
-                   src="${esc(safeUrl(service.photoUrl))}"
-                   alt="Foto del servicio">`
-              : ''
-            }
-
-            <b>${esc(service.name)}</b>
-
-            <p>${esc(service.description||'')}</p>
-
-            <p class="muted">
-              Precio: ${priceFmt(service.price)}
-              · Duración: ${Number(service.duration||0)} min
-              · ${service.active===false?'Desactivado':'Activo'}
-            </p>
-          </div>
-
-          <label>Editar nombre</label>
-          <input id="name_${id}" maxlength="100"
-                 value="${esc(service.name)}">
-
-          <div class="grid">
-            <div>
-              <label>Precio ($)</label>
-              <input id="price_${id}" inputmode="numeric"
-                     value="${esc(service.price||0)}">
-            </div>
-
-            <div>
-              <label>Duración (min)</label>
-              <input id="duration_${id}" type="number"
-                     min="15" max="600"
-                     value="${esc(service.duration||30)}">
-            </div>
-          </div>
-
-          <label>Descripción</label>
-          <textarea id="desc_${id}" maxlength="500">${esc(service.description||'')}</textarea>
-
-          <label>Cambiar foto (opcional)</label>
-          <input type="file" accept="image/jpeg,image/png,image/webp"
-                 id="photo_${id}">
-
-          <p class="muted">
-            Máximo 15 MB originales. Se comprime automáticamente.
-          </p>
-
-          <div class="actions">
-
-            <button onclick="window.saveService('${id}')">
-              Guardar cambios
-            </button>
-
-            <button class="secondary"
-              onclick="window.toggleService('${id}')">
-              ${service.active===false?'Activar':'Desactivar'}
-            </button>
-
-            <button class="danger"
-              onclick="window.deleteService('${id}')">
-              Eliminar
-            </button>
-
-          </div>
-        </div>
-      `;
-
-    }).join('')
-    : 'Todavía no hay servicios cargados.';
+ $('services').innerHTML=servicesCache.length?servicesCache.map(service=>{const id=esc(service.id);return `<div class="item"><div>${service.photoUrl?`<img class="service-photo" src="${esc(safeUrl(service.photoUrl))}" alt="Foto del servicio">`:''}<b>${esc(service.name)}</b><p>${esc(service.description||'')}</p><p class="muted">Precio: ${priceFmt(service.price)} · Duración: ${Number(service.duration||0)} min · ${service.active===false?'Desactivado':'Activo'}</p></div><label>Editar nombre</label><input id="name_${id}" maxlength="100" value="${esc(service.name)}"><div class="grid"><div><label>Precio ($)</label><input id="price_${id}" inputmode="numeric" value="${esc(service.price||0)}"></div><div><label>Duración (min)</label><input id="duration_${id}" type="number" min="15" max="600" value="${esc(service.duration||30)}"></div></div><label>Descripción</label><textarea id="desc_${id}" maxlength="500">${esc(service.description||'')}</textarea><label>Cambiar foto (opcional)</label><input type="file" accept="image/jpeg,image/png,image/webp" id="photo_${id}"><p class="muted">Máximo 15 MB originales. Se comprime automáticamente.</p><div class="actions"><button type="button" onclick="window.saveService('${id}')">Guardar cambios</button><button type="button" class="secondary" onclick="window.toggleService('${id}')">${service.active===false?'Activar':'Desactivar'}</button><button type="button" class="danger" onclick="window.deleteService('${id}')">Eliminar</button></div></div>`}).join(''):'Todavía no hay servicios cargados.'
 }
-
-
-/* EDITAR SERVICIO */
-
-window.saveService = async id=>{
-
-  const service = servicesCache.find(x=>x.id===id);
-
-  if(!service) return;
-
-  const name = $('name_'+id).value.trim();
-  const priceText = $('price_'+id).value.replace(/\D/g,'');
-  const duration = Number($('duration_'+id).value);
-  const description = $('desc_'+id).value.trim();
-  const file = $('photo_'+id).files[0];
-
-  if(!name || name.length>100){
-    alert('Ingresá un nombre válido de hasta 100 caracteres.');
-    return;
-  }
-
-  if(!validDuration(duration)){
-    alert('La duración debe estar entre 15 y 600 minutos.');
-    return;
-  }
-
-  if(priceText && !validPrice(priceText)){
-    alert('Revisá el precio ingresado.');
-    return;
-  }
-
-  if(file){
-
-    if(file.size>MAX_IMAGE_SIZE){
-      alert('La foto original supera los 15 MB.');
-      return;
-    }
-
-    if(!['image/jpeg','image/png','image/webp'].includes(file.type)){
-      alert('Elegí una imagen JPG, PNG o WebP.');
-      return;
-    }
-  }
-
-  try{
-
-    let photoUrl = service.photoUrl||'';
-
-    if(file){
-      photoUrl = await uploadPhoto(file,id);
-    }
-
-    await updateDoc(doc(db,'services',id),{
-      name,
-      price:priceText?Number(priceText):0,
-      duration,
-      description,
-      photoUrl
-    });
-
-    if(file && service.photoUrl){
-      await removePhoto(service.photoUrl);
-    }
-
-    await loadServices();
-
-    alert('Servicio actualizado correctamente.');
-
-  }catch(error){
-
-    alert('Error al guardar: '+error.message);
-  }
+window.saveService=async id=>{
+ const service=servicesCache.find(x=>x.id===id);if(!service)return;
+ const name=$('name_'+id).value.trim(),priceText=$('price_'+id).value.replace(/\D/g,''),duration=Number($('duration_'+id).value),description=$('desc_'+id).value.trim(),file=$('photo_'+id).files[0];
+ if(!name||name.length>100)return alert('Ingresá un nombre válido de hasta 100 caracteres.');
+ if(!validDuration(duration))return alert('La duración debe estar entre 15 y 600 minutos.');
+ if(priceText&&!validPrice(priceText))return alert('Revisá el precio ingresado.');
+ if(file&&(file.size>MAX_IMAGE_SIZE||!['image/jpeg','image/png','image/webp'].includes(file.type)))return alert(file.size>MAX_IMAGE_SIZE?'La foto original supera los 15 MB.':'Elegí una imagen JPG, PNG o WebP.');
+ try{let photoUrl=service.photoUrl||'';if(file)photoUrl=await uploadPhoto(file,id);await updateDoc(doc(db,'services',id),{name,price:priceText?Number(priceText):0,duration,description,photoUrl});if(file&&service.photoUrl)await removePhoto(service.photoUrl);await loadServices();alert('Servicio actualizado correctamente.')}
+ catch(error){alert('Error al guardar: '+error.message)}
 };
-
-
-/* ACTIVAR Y DESACTIVAR */
-
-window.toggleService = async id=>{
-
-  const service = servicesCache.find(x=>x.id===id);
-
-  if(!service) return;
-
-  try{
-
-    await updateDoc(doc(db,'services',id),{
-      active:service.active===false
-    });
-
-    await loadServices();
-
-  }catch(error){
-
-    alert('Error al cambiar el estado: '+error.message);
-  }
-};
-
-
-/* ELIMINAR SERVICIO */
-
-window.deleteService = async id=>{
-
-  const service = servicesCache.find(x=>x.id===id);
-
-  if(!service) return;
-
-  if(!confirm(
-    '¿Eliminar este servicio? No se borran reservas históricas.'
-  )){
-    return;
-  }
-
-  try{
-
-    await deleteDoc(doc(db,'services',id));
-
-    if(service.photoUrl){
-      await removePhoto(service.photoUrl);
-    }
-
-    await loadServices();
-
-    alert('Servicio eliminado.');
-
-  }catch(error){
-
-    alert('Error al eliminar: '+error.message);
-  }
-};
-
-
-/* SOLICITUDES DE TURNOS */
-
+window.toggleService=async id=>{const service=servicesCache.find(x=>x.id===id);if(!service)return;try{await updateDoc(doc(db,'services',id),{active:service.active===false});await loadServices()}catch(error){alert('Error al cambiar el estado: '+error.message)}};
+window.deleteService=async id=>{const service=servicesCache.find(x=>x.id===id);if(!service)return;if(!confirm('¿Eliminar este servicio? No se borran reservas históricas.'))return;try{await deleteDoc(doc(db,'services',id));if(service.photoUrl)await removePhoto(service.photoUrl);await loadServices();alert('Servicio eliminado.')}catch(error){alert('Error al eliminar: '+error.message)}};
 function renderRequests(){
-
-  if(!requestsCache.length){
-    $('requests').innerHTML = 'Todavía no hay solicitudes.';
-    return;
-  }
-
-  $('requests').innerHTML = requestsCache.map(request=>{
-
-    const status = request.status||'Pendiente';
-
-    const className =
-      status.toLowerCase().includes('confirm')
-        ? 'status-confirmado'
-        : status.toLowerCase().includes('cancel')
-          ? 'status-cancelado'
-          : 'status-pendiente';
-
-    return `
-      <div class="item">
-
-        <b>${esc(request.name||request.customerName||'Cliente')}</b>
-
-        <p>
-          ${esc(request.serviceName||request.service||'Servicio')}
-          · ${esc(request.date||'Fecha')}
-          ${esc(request.time||'Horario')}
-        </p>
-
-        <p>
-          WhatsApp: ${esc(request.phone||request.whatsapp||'—')}
-          · Seña: ${esc(request.deposit||request.seña||'No especificada')}
-        </p>
-
-        <p class="${className}">
-          Estado: ${esc(status)}
-        </p>
-
-        <div class="actions">
-
-          <button class="success"
-            onclick="window.setRequestStatus('${esc(request.id)}','Confirmado')">
-            Confirmar
-          </button>
-
-          <button class="secondary"
-            onclick="window.setRequestStatus('${esc(request.id)}','Pendiente')">
-            Pendiente
-          </button>
-
-          <button class="danger"
-            onclick="window.setRequestStatus('${esc(request.id)}','Cancelado')">
-            Cancelar
-          </button>
-
-        </div>
-
-      </div>
-    `;
-
-  }).join('');
+ if(!requestsCache.length){$('requests').innerHTML='Todavía no hay solicitudes.';return}
+ $('requests').innerHTML=requestsCache.map(request=>{const status=request.status||'Pendiente',className=status.toLowerCase().includes('confirm')?'status-confirmado':status.toLowerCase().includes('cancel')?'status-cancelado':'status-pendiente';return `<div class="item"><b>${esc(request.name||request.customerName||'Cliente')}</b><p>${esc(request.serviceName||request.service||'Servicio')} · ${esc(request.date||'Fecha')} ${esc(request.time||'Horario')}</p><p>WhatsApp: ${esc(request.phone||request.whatsapp||'—')} · Seña: ${esc(request.deposit||request.seña||'No especificada')}</p><p class="${className}">Estado: ${esc(status)}</p><div class="actions"><button type="button" class="success" onclick="window.setRequestStatus('${esc(request.id)}','Confirmado')">Confirmar</button><button type="button" class="secondary" onclick="window.setRequestStatus('${esc(request.id)}','Pendiente')">Pendiente</button><button type="button" class="danger" onclick="window.setRequestStatus('${esc(request.id)}','Cancelado')">Cancelar</button></div></div>`}).join('')
 }
-
-
-/* CAMBIAR ESTADO DE SOLICITUD */
-
-window.setRequestStatus = async(id,status)=>{
-
-  const request = requestsCache.find(x=>x.id===id);
-
-  if(!request) return;
-
-  if(status==='Cancelado' &&
-     !confirm('¿Querés cancelar esta solicitud?')){
-    return;
-  }
-
-  try{
-
-    await updateDoc(doc(db,'bookingRequests',id),{
-      status,
-      updatedAt:new Date().toISOString()
-    });
-
-    await loadRequests();
-
-  }catch(error){
-
-    alert(
-      'No se pudo actualizar. Revisá las reglas de Firestore: '+
-      error.message
-    );
-  }
-};
-
+window.setRequestStatus=async(id,status)=>{const request=requestsCache.find(x=>x.id===id);if(!request)return;if(status==='Cancelado'&&!confirm('¿Querés cancelar esta solicitud?'))return;try{await updateDoc(doc(db,'bookingRequests',id),{status,updatedAt:new Date().toISOString()});await loadRequests()}catch(error){alert('No se pudo actualizar. Revisá las reglas de Firestore: '+error.message)}};
 </script>
 </body>
 </html>
