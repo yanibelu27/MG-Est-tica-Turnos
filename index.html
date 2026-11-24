@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -180,17 +179,10 @@ function minutes(hhmm){
  return parts[0]*60+parts[1];
 }
 
-/*
- Duración estricta:
- acepta valores como 60, "60" o "60 min".
- No inventa una duración si el servicio está mal configurado.
-*/
 function durationMinutes(value){
  const match=String(value??'').match(/\d+/);
  if(!match)return null;
-
  const n=Number.parseInt(match[0],10);
-
  return Number.isInteger(n)&&n>=15&&n<=600?n:null;
 }
 
@@ -226,7 +218,6 @@ function serviceById(id){
 
 function normalizeScheduleEntry(entry){
  if(!entry||!entry.serviceId)return null;
-
  const full=serviceById(entry.serviceId);
  if(!full||full.active===false)return null;
 
@@ -258,7 +249,6 @@ function getServicesForDate(dateValue){
   if(targets.length){
    entries=entries.map(e=>{
     if(!targets.some(t=>t.serviceId===e.serviceId))return e;
-
     return {
      ...e,
      start:times[0],
@@ -275,47 +265,42 @@ function getServicesForDate(dateValue){
 
 function candidateTimes(entry,fullService){
  const duration=durationMinutes(fullService.duration);
-
  if(!duration)return [];
 
  const start=minutes(entry.start);
  const end=minutes(entry.end);
-
  if(!Number.isFinite(start)||!Number.isFinite(end)||end<=start)return [];
 
  if(Array.isArray(entry.explicitTimes)){
   return [...new Set(entry.explicitTimes)]
    .filter(t=>typeof t==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(t))
-   .filter(t=>minutes(t)+duration<=1440)
+   .filter(t=>{
+    const m=minutes(t);
+    return m>=start&&m%15===0&&m+duration<=end;
+   })
    .sort((a,b)=>minutes(a)-minutes(b));
  }
 
  const interval=Number(entry.interval||30);
-
  if(!Number.isFinite(interval)||interval<=0)return [];
 
  const out=[];
-
  for(let m=start;m+duration<=end;m+=interval){
-  out.push(clock(m));
+  if(m%15===0)out.push(clock(m));
  }
-
  return out;
 }
 
 function isDayAvailable(dateValue){
  if(dateValue<todayString)return false;
-
  return getServicesForDate(dateValue).some(entry=>{
   const full=serviceById(entry.serviceId);
-
   return full&&candidateTimes(entry,full).some(t=>minAdvanceOK(dateValue,t));
  });
 }
 
 function updateSelectedDate(){
  refreshCounter++;
-
  const dateValue=dateInput.value;
 
  if(!dateValue){
@@ -336,15 +321,10 @@ function updateSelectedDate(){
  }
 
  dayServicesSection.classList.remove('hidden');
-
  dayServicesHint.textContent=`✅ ${selectedDateServices.length} servicio${selectedDateServices.length===1?'':'s'} disponible${selectedDateServices.length===1?'':'s'} este día`;
 
  service.innerHTML='<option value="">Seleccioná un servicio</option>';
-
- selectedDateServices.forEach(s=>{
-  service.add(new Option(s.name,s.serviceId));
- });
-
+ selectedDateServices.forEach(s=>service.add(new Option(s.name,s.serviceId)));
  resetTime('Primero elegí un servicio');
 }
 
@@ -357,7 +337,6 @@ function renderCalendar(){
  }).format(monthCursor);
 
  grid.innerHTML='';
-
  weekdays.forEach(d=>{
   const el=document.createElement('div');
   el.className='weekday';
@@ -383,10 +362,8 @@ function renderCalendar(){
 
   btn.type='button';
   btn.className='calendar-day';
-
   if(available)btn.classList.add('available');
   if(selected)btn.classList.add('selected');
-
   btn.textContent=day;
   btn.disabled=!available;
   btn.setAttribute('aria-label',value+(available?' disponible':' sin atención'));
@@ -399,12 +376,10 @@ function renderCalendar(){
     updateSelectedDate();
    });
   }
-
   grid.appendChild(btn);
  }
 
  $('prevMonth').disabled=year===today.getFullYear()&&month<=today.getMonth();
-
  $('calendarInfo').textContent='Los días en verde tienen servicios y horarios que cumplen la anticipación mínima de 48 horas.';
 }
 
@@ -419,20 +394,31 @@ $('nextMonth').addEventListener('click',()=>{
 });
 
 /*
- Cada bloque representa 30 minutos.
- Se incluyen todos los bloques que se cruzan con el turno.
+ Los bloqueos nuevos se guardan en bloques de 15 minutos.
+ Se incluye cada bloque que se cruza con el turno.
 */
 function blockSlotIds(dateValue,start,duration){
  const end=start+duration;
- const ids=new Set();
+ const ids=[];
+
+ for(let m=Math.floor(start/15)*15;m<end;m+=15){
+  if(m>=0&&m<1440)ids.push(dateValue+'_'+clock(m));
+ }
+ return ids;
+}
+
+/*
+ Compatibilidad: calcula los documentos que podría haber creado
+ la versión antigua, que utilizaba bloques de 30 minutos.
+*/
+function legacySlotIds(dateValue,start,duration){
+ const end=start+duration;
+ const ids=[];
 
  for(let m=Math.floor(start/30)*30;m<end;m+=30){
-  if(m>=0&&m<1440){
-   ids.add(dateValue+'_'+clock(m));
-  }
+  if(m>=0&&m<1440)ids.push(dateValue+'_'+clock(m));
  }
-
- return [...ids];
+ return ids;
 }
 
 function overlaps(startA,endA,startB,endB){
@@ -442,10 +428,7 @@ function overlaps(startA,endA,startB,endB){
 function getSlotTime(slotDoc){
  const data=slotDoc.data();
 
- if(
-  typeof data.time==='string'&&
-  /^([01]\d|2[0-3]):[0-5]\d$/.test(data.time)
- ){
+ if(typeof data.time==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(data.time)){
   return data.time;
  }
 
@@ -455,7 +438,6 @@ function getSlotTime(slotDoc){
  if(/^([01]\d|2[0-3]):[0-5]\d$/.test(possibleTime)){
   return possibleTime;
  }
-
  return null;
 }
 
@@ -468,7 +450,6 @@ function slotIsOccupied(data){
 
 async function refreshTime(){
  const requestId=++refreshCounter;
-
  resetTime('Buscando horarios…');
 
  if(!dateInput.value||!service.value){
@@ -485,49 +466,39 @@ async function refreshTime(){
  }
 
  const duration=durationMinutes(full.duration);
-
  if(!duration){
   resetTime('Duración no configurada');
   availabilityMsg.textContent='Este servicio tiene una duración inválida. Contactá a MG Estética.';
   return;
  }
 
- const candidates=candidateTimes(dayEntry,full)
-  .filter(t=>minAdvanceOK(dateInput.value,t));
-
+ const candidates=candidateTimes(dayEntry,full).filter(t=>minAdvanceOK(dateInput.value,t));
  if(!candidates.length){
   resetTime('No hay horarios con 48 horas de anticipación');
   return;
  }
 
  try{
-  /*
-   Se leen solamente los bloqueos públicos de slots.
-   No se consulta la colección privada bookings.
-  */
   const slotsQuery=query(
    collection(db,'slots'),
    where('date','==',dateInput.value)
   );
-
   const slotsSnap=await getDocs(slotsQuery);
 
   if(requestId!==refreshCounter)return;
 
   const occupiedIntervals=[];
-
   slotsSnap.forEach(snap=>{
    const data=snap.data();
 
    if(slotIsOccupied(data)){
     const timeValue=getSlotTime(snap);
-
     if(timeValue){
      const occupiedStart=minutes(timeValue);
-
+     const blockLength=Number(data.blockMinutes)===15?15:30;
      occupiedIntervals.push({
       start:occupiedStart,
-      end:occupiedStart+30
+      end:occupiedStart+blockLength
      });
     }
    }
@@ -536,22 +507,13 @@ async function refreshTime(){
   const available=candidates.filter(time=>{
    const candidateStart=minutes(time);
    const candidateEnd=candidateStart+duration;
-
    return !occupiedIntervals.some(occupied=>
-    overlaps(
-     candidateStart,
-     candidateEnd,
-     occupied.start,
-     occupied.end
-    )
+    overlaps(candidateStart,candidateEnd,occupied.start,occupied.end)
    );
   });
 
   resetTime('Seleccioná horario');
-
-  available.forEach(time=>{
-   timeSelect.add(new Option(time,time));
-  });
+  available.forEach(time=>timeSelect.add(new Option(time,time)));
 
   if(!available.length){
    resetTime('No hay horarios libres');
@@ -559,10 +521,8 @@ async function refreshTime(){
   }else{
    availabilityMsg.textContent=`✅ ${available.length} horario${available.length===1?'':'s'} disponible${available.length===1?'':'s'}. Se exige una anticipación mínima de 48 horas.`;
   }
-
  }catch(e){
   console.error('Error al consultar los bloqueos:',e);
-
   if(requestId===refreshCounter){
    resetTime('Error al consultar disponibilidad');
    availabilityMsg.textContent='No se pudo verificar la disponibilidad. Intentá nuevamente.';
@@ -631,18 +591,12 @@ async function submitBooking(){
  }
 
  const duration=durationMinutes(full.duration);
-
  if(!duration){
   showResult('La duración de este servicio no está correctamente configurada. Contactá a MG Estética.','error');
   return;
  }
 
- /*
-  Evita aceptar un horario que no pertenezca a los horarios
-  configurados para ese servicio y esa fecha.
- */
  const validTimes=candidateTimes(entry,full);
-
  if(!validTimes.includes(timeValue)){
   showResult('El horario elegido ya no corresponde a este servicio. Actualizá la disponibilidad e intentá nuevamente.','error');
   await refreshTime();
@@ -651,13 +605,10 @@ async function submitBooking(){
 
  const start=minutes(timeValue);
  const slotIds=blockSlotIds(dateValue,start,duration);
+ const oldSlotIds=legacySlotIds(dateValue,start,duration);
 
- /*
-  Las reglas actuales de Firestore permiten entre 1 y 20
-  elementos en bookings.slotIds.
- */
- if(slotIds.length<1||slotIds.length>20){
-  showResult('Este horario necesita más de 20 bloques de reserva y no puede registrarse con la configuración actual. Elegí otro horario o pedí a MG Estética que revise la duración.','error');
+ if(slotIds.length<1||slotIds.length>40){
+  showResult('No se pudo calcular correctamente el bloqueo de este turno. Contactá a MG Estética.','error');
   return;
  }
 
@@ -669,31 +620,21 @@ async function submitBooking(){
   const bookingRef=doc(collection(db,'bookings'));
 
   await runTransaction(db,async transaction=>{
-   const slotRefs=slotIds.map(id=>doc(db,'slots',id));
-   const slotSnaps=[];
+   const allIds=[...new Set([...slotIds,...oldSlotIds])];
+   const refs=allIds.map(id=>doc(db,'slots',id));
+   const snaps=[];
 
-   /*
-    Primero se leen todos los documentos.
-    Después se realizan las escrituras.
-   */
-   for(const ref of slotRefs){
-    slotSnaps.push(await transaction.get(ref));
+   // Firestore exige completar todas las lecturas antes de escribir.
+   for(const ref of refs){
+    snaps.push(await transaction.get(ref));
    }
 
-   for(const snap of slotSnaps){
-    if(snap.exists()){
-     const data=snap.data();
-
-     if(slotIsOccupied(data)){
-      throw new Error('Ese horario acaba de ser ocupado. Elegí otro horario.');
-     }
+   for(const snap of snaps){
+    if(snap.exists()&&slotIsOccupied(snap.data())){
+     throw new Error('Ese horario acaba de ser ocupado. Elegí otro horario.');
     }
    }
 
-   /*
-    La reserva y sus bloqueos se guardan juntos
-    en una única transacción.
-   */
    transaction.set(bookingRef,{
     name,
     phone,
@@ -703,28 +644,29 @@ async function submitBooking(){
     serviceName:full.name||entry.name,
     duration,
     price:full.price??null,
-    slotIds:slotIds,
+    slotIds,
     status:'pending',
     createdAt:serverTimestamp(),
     source:'web'
    });
 
-   slotRefs.forEach((ref,index)=>{
-    transaction.set(ref,{
+   slotIds.forEach(slotId=>{
+    const slotRef=doc(db,'slots',slotId);
+    transaction.set(slotRef,{
      date:dateValue,
-     time:slotIds[index].split('_').slice(1).join('_'),
+     time:slotId.split('_').slice(1).join('_'),
      busy:true,
      bookingId:bookingRef.id,
      status:'pending',
+     blockMinutes:15,
      updatedAt:serverTimestamp()
-    },{merge:true});
+    });
    });
   });
 
   showResult('¡Solicitud registrada! MG Estética recibió tu pedido. Ahora podés enviar los datos por WhatsApp para coordinar la confirmación.','ok');
 
   const wa=getWhatsappNumber();
-
   const message=[
    'Hola, MG Estética. Acabo de solicitar un turno:',
    `Nombre: ${name}`,
@@ -737,7 +679,6 @@ async function submitBooking(){
 
   const waLink='https://wa.me/'+wa+'?text='+encodeURIComponent(message);
   const link=document.createElement('a');
-
   link.href=waLink;
   link.target='_blank';
   link.rel='noopener';
@@ -755,14 +696,11 @@ async function submitBooking(){
 
  }catch(e){
   console.error(e);
-
   showResult(
    e.message||'No se pudo registrar la solicitud. Revisá tu conexión e intentá nuevamente.',
    'error'
   );
-
   await refreshTime();
-
  }finally{
   submit.disabled=false;
   submit.textContent='Enviar solicitud de turno';
@@ -793,40 +731,27 @@ async function loadData(){
   }).join('')||'<p class="muted">Los servicios aún no están publicados.</p>';
 
   const snapDates=await getDocs(collection(db,'specialDates'));
-
   specialDates={};
-
-  snapDates.forEach(d=>{
-   specialDates[d.id]=d.data()||{};
-  });
+  snapDates.forEach(d=>specialDates[d.id]=d.data()||{});
 
   const snapDaily=await getDocs(collection(db,'dailyServices'));
-
   dailyServices={};
-
-  snapDaily.forEach(d=>{
-   dailyServices[d.id]=d.data()||{};
-  });
+  snapDaily.forEach(d=>dailyServices[d.id]=d.data()||{});
 
   try{
    const settingsSnap=await getDoc(doc(db,'settings','public'));
-
    publicSettings=settingsSnap.exists()?settingsSnap.data():{};
-
   }catch(e){
    console.warn('No se pudieron leer los ajustes públicos; se usará el WhatsApp predeterminado.',e);
   }
 
   status.textContent=`✅ ${allServices.length} servicios cargados. Elegí una fecha marcada en verde.`;
-
   renderCalendar();
   updateSelectedDate();
 
  }catch(e){
   console.error(e);
-
   status.textContent='No se pudieron cargar los datos. Verificá la conexión y las reglas de acceso de Firebase.';
-
   $('calendarInfo').textContent='No fue posible cargar el calendario.';
  }
 }
