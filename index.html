@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MG Estética | Turnos</title>
+<style>
+:root{--p:#b83272;--d:#27212a;--s:#fff2f8;--l:#eadde5;--green:#238653;--greenbg:#e8f6ee;--gray:#aaa2a9}
+*{box-sizing:border-box}body{margin:0;background:#faf7f9;color:var(--d);font:16px system-ui}header{background:linear-gradient(120deg,#351e32,#a83270);color:white;padding:25px}main{max-width:850px;margin:auto;padding:16px}.panel{background:white;border:1px solid var(--l);border-radius:16px;padding:18px;margin:14px 0}h1{margin:0}h2{margin-top:0}label{display:block;margin:12px 0 5px;font-weight:650}input,select,button{width:100%;padding:12px;border:1px solid #d9cbd4;border-radius:10px;font:inherit}button{background:var(--p);color:white;font-weight:700;border:0;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.service{border:1px solid var(--l);border-radius:12px;padding:12px;overflow:hidden;background:white}.service img{width:100%;height:175px;object-fit:cover;border-radius:9px;display:block;margin-bottom:10px}.muted{font-size:14px;color:#746975}.notice{background:var(--s);padding:12px;border-radius:12px;line-height:1.5}footer{text-align:center;padding:20px;color:#777;font-size:12px}.hidden{display:none!important}.calendar{border:1px solid var(--l);border-radius:14px;padding:12px;margin-top:12px}.calendar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.calendar-head button{width:44px;height:42px;padding:5px;margin:0;font-size:22px}.calendar-head h3{margin:0;text-align:center;text-transform:capitalize;font-size:19px}.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}.weekday{text-align:center;font-size:12px;font-weight:700;color:#756b75;padding:7px 0}.calendar-day{min-width:0;min-height:43px;padding:5px 2px;border-radius:9px;background:#f1eef0;color:#aaa2a9;border:1px solid transparent;margin:0;font-size:14px;font-weight:600}.calendar-day.available{background:var(--greenbg);color:var(--green);border-color:#b9e4c9}.calendar-day.selected{background:var(--p);color:white;border-color:var(--p)}.calendar-day:disabled{opacity:1;cursor:not-allowed}.calendar-day.empty{visibility:hidden}.calendar-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;color:#746975}.legend-item{display:flex;align-items:center;gap:5px}.legend-dot{width:11px;height:11px;border-radius:4px;display:inline-block}.legend-available{background:var(--greenbg);border:1px solid #b9e4c9}.legend-disabled{background:#f1eef0}.legend-selected{background:var(--p)}.selected-date{background:var(--s);padding:11px;border-radius:10px;margin-top:12px;font-weight:650}.calendar-info{font-size:13px;color:#746975;margin:10px 0 0;line-height:1.4}.service-hint{background:#f0f4ff;padding:10px;border-radius:8px;font-size:14px;margin:8px 0;color:#333}.result{padding:12px;border-radius:10px;margin-top:12px;line-height:1.45}.result.ok{background:#e8f6ee;color:#155d38}.result.error{background:#fff0f0;color:#8b2525}.payment{background:#fff7fb;border:1px solid #e9bfd2;border-radius:12px;padding:13px;margin-top:12px;line-height:1.55}.payment strong{color:#8d2458}.payment a{color:#8d2458;font-weight:700}
+@media(max-width:420px){main{padding:10px}.panel{padding:13px}.calendar{padding:8px}.calendar-grid{gap:3px}.calendar-day{min-height:40px;font-size:13px}.calendar-head h3{font-size:17px}}
+</style>
+</head>
+<body>
+<header><h1>MG Estética</h1><p>Reservá tu turno · Consultá servicios y horarios</p></header>
+<main>
+<div class="panel"><h2>Nuestros Servicios</h2><p class="muted">Seleccioná una fecha primero para ver qué servicios están disponibles ese día</p><div id="catalog" class="grid"></div><p id="status" class="muted">Conectando…</p></div>
+<div class="panel">
+<h2>Elegí tu turno</h2><label>Elegí una fecha</label>
+<div class="calendar"><div class="calendar-head"><button type="button" id="prevMonth" aria-label="Mes anterior">‹</button><h3 id="monthTitle">Cargando calendario</h3><button type="button" id="nextMonth" aria-label="Mes siguiente">›</button></div><div class="calendar-grid" id="calendarGrid"></div>
+<div class="calendar-legend"><span class="legend-item"><span class="legend-dot legend-available"></span>Día con atención</span><span class="legend-item"><span class="legend-dot legend-disabled"></span>Sin atención</span><span class="legend-item"><span class="legend-dot legend-selected"></span>Fecha elegida</span></div>
+<p class="calendar-info" id="calendarInfo">Los días en verde tienen atención disponible. Al elegir un día verás qué servicios se ofrecen.</p></div>
+<input id="date" type="date" hidden><div id="selectedDateBox" class="selected-date">Todavía no seleccionaste una fecha.</div>
+<div id="dayServicesSection" class="hidden">
+<label for="service">Servicio disponible ese día</label><div id="dayServicesHint" class="service-hint"></div><select id="service"><option value="">Elegí un servicio</option></select>
+<label for="time">Horario disponible</label><select id="time"><option value="">Primero elegí fecha y servicio</option></select><p id="availabilityMsg" class="muted"></p>
+<label for="name">Nombre y apellido</label><input id="name" autocomplete="name" maxlength="100" placeholder="Tu nombre y apellido">
+<label for="phone">WhatsApp</label><input id="phone" inputmode="tel" maxlength="30" placeholder="Tu número de WhatsApp">
+<button id="submit" type="button">Solicitar turno y pagar seña</button><div id="result" aria-live="polite"></div>
+</div>
+<p class="notice"><strong>Importante:</strong> para solicitar el turno se requiere una seña del 50 % del valor del servicio. La reserva queda pendiente hasta que MG Estética compruebe el comprobante y confirme el pago. Enviá el comprobante por WhatsApp.</p>
+</div>
+<footer>MG Estética · Caracas 1149, Santa Marta · WhatsApp: 11 4173-6931</footer>
+</main>
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js';
+import{getFirestore,collection,getDocs,getDoc,doc,runTransaction,serverTimestamp,query,where,Timestamp}from'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+const firebaseConfig={apiKey:'AIzaSyBlojGI6d8qF5hgJUYxXSJmz77NGqr3L8A',authDomain:'mg-estetica-turnos.firebaseapp.com',projectId:'mg-estetica-turnos',storageBucket:'mg-estetica-turnos.firebasestorage.app',messagingSenderId:'425300609473',appId:'1:425300609473:web:45bb97101299ae18b00740'};
+const app=initializeApp(firebaseConfig),db=getFirestore(app),$=id=>document.getElementById(id);
+const catalog=$('catalog'),service=$('service'),dateInput=$('date'),timeSelect=$('time'),status=$('status'),availabilityMsg=$('availabilityMsg'),selectedDateBox=$('selectedDateBox'),dayServicesSection=$('dayServicesSection'),dayServicesHint=$('dayServicesHint'),resultBox=$('result');
+const MP_LINK='https://mpago.la/2cSM3uh',MP_ALIAS='esteticamg2',MP_CVU='0000003100037715816174',MP_HOLDER='Yanina Belen Romero';
+let allServices=[],specialDates={},dailyServices={},selectedDateServices=[],publicSettings={},refreshCounter=0;
+const weekdays=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],today=new Date(),todayString=dateString(today);
+dateInput.min=todayString;let monthCursor=new Date(today.getFullYear(),today.getMonth(),1);
+function dateString(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function safeImageUrl(v){try{const u=new URL(v);return u.protocol==='https:'?u.href:''}catch{return ''}}
+function price(v){const n=Number(v);return Number.isFinite(n)&&n>0?'$'+Math.round(n).toLocaleString('es-AR'):'Precio a consultar'}
+function money(v){return '$'+Number(v||0).toLocaleString('es-AR',{maximumFractionDigits:2})}
+function minutes(t){const p=String(t).split(':').map(Number);return p.length===2&&p.every(Number.isFinite)?p[0]*60+p[1]:NaN}
+function durationMinutes(v){const m=String(v??'').match(/^\s*(\d+)\s*$/);if(!m)return null;const n=Number(m[1]);return Number.isInteger(n)&&n>=30&&n<=600&&n%15===0?n:null}
+function clock(m){return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
+function argentinaTimestamp(d,t){if(!/^\d{4}-\d{2}-\d{2}$/.test(String(d))||!/^([01]\d|2[0-3]):[0-5]\d$/.test(String(t)))return null;const[y,mo,day]=d.split('-').map(Number),[h,mi]=t.split(':').map(Number);return Date.UTC(y,mo-1,day,h+3,mi,0,0)}
+function minAdvanceOK(d,t){const target=argentinaTimestamp(d,t),start=minutes(t);return target!==null&&Number.isInteger(start)&&start%15===0&&target>=Date.now()+48*60*60*1000+60000}
+function formatDateKey(k){return new Date(k+'T12:00:00').toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+function resetTime(msg){timeSelect.innerHTML='';timeSelect.add(new Option(msg,''));availabilityMsg.textContent=''}
+function serviceById(id){return allServices.find(s=>s.id===id)}
+function normalizeScheduleEntry(e){if(!e||!e.serviceId)return null;const f=serviceById(e.serviceId);if(!f||f.active===false)return null;return{serviceId:e.serviceId,name:e.name||f.name||'Servicio',start:e.start||'10:00',end:e.end||'19:30',interval:Number(e.interval??30),...(Array.isArray(e.explicitTimes)?{explicitTimes:e.explicitTimes}: {})}}
+
+/* Si hay horarios antiguos guardados en specialDates.times,
+   se conservan como apertura y cierre, pero el intervalo configurado
+   sigue siendo el que determina los comienzos de los turnos. */
+function getServicesForDate(d){
+ const sp=specialDates[d]||{},daily=dailyServices[d]||{};
+ if(Array.isArray(sp.services)&&sp.services.length){
+  return sp.services.map(normalizeScheduleEntry).filter(Boolean);
+ }
+ let entries=(Array.isArray(daily.serviceIds)?daily.serviceIds:[])
+  .map(id=>normalizeScheduleEntry({serviceId:id}))
+  .filter(Boolean);
+ const times=Array.isArray(sp.times)?sp.times:[];
+ if(times.length){
+  const dep=entries.filter(e=>/depil/i.test(e.serviceId+' '+e.name));
+  const targets=dep.length?dep:(entries.length===1?entries:[]);
+  if(targets.length){
+   entries=entries.map(e=>targets.some(t=>t.serviceId===e.serviceId)
+    ?{...e,start:times[0],end:times[times.length-1]}
+    :e);
+  }
+ }
+ return entries;
+}
+
+/* Todos los servicios respetan el intervalo configurado.
+   La duración determina hasta qué hora puede comenzar un turno
+   para que termine antes o justo al cierre. */
+function candidateTimes(e,s){
+ const dur=durationMinutes(s.duration);
+ const start=minutes(e.start);
+ const end=minutes(e.end);
+ const interval=Number(e.interval??30);
+
+ if(!dur||!Number.isFinite(start)||!Number.isFinite(end)||end<=start)return[];
+ if(!Number.isInteger(interval)||interval<30||interval>600||interval%15!==0)return[];
+
+ const out=[];
+ for(let m=start;m+dur<=end;m+=interval){
+  if(m%15===0)out.push(clock(m));
+ }
+ return out;
+}
+
+function isDayAvailable(d){if(d<todayString)return false;return getServicesForDate(d).some(e=>{const s=serviceById(e.serviceId);return s&&candidateTimes(e,s).some(t=>minAdvanceOK(d,t))})}
+function updateSelectedDate(){refreshCounter++;const d=dateInput.value;resultBox.innerHTML='';if(!d){selectedDateBox.textContent='Todavía no seleccionaste una fecha.';dayServicesSection.classList.add('hidden');return}selectedDateBox.textContent='📅 Fecha elegida: '+formatDateKey(d);selectedDateServices=getServicesForDate(d);if(!selectedDateServices.length){dayServicesHint.textContent='⚠️ No hay servicios disponibles para esta fecha.';service.innerHTML='<option value="">Sin servicios disponibles</option>';dayServicesSection.classList.add('hidden');resetTime('Elegí otra fecha');return}dayServicesSection.classList.remove('hidden');dayServicesHint.textContent=`✅ ${selectedDateServices.length} servicio${selectedDateServices.length===1?'':'s'} disponible${selectedDateServices.length===1?'':'s'} este día`;service.innerHTML='<option value="">Seleccioná un servicio</option>';selectedDateServices.forEach(s=>service.add(new Option(s.name,s.serviceId)));resetTime('Primero elegí un servicio')}
+function renderCalendar(){const grid=$('calendarGrid'),title=$('monthTitle'),y=monthCursor.getFullYear(),m=monthCursor.getMonth();title.textContent=new Intl.DateTimeFormat('es-AR',{month:'long',year:'numeric'}).format(monthCursor);grid.innerHTML='';weekdays.forEach(d=>{const el=document.createElement('div');el.className='weekday';el.textContent=d;grid.appendChild(el)});const first=new Date(y,m,1),total=new Date(y,m+1,0).getDate(),offset=(first.getDay()+6)%7;for(let i=0;i<offset;i++){const e=document.createElement('div');e.className='calendar-day empty';grid.appendChild(e)}for(let day=1;day<=total;day++){const value=dateString(new Date(y,m,day)),available=isDayAvailable(value),selected=dateInput.value===value,btn=document.createElement('button');btn.type='button';btn.className='calendar-day'+(available?' available':'')+(selected?' selected':'');btn.textContent=day;btn.disabled=!available;btn.setAttribute('aria-label',value+(available?' disponible':' sin atención'));if(available)btn.addEventListener('click',()=>{dateInput.value=value;resultBox.innerHTML='';renderCalendar();updateSelectedDate()});grid.appendChild(btn)}$('prevMonth').disabled=y===today.getFullYear()&&m<=today.getMonth();$('calendarInfo').textContent='Los días en verde tienen servicios y horarios que cumplen la anticipación mínima de 48 horas.'}
+$('prevMonth').addEventListener('click',()=>{monthCursor=new Date(monthCursor.getFullYear(),monthCursor.getMonth()-1,1);renderCalendar()});
+$('nextMonth').addEventListener('click',()=>{monthCursor=new Date(monthCursor.getFullYear(),monthCursor.getMonth()+1,1);renderCalendar()});
+function blockSlotIds(d,start,duration){const end=start+duration,ids=[];for(let m=Math.floor(start/15)*15;m<end;m+=15)if(m>=0&&m<1440)ids.push(d+'_'+clock(m));return ids}
+function legacySlotIds(d,start,duration){const end=start+duration,ids=[];for(let m=Math.floor(start/30)*30;m<end;m+=30)if(m>=0&&m<1440)ids.push(d+'_'+clock(m));return ids}
+function overlaps(a,b,c,d){return a<d&&b>c}
+function getSlotTime(s){const data=s.data();if(typeof data.time==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(data.time))return data.time;const t=s.id.split('_').slice(1).join('_');return/^([01]\d|2[0-3]):[0-5]\d$/.test(t)?t:null}
+function slotIsOccupied(d){if(!d||d.status==='pending'||d.status==='cancelled')return false;return d.status==='confirmed'||d.busy===true||Boolean(d.bookingId)}
+async function refreshTime(){
+ const rid=++refreshCounter;
+ resetTime('Buscando horarios…');
+
+ if(!dateInput.value||!service.value){
+  resetTime('Elegí fecha y servicio');
+  return;
+ }
+
+ const entry=selectedDateServices.find(x=>x.serviceId===service.value);
+ const full=serviceById(service.value);
+
+ if(!entry||!full){
+  resetTime('Servicio no disponible');
+  return;
+ }
+
+ const duration=durationMinutes(full.duration);
+
+ if(!duration){
+  resetTime('Duración no configurada');
+  availabilityMsg.textContent='Contactá a MG Estética.';
+  return;
+ }
+
+ const candidates=candidateTimes(entry,full)
+  .filter(t=>minAdvanceOK(dateInput.value,t));
+
+ if(!candidates.length){
+  resetTime('No hay horarios con 48 horas de anticipación');
+  return;
+ }
+
+ try{
+  const snap=await getDocs(
+   query(collection(db,'slots'),where('date','==',dateInput.value))
+  );
+
+  if(rid!==refreshCounter)return;
+
+  const occupied=[];
+
+  snap.forEach(s=>{
+   const d=s.data();
+
+   if(slotIsOccupied(d)){
+    const t=getSlotTime(s);
+
+    if(t){
+     const st=minutes(t);
+     const len=Number(d.blockMinutes)===15?15:30;
+     occupied.push({start:st,end:st+len});
+    }
+   }
+  });
+
+  resetTime('Seleccioná horario');
+
+  let availableCount=0;
+
+  candidates.forEach(t=>{
+   const st=minutes(t);
+   const end=st+duration;
+   const busy=occupied.some(o=>overlaps(st,end,o.start,o.end));
+
+   const option=new Option(
+    busy ? `${t} — OCUPADO` : t,
+    t
+   );
+
+   option.disabled=busy;
+   timeSelect.add(option);
+
+   if(!busy)availableCount++;
+  });
+
+  if(!availableCount){
+   availabilityMsg.textContent=
+    'Todos los horarios para este servicio ya están reservados.';
+  }else{
+   availabilityMsg.textContent=
+    `✅ ${availableCount} horario${availableCount===1?'':'s'} disponible${availableCount===1?'':'s'}. Los horarios ocupados aparecen indicados y no se pueden seleccionar. Se exige una anticipación mínima de 48 horas.`;
+  }
+
+ }catch(e){
+  console.error(e);
+
+  if(rid===refreshCounter){
+   resetTime('Error al consultar disponibilidad');
+   availabilityMsg.textContent=
+    'No se pudo verificar la disponibilidad. Intentá nuevamente.';
+  }
+ }
+}
+service.addEventListener('change',()=>{resultBox.innerHTML='';refreshTime()});timeSelect.addEventListener('change',()=>resultBox.innerHTML='');
+function showResult(msg,type){resultBox.className='result '+type;resultBox.textContent=msg}
+function normalizePhone(v){return String(v||'').replace(/\D/g,'')}
+function getWhatsappNumber(){return normalizePhone(publicSettings.whatsapp||publicSettings.phone||'5491141736931')}
+function paymentHtml(total,deposit,balance,name,phone,serviceName,dateValue,timeValue){const wa=getWhatsappNumber(),message=['Hola, MG Estética. Realicé el pago de la seña de mi turno:','Nombre: '+name,'WhatsApp: '+phone,'Servicio: '+serviceName,'Fecha: '+formatDateKey(dateValue),'Horario: '+timeValue,'Seña abonada: '+money(deposit),'Adjunto el comprobante de pago.'].join('\n'),waLink='https://wa.me/'+wa+'?text='+encodeURIComponent(message);return `<div class="payment"><strong>Tu solicitud quedó registrada, pendiente de confirmación.</strong><p>Valor del servicio: <b>${esc(money(total))}</b><br>Seña del 50 %: <b>${esc(money(deposit))}</b><br>Saldo restante: <b>${esc(money(balance))}</b></p><p>Para abonar la seña:</p><p><b>Mercado Pago:</b> <a href="${esc(MP_LINK)}" target="_blank" rel="noopener noreferrer">Abrir enlace de pago</a><br><b>Alias:</b> ${esc(MP_ALIAS)}<br><b>CVU:</b> ${esc(MP_CVU)}<br><b>Titular:</b> ${esc(MP_HOLDER)}</p><p>El enlace de Mercado Pago puede no completar automáticamente el importe. Antes de pagar, verificá que ingreses exactamente <b>${esc(money(deposit))}</b>.</p><p>Después del pago, abrí WhatsApp y adjuntá manualmente el comprobante. El turno se confirma cuando MG Estética verifica la seña.</p><a href="${esc(waLink)}" target="_blank" rel="noopener noreferrer">Enviar comprobante por WhatsApp</a><p class="muted">La solicitud queda pendiente durante 2 horas como plazo informativo. El sistema no cancela automáticamente ni libera el horario al cumplirse ese plazo.</p></div>`}
+async function submitBooking(){
+ const dateValue=dateInput.value,timeValue=timeSelect.value,serviceId=service.value;
+ const name=$('name').value.trim(),phone=$('phone').value.trim();
+ if(!dateValue||!serviceId||!timeValue)return showResult('Elegí una fecha, un servicio y un horario.','error');
+ if(name.length<3||name.length>100)return showResult('Ingresá tu nombre y apellido (3 a 100 caracteres).','error');
+ const phoneDigits=normalizePhone(phone);
+ if(phoneDigits.length<8||phoneDigits.length>30)return showResult('Ingresá un número de WhatsApp válido.','error');
+ if(!minAdvanceOK(dateValue,timeValue))return showResult('Los turnos deben solicitarse con al menos 48 horas de anticipación.','error');
+ const entry=selectedDateServices.find(x=>x.serviceId===serviceId),full=serviceById(serviceId);
+ if(!entry||!full)return showResult('El servicio seleccionado ya no está disponible. Actualizá la página.','error');
+ const duration=durationMinutes(full.duration),total=Number(full.price);
+ if(!duration)return showResult('La duración debe estar configurada en múltiplos de 15 minutos, con un mínimo de 30.','error');
+ if(!Number.isFinite(total)||total<=0)return showResult('Este servicio no tiene un precio válido. Contactá a MG Estética.','error');
+ const deposit=total*0.5,balance=total-deposit,start=minutes(timeValue);
+ if(!Number.isInteger(start)||start<0||start>=1440||start%15!==0)return showResult('El horario debe comenzar en un intervalo válido de 15 minutos.','error');
+ const slotIds=blockSlotIds(dateValue,start,duration);
+ if(!slotIds.length||slotIds.length>40)return showResult('No se pudo calcular correctamente la duración del turno.','error');
+ const button=$('submit');button.disabled=true;button.textContent='Registrando solicitud…';
+ try{
+  const bookingRef=doc(collection(db,'bookings'));
+  const appointmentMs=argentinaTimestamp(dateValue,timeValue);
+  if(!Number.isFinite(appointmentMs))throw new Error('La fecha o el horario no son válidos.');
+  await runTransaction(db,async tx=>{
+   const serviceRef=doc(db,'services',serviceId),specialRef=doc(db,'specialDates',dateValue),dailyRef=doc(db,'dailyServices',dateValue);
+   const serviceSnap=await tx.get(serviceRef),specialSnap=await tx.get(specialRef),dailySnap=await tx.get(dailyRef);
+   if(!serviceSnap.exists())throw new Error('El servicio ya no existe.');
+   const currentService=serviceSnap.data();
+   if(currentService.active===false)throw new Error('El servicio está desactivado.');
+   if(String(currentService.name||'')!==String(full.name||'')||Number(currentService.price)!==total||Number(currentService.duration)!==duration)throw new Error('Los datos del servicio cambiaron. Actualizá la página.');
+   const freshSpecial=specialSnap.exists()?specialSnap.data():{},freshDaily=dailySnap.exists()?dailySnap.data():{};
+   const previousSpecial=specialDates[dateValue],previousDaily=dailyServices[dateValue];
+   specialDates[dateValue]=freshSpecial;dailyServices[dateValue]=freshDaily;
+   const freshEntry=getServicesForDate(dateValue).find(x=>x.serviceId===serviceId)||null;
+   if(previousSpecial===undefined)delete specialDates[dateValue];else specialDates[dateValue]=previousSpecial;
+   if(previousDaily===undefined)delete dailyServices[dateValue];else dailyServices[dateValue]=previousDaily;
+   if(!freshEntry||!candidateTimes(freshEntry,currentService).includes(timeValue))throw new Error('El horario ya no está habilitado para ese servicio.');
+   if(!minAdvanceOK(dateValue,timeValue))throw new Error('Se requieren al menos 48 horas de anticipación.');
+   const slotsToCheck=[...new Set([...slotIds,...legacySlotIds(dateValue,start,duration)])];
+   const existing=await Promise.all(slotsToCheck.map(slotId=>tx.get(doc(db,'slots',slotId))));
+   for(const snap of existing){if(!snap.exists())continue;const data=snap.data()||{};if(!slotIsOccupied(data))continue;const occupiedTime=typeof data.time==='string'?data.time:snap.id.split('_').slice(1).join('_');const occupiedStart=minutes(occupiedTime);if(!Number.isFinite(occupiedStart))continue;const occupiedLength=Number(data.blockMinutes)===15?15:30;if(overlaps(start,start+duration,occupiedStart,occupiedStart+occupiedLength))throw new Error('Ese horario acaba de ser reservado. Elegí otro horario.');}
+   tx.set(bookingRef,{name,phone,date:dateValue,time:timeValue,appointmentAt:Timestamp.fromMillis(appointmentMs),serviceId,serviceName:currentService.name,duration,price:total,depositAmount:deposit,balanceAmount:balance,depositPercent:50,depositStatus:'pending',slotIds,status:'pending',createdAt:serverTimestamp(),source:'web'});
+  });
+  resultBox.className='result ok';resultBox.innerHTML=paymentHtml(total,deposit,balance,name,phone,full.name||entry.name,dateValue,timeValue);
+  timeSelect.value='';await refreshTime();
+ }catch(e){console.error('Error al registrar la reserva:',e);const msg=e?.code==='permission-denied'?'Firebase rechazó la solicitud por las reglas de seguridad. Contactá a MG Estética.':e?.code==='unavailable'?'No hay conexión con Firebase. Revisá Internet e intentá nuevamente.':e.message||'No se pudo registrar la solicitud.';showResult(msg,'error');try{await refreshTime()}catch(err){console.error(err)}}
+ finally{button.disabled=false;button.textContent='Solicitar turno y pagar seña'}
+}
+$('submit').addEventListener('click',submitBooking);
+async function loadData(){try{const ss=await getDocs(collection(db,'services'));allServices=ss.docs.map(d=>({id:d.id,...d.data()})).filter(s=>s.active!==false);catalog.innerHTML=allServices.map(s=>{const image=safeImageUrl(s.imageUrl||s.photoUrl),duration=durationMinutes(s.duration);return `<article class="service">${image?`<img src="${esc(image)}" alt="Foto de ${esc(s.name||'servicio')}" loading="lazy">`:''}<b>${esc(s.name||'Servicio')}</b><div class="muted">${duration?duration+' min':'Duración no configurada'} · ${esc(price(s.price))}</div>${s.description?`<p style="font-size:13px;margin:4px 0 0">${esc(s.description)}</p>`:''}</article>`}).join('')||'<p class="muted">Los servicios aún no están publicados.</p>';const sd=await getDocs(collection(db,'specialDates'));specialDates={};sd.forEach(d=>specialDates[d.id]=d.data()||{});const dd=await getDocs(collection(db,'dailyServices'));dailyServices={};dd.forEach(d=>dailyServices[d.id]=d.data()||{});try{const st=await getDoc(doc(db,'settings','public'));publicSettings=st.exists()?st.data():{}}catch(e){console.warn('No se pudieron leer ajustes públicos.',e)}status.textContent=`✅ ${allServices.length} servicios cargados. Elegí una fecha marcada en verde.`;renderCalendar();updateSelectedDate()}catch(e){console.error(e);status.textContent='No se pudieron cargar los datos. Verificá la conexión y las reglas de Firebase.';$('calendarInfo').textContent='No fue posible cargar el calendario.'}}
+renderCalendar();loadData();
+</script>
+</body>
+</html>
