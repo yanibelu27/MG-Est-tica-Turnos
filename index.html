@@ -50,7 +50,7 @@ function minutes(t){const p=String(t).split(':').map(Number);return p.length===2
 function durationMinutes(v){const m=String(v??'').match(/^\s*(\d+)\s*$/);if(!m)return null;const n=Number(m[1]);return Number.isInteger(n)&&n>=30&&n<=600&&n%15===0?n:null}
 function clock(m){return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
 function argentinaTimestamp(d,t){if(!/^\d{4}-\d{2}-\d{2}$/.test(String(d))||!/^([01]\d|2[0-3]):[0-5]\d$/.test(String(t)))return null;const[y,mo,day]=d.split('-').map(Number),[h,mi]=t.split(':').map(Number);return Date.UTC(y,mo-1,day,h+3,mi,0,0)}
-function minAdvanceOK(d,t){const target=argentinaTimestamp(d,t),start=minutes(t);return target!==null&&Number.isInteger(start)&&start%15===0&&target>=Date.now()+48*60*60*1000+60000}
+function minAdvanceOK(d,t){const target=argentinaTimestamp(d,t),start=minutes(t);return target!==null&&Number.isInteger(start)&&start%15===0&&target>=Date.now()+48*60*60*1000}
 function formatDateKey(k){return new Date(k+'T12:00:00').toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
 function resetTime(msg){timeSelect.innerHTML='';timeSelect.add(new Option(msg,''));availabilityMsg.textContent=''}
 function serviceById(id){return allServices.find(s=>s.id===id)}
@@ -108,7 +108,7 @@ function blockSlotIds(d,start,duration){const end=start+duration,ids=[];for(let 
 function legacySlotIds(d,start,duration){const end=start+duration,ids=[];for(let m=Math.floor(start/30)*30;m<end;m+=30)if(m>=0&&m<1440)ids.push(d+'_'+clock(m));return ids}
 function overlaps(a,b,c,d){return a<d&&b>c}
 function getSlotTime(s){const data=s.data();if(typeof data.time==='string'&&/^([01]\d|2[0-3]):[0-5]\d$/.test(data.time))return data.time;const t=s.id.split('_').slice(1).join('_');return/^([01]\d|2[0-3]):[0-5]\d$/.test(t)?t:null}
-function slotIsOccupied(d){if(!d||d.status==='pending'||d.status==='cancelled')return false;return d.status==='confirmed'||d.busy===true||Boolean(d.bookingId)}
+function slotIsOccupied(d){return Boolean(d&&d.status==='confirmed'&&d.busy===true&&typeof d.bookingId==='string'&&d.bookingId.trim())}
 async function refreshTime(){
  const rid=++refreshCounter;
  resetTime('Buscando horarios…');
@@ -134,11 +134,12 @@ async function refreshTime(){
   return;
  }
 
- const candidates=candidateTimes(entry,full)
-  .filter(t=>minAdvanceOK(dateInput.value,t));
+ // Mostrar todos los horarios configurados. La anticipación mínima
+ // solo determina si cada horario puede seleccionarse, no si se muestra.
+ const candidates=candidateTimes(entry,full);
 
  if(!candidates.length){
-  resetTime('No hay horarios con 48 horas de anticipación');
+  resetTime('No hay horarios configurados para este servicio');
   return;
  }
 
@@ -169,28 +170,37 @@ async function refreshTime(){
 
   let availableCount=0;
 
+  let advanceBlockedCount=0;
+  let reservedCount=0;
+
   candidates.forEach(t=>{
    const st=minutes(t);
    const end=st+duration;
-   const busy=occupied.some(o=>overlaps(st,end,o.start,o.end));
+   const reserved=occupied.some(o=>overlaps(st,end,o.start,o.end));
+   const advanceAllowed=minAdvanceOK(dateInput.value,t);
+   const blocked=reserved||!advanceAllowed;
+   const label=reserved
+    ? `${t} — RESERVADO`
+    : (!advanceAllowed ? `${t} — BLOQUEADO (requiere 48 h)` : t);
 
-   const option=new Option(
-    busy ? `${t} — OCUPADO` : t,
-    t
-   );
-
-   option.disabled=busy;
+   const option=new Option(label,t);
+   option.disabled=blocked;
    timeSelect.add(option);
 
-   if(!busy)availableCount++;
+   if(reserved)reservedCount++;
+   else if(!advanceAllowed)advanceBlockedCount++;
+   else availableCount++;
   });
 
   if(!availableCount){
-   availabilityMsg.textContent=
-    'Todos los horarios para este servicio ya están reservados.';
+   if(reservedCount===candidates.length){
+    availabilityMsg.textContent='Todos los horarios están reservados.';
+   }else{
+    availabilityMsg.textContent='Los horarios se muestran, pero todavía no se pueden solicitar porque no cumplen las 48 horas mínimas de anticipación.';
+   }
   }else{
    availabilityMsg.textContent=
-    `✅ ${availableCount} horario${availableCount===1?'':'s'} disponible${availableCount===1?'':'s'}. Los horarios ocupados aparecen indicados y no se pueden seleccionar. Se exige una anticipación mínima de 48 horas.`;
+    `✅ ${availableCount} horario${availableCount===1?'':'s'} disponible${availableCount===1?'':'s'} para reservar. Los horarios con menos de 48 horas siguen visibles, pero están bloqueados${reservedCount?'; los horarios reservados también están bloqueados':''}.`;
   }
 
  }catch(e){
